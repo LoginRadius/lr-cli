@@ -53,6 +53,9 @@ func resend(opts *ResendOpts) error {
 		})
 		var resendResp ResendResponse
 		resp, err := request.Rest(http.MethodPut, url, nil, string(body))
+		if err != nil {
+			return err
+		}
 		err = json.Unmarshal(resp, &resendResp)
 		fmt.Println(resendResp.IsPosted)
 		if err != nil {

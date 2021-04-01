@@ -47,6 +47,9 @@ func get() error {
 
 	var resultResp socialProviderList
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal([]byte(resp), &resultResp)
 	if err != nil {
 		return err

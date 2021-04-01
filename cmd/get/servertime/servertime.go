@@ -60,6 +60,10 @@ func servertime() error {
 	var resObj Server
 	serverURL := conf.LoginRadiusAPIDomain + "/identity/v2/serverinfo?apikey=" + apiObj.Key + "&timedifference=" + *timediff
 	resp, err := request.Rest(http.MethodGet, serverURL, nil, "")
+	if err != nil {
+		return err
+	}
+
 	err = json.Unmarshal(resp, &resObj)
 
 	if err != nil {

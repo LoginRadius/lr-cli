@@ -70,6 +70,9 @@ func set(a int, b int, c int) error {
 
 	var resultResp email
 	resp, err := request.Rest(http.MethodPut, url, nil, string(body))
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal(resp, &resultResp)
 	if err != nil {
 		return err

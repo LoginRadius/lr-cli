@@ -48,7 +48,10 @@ func NewdomainCmd() *cobra.Command {
 				return &cmdutil.FlagError{Err: errors.New("`domainmod` is require argument")}
 			}
 
-			var p, _ = get()
+			var p, err = get()
+			if err != nil {
+				return err
+			}
 			domain := strings.ReplaceAll(p.CallbackUrl, (";" + opts.Domain), (";" + opts.DomainMod))
 			return set(domain)
 
@@ -69,6 +72,9 @@ func get() (*domainManagement, error) {
 
 	var resultResp *domainManagement
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
 	err = json.Unmarshal(resp, &resultResp)
 	if err != nil {
 		return nil, err

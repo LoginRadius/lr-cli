@@ -1,7 +1,6 @@
 package logout
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -20,19 +19,11 @@ import (
 var tempServer *cmdutil.TempServer
 
 func NewLogoutCmd() *cobra.Command {
-	conf := config.GetInstance()
 	cmd := &cobra.Command{
 		Use:   "logout",
 		Short: "Logout of LR account",
 		Long:  `This commmand logs user out of the LR account`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cmdutil.Openbrowser(conf.HubPageDomain + "/auth.aspx?action=logout&return_url=http://localhost:8089/postLogout")
-			tempServer = cmdutil.CreateTempServer(cmdutil.TempServer{
-				Port:        ":8089",
-				HandlerFunc: postLogout,
-				RouteName:   "/postLogout",
-			})
-			tempServer.Server.ListenAndServe()
 			return logout()
 		},
 	}
@@ -40,13 +31,21 @@ func NewLogoutCmd() *cobra.Command {
 }
 
 func logout() error {
+	conf := config.GetInstance()
 	user, _ := user.Current()
-	fileName := filepath.Join(user.HomeDir, ".lrcli", "token.json")
 	dirName := filepath.Join(user.HomeDir, ".lrcli")
-	_, err := os.Stat(fileName)
+	_, err := os.Stat(dirName)
 	if os.IsNotExist(err) {
-		return &cmdutil.FlagError{Err: errors.New(" You have already been logged Out")}
+		fmt.Println("You are already been logged out")
+		return nil
 	} else {
+		cmdutil.Openbrowser(conf.HubPageDomain + "/auth.aspx?action=logout&return_url=http://localhost:8089/postLogout")
+		tempServer = cmdutil.CreateTempServer(cmdutil.TempServer{
+			Port:        ":8089",
+			HandlerFunc: postLogout,
+			RouteName:   "/postLogout",
+		})
+		tempServer.Server.ListenAndServe()
 		dir, err := ioutil.ReadDir(dirName)
 		for _, d := range dir {
 			os.RemoveAll(path.Join([]string{dirName, d.Name()}...))

@@ -43,6 +43,9 @@ func get() error {
 
 	var resultResp domainManagement
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal(resp, &resultResp)
 	if err != nil {
 		return err
