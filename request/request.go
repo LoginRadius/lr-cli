@@ -1,6 +1,7 @@
 package request
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -25,6 +26,8 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 	if err == nil && v2.AppName != "" {
 		req.Header.Set("x-is-loginradius--sign", v2.XSign)
 		req.Header.Set("x-is-loginradius--token", v2.XToken)
+	} else if !strings.Contains(url, "auth/login") {
+		return nil, errors.New("Please Login to execute this command")
 	}
 	req.Header.Set("Origin", conf.DashboardDomain)
 	req.Header.Set("x-is-loginradius-ajax", "true")

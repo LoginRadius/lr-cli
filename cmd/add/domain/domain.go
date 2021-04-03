@@ -43,12 +43,13 @@ func NewdomainCmd() *cobra.Command {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
 			}
 
-			var p, _ = get()
-			fmt.Printf(p.CallbackUrl)
+			p, err := get()
+			if err != nil {
+				return err
+			}
 			s := strings.Split(p.CallbackUrl, ";")
 			if len(s) < 3 {
 				domain := p.CallbackUrl + ";" + opts.Domain
-
 				return add(domain)
 			} else {
 				return &cmdutil.FlagError{Err: errors.New("more than 3 domains cannot be added in free plan")}
@@ -70,6 +71,9 @@ func get() (*domainManagement, error) {
 
 	var resultResp *domainManagement
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
 	err = json.Unmarshal(resp, &resultResp)
 	if err != nil {
 		return nil, err

@@ -36,26 +36,23 @@ func configure() error {
 	var resObj cmdutil.APICred
 	conf := config.GetInstance()
 	siteURL := conf.AdminConsoleAPIDomain + "/deployment/sites?"
-	res, _ := cmdutil.GetAPICreds()
-	if res != nil {
+	res, err := cmdutil.GetAPICreds()
+	if err == nil {
 		log.Println("API Key:", res.Key)
 		log.Println("API Secret:", res.Secret)
-
+		return nil
 	} else {
-
 		resp, err := request.Rest(http.MethodGet, siteURL, nil, "")
-		err = json.Unmarshal(resp, &resObj)
 		if err != nil {
 			return err
 		}
-		err = cmdutil.StoreAPICreds(&resObj) //wrote into the file
+		err = json.Unmarshal(resp, &resObj)
 		if err != nil {
 			return err
 		}
 		log.Println("API Key:", resObj.Key)
 		log.Println("API Secret:", resObj.Secret)
-
+		return cmdutil.StoreAPICreds(&resObj) //wrote into the file
 	}
-	return nil
 
 }

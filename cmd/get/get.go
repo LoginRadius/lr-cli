@@ -1,11 +1,11 @@
 package get
 
 import (
-	"github.com/loginradius/lr-cli/cmd/add/social"
 	"github.com/loginradius/lr-cli/cmd/get/config"
 	"github.com/loginradius/lr-cli/cmd/get/domain"
 	"github.com/loginradius/lr-cli/cmd/get/email"
 	"github.com/loginradius/lr-cli/cmd/get/servertime"
+	"github.com/loginradius/lr-cli/cmd/get/social"
 	"github.com/loginradius/lr-cli/cmd/get/theme"
 
 	"github.com/spf13/cobra"

@@ -43,6 +43,9 @@ func reset() error {
 	changeURL := conf.AdminConsoleAPIDomain + "/security-configuration/api-credentials/change?"
 
 	resp, err := request.Rest(http.MethodGet, changeURL, nil, "")
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal(resp, &resObj) //store reset response
 	if err != nil {
 		return err
