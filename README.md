@@ -12,6 +12,19 @@
 
 `lr` is available via [Homebrew](https://brew.sh/) and as a downloadable binary from the [release page](https://github.com/loginradius/lr-cli/releases/latest).
 
+### How do I install this formulae using homebrew?
+
+#### Install the tap via:
+
+```sh
+$ brew tap loginradius/tap
+```
+#### Then you can install LR CLI via:
+
+```sh
+$ brew install lr
+```
+
 ## Other Platforms
 
 Download packaged binaries from the [release page](https://github.com/loginradius/lr-cli/releases/latest).
@@ -52,6 +65,13 @@ Download packaged binaries from the [release page](https://github.com/loginradiu
 
    #### Windows
    Run `bin\lr --help` to check if it worked.
+
+## Contributing
+
+We encourage you to contribute to LoginRadius CLI! Please check out the
+[Guidelines for Contributing](CONTRIBUTING.md) and become a contributor.
+
+Everyone interacting in LoginRadius CLI codebases, issue trackers, chat rooms, and mailing lists is expected to follow the LoginRadius [code of conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
