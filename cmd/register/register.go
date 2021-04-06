@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
-	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
 
@@ -38,23 +38,13 @@ func NewRegisterCmd() *cobra.Command {
 }
 
 func register(token string) error {
-	conf := config.GetInstance()
-
-	// Admin Console Backend API
-	var resObj cmdutil.LoginResponse
-
-	backendURL := conf.AdminConsoleAPIDomain + "/auth/login"
-	body, _ := json.Marshal(map[string]string{
-		"accesstoken": token,
-	})
-	resp, err := request.Rest(http.MethodPost, backendURL, nil, string(body))
-
-	err = json.Unmarshal(resp, &resObj)
+	resObj, err := api.AuthLogin(token)
 	if err != nil {
 		return err
 	}
 	log.Println("Successfully Registered")
-	return cmdutil.StoreCreds(&resObj)
+	creds, _ := json.Marshal(resObj)
+	return cmdutil.StoreCreds(creds)
 }
 
 func getAccessToken(w http.ResponseWriter, r *http.Request) {

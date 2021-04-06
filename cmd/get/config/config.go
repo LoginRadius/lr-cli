@@ -1,14 +1,11 @@
 package config
 
 import (
-	"encoding/json"
 	"log"
-	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
-	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
 
@@ -33,26 +30,26 @@ func NewConfigCmd() *cobra.Command {
 }
 
 func configure() error {
-	var resObj cmdutil.APICred
-	conf := config.GetInstance()
-	siteURL := conf.AdminConsoleAPIDomain + "/deployment/sites?"
 	res, err := cmdutil.GetAPICreds()
 	if err == nil {
 		log.Println("API Key:", res.Key)
 		log.Println("API Secret:", res.Secret)
 		return nil
 	} else {
-		resp, err := request.Rest(http.MethodGet, siteURL, nil, "")
+		resp, err := api.GetSites()
 		if err != nil {
 			return err
 		}
-		err = json.Unmarshal(resp, &resObj)
+		resObj := &cmdutil.APICred{
+			Key:    resp.Key,
+			Secret: resp.Secret,
+		}
 		if err != nil {
 			return err
 		}
 		log.Println("API Key:", resObj.Key)
 		log.Println("API Secret:", resObj.Secret)
-		return cmdutil.StoreAPICreds(&resObj) //wrote into the file
+		return cmdutil.StoreAPICreds(resObj) //wrote into the file
 	}
 
 }

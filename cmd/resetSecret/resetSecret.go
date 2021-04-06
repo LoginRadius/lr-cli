@@ -60,24 +60,12 @@ func reset() error {
 			return err
 		}
 	}
-
-	err = update()
+	credResp, _ := json.Marshal(resObj)
+	err = cmdutil.StoreCreds(credResp)
 	if err != nil {
 		return err
 	}
 	log.Println("API Secret reset successfully")
 
 	return nil
-}
-
-func update() error { //for token.json
-	token, _ := cmdutil.GetCreds()
-	token.XSign = resObj.XSign
-	token.XToken = resObj.XToken
-	err := cmdutil.StoreCreds(token)
-	if err != nil {
-		return err
-	}
-	return nil
-
 }

@@ -1,13 +1,10 @@
 package domain
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/loginradius/lr-cli/config"
-	"github.com/loginradius/lr-cli/request"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/spf13/cobra"
 )
 
@@ -28,28 +25,15 @@ func NewdomainCmd() *cobra.Command {
 		Example: heredoc.Doc(`$ lr get domain`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			return get()
+			resp, err := api.GetSites()
+			if err != nil {
+				return err
+			}
+			fmt.Println(resp.Callbackurl)
+			return nil
 
 		},
 	}
 
 	return cmd
-}
-
-func get() error {
-	conf := config.GetInstance()
-
-	url = conf.AdminConsoleAPIDomain + "/deployment/sites?"
-
-	var resultResp domainManagement
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(resp, &resultResp)
-	if err != nil {
-		return err
-	}
-	fmt.Println(resultResp)
-	return nil
 }

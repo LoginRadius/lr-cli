@@ -1,6 +1,7 @@
 package request
 
 import (
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -21,11 +22,20 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 		return nil, err
 	}
 
+	type TokenResp struct {
+		AppName string `json:"app_name"`
+		XSign   string `json:"xsign"`
+		XToken  string `json:"xtoken"`
+	}
+
+	var token TokenResp
+
 	// LoginRadius Default Headers
 	v2, err := cmdutil.GetCreds()
-	if err == nil && v2.AppName != "" {
-		req.Header.Set("x-is-loginradius--sign", v2.XSign)
-		req.Header.Set("x-is-loginradius--token", v2.XToken)
+	err = json.Unmarshal(v2, &token)
+	if err == nil && token.AppName != "" {
+		req.Header.Set("x-is-loginradius--sign", token.XSign)
+		req.Header.Set("x-is-loginradius--token", token.XToken)
 	} else if !strings.Contains(url, "auth/login") {
 		return nil, errors.New("Please Login to execute this command")
 	}
