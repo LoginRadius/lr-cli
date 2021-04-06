@@ -28,7 +28,7 @@ This project and everyone participating in it are governed by the [LoginRadius C
 
 * **If the problem wasn't triggered by a specific action**, describe what you were doing before the problem happened and share more information using the guidelines below.
 
-Provide more context by answering these questions:
+#### Provide more context by answering these questions:
 
 * **Did the problem start happening recently** (e.g. after updating to a new version of LoginRadius CLI) or was this always a problem?
 * If the problem started happening recently, **can you reproduce the problem in an older version of LoginRadius CLI?** What's the most recent version in which the problem doesn't happen? You can download older versions of LoginRadius CLI from [the releases page](https://github.com/loginradius/lr-cli/releases).
@@ -46,7 +46,7 @@ Changes that are cosmetic and do not add anything substantial to the stability, 
 
 ### Suggesting Enhancements
 
-* Suggest your change in the [loginrradius community page](https://community.loginradius.com/) and start writing code.
+* Suggest your change in the [LoginRadius community page](https://community.loginradius.com/) and start writing code.
 
 * Do not open an issue on GitHub until you have collected positive feedback about the change. GitHub issues are primarily intended for bug reports and fixes.
 
