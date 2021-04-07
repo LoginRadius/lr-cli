@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var all *string
+
 // themeCmd represents the theme command
 func NewThemeCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -16,13 +18,19 @@ func NewThemeCmd() *cobra.Command {
 			list()
 		},
 	}
+	fl := cmd.Flags()
+	all = fl.String("all", "false", "All themes available")
+	fl.Lookup("all").NoOptDefVal = "true"
+
 	return cmd
 }
 
 //Displays the themes
 func list() {
-	fmt.Println("Available Themes:")
-	fmt.Println("1. Tokyo")
-	fmt.Println("2. London")
-	fmt.Println("3. Helsinki")
+	if *all == "true" {
+		fmt.Println("Available Themes:")
+		fmt.Println("1. Tokyo")
+		fmt.Println("2. London")
+		fmt.Println("3. Helsinki")
+	}
 }
