@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/loginradius/lr-cli/cmdutil"
@@ -42,14 +43,13 @@ func NewdomainCmd() *cobra.Command {
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
 			}
-
-			p, err := get()
+			p, err := api.GetSites()
 			if err != nil {
 				return err
 			}
-			s := strings.Split(p.CallbackUrl, ";")
+			s := strings.Split(p.Callbackurl, ";")
 			if len(s) < 3 {
-				domain := p.CallbackUrl + ";" + opts.Domain
+				domain := p.Callbackurl + ";" + opts.Domain
 				return add(domain)
 			} else {
 				return &cmdutil.FlagError{Err: errors.New("more than 3 domains cannot be added in free plan")}
@@ -62,24 +62,6 @@ func NewdomainCmd() *cobra.Command {
 	fl.StringVarP(&opts.Domain, "domain", "d", "", "domain name")
 
 	return cmd
-}
-
-func get() (*domainManagement, error) {
-	conf := config.GetInstance()
-	var url string
-	url = conf.AdminConsoleAPIDomain + "/deployment/sites?"
-
-	var resultResp *domainManagement
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(resp, &resultResp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resultResp, nil
 }
 
 func add(domain string) error {
