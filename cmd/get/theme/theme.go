@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var all *string
-var active *string
+var all *bool
+var active *bool
 
 func NewThemeCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -33,21 +33,21 @@ func NewThemeCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	all = fl.String("all", "false", "Lists all available themes")
+	all = fl.Bool("all", false, "Lists all available themes")
 	fl.Lookup("all").NoOptDefVal = "true"
-	active = fl.String("active", "false", "Shows current theme")
+	active = fl.Bool("active", false, "Shows current theme")
 	fl.Lookup("active").NoOptDefVal = "true"
 
 	return cmd
 }
 
 func themes() error {
-	if *all == "true" && *active == "false" {
+	if *all == true && *active == false {
 		fmt.Println("Available Themes:")
 		fmt.Println("1. Tokyo")
 		fmt.Println("2. London")
 		fmt.Println("3. Helsinki")
-	} else if *active == "true" && *all == "false" {
+	} else if *active == true && *all == false {
 		resp, err := api.GetPage()
 		if err != nil {
 			return err
