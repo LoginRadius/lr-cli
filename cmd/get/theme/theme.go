@@ -33,21 +33,21 @@ func NewThemeCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	all = fl.Bool("all", false, "Lists all available themes")
-	fl.Lookup("all").NoOptDefVal = "true"
-	active = fl.Bool("active", false, "Shows current theme")
-	fl.Lookup("active").NoOptDefVal = "true"
+	all = fl.Bool("all", true, "Lists all available themes")
+	//fl.Lookup("all").NoOptDefVal = "true"
+	active = fl.Bool("active", true, "Shows current theme")
+	//fl.Lookup("active").NoOptDefVal = "true"
 
 	return cmd
 }
 
 func themes() error {
-	if *all == true && *active == false {
+	if *all && !*active {
 		fmt.Println("Available Themes:")
 		fmt.Println("1. Tokyo")
 		fmt.Println("2. London")
 		fmt.Println("3. Helsinki")
-	} else if *active == true && *all == false {
+	} else if *active && !*all {
 		resp, err := api.GetPage()
 		if err != nil {
 			return err
