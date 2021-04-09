@@ -34,9 +34,7 @@ func NewThemeCmd() *cobra.Command {
 	}
 	fl := cmd.Flags()
 	all = fl.Bool("all", true, "Lists all available themes")
-	//fl.Lookup("all").NoOptDefVal = "true"
 	active = fl.Bool("active", true, "Shows current theme")
-	//fl.Lookup("active").NoOptDefVal = "true"
 
 	return cmd
 }
