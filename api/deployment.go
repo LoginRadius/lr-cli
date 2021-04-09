@@ -43,11 +43,43 @@ type SitesReponse struct {
 	} `json:"ProductPlan"`
 }
 
+type HostedPageResponse struct {
+	Pages []struct {
+		Pagetype     string        `json:"PageType"`
+		Customcss    []string      `json:"CustomCss"`
+		Headtags     []interface{} `json:"HeadTags"`
+		Favicon      string        `json:"FavIcon"`
+		Htmlbody     string        `json:"HtmlBody"`
+		Endscript    string        `json:"EndScript"`
+		Beforescript string        `json:"BeforeScript"`
+		Customjs     []string      `json:"CustomJS"`
+		Isactive     bool          `json:"IsActive"`
+		Mainscript   string        `json:"MainScript"`
+		Commonscript string        `json:"CommonScript"`
+		Status       string        `json:"Status"`
+	} `json:"Pages"`
+}
+
 func GetSites() (*SitesReponse, error) {
 
 	url := conf.AdminConsoleAPIDomain + "/deployment/sites?"
 
 	var resultResp SitesReponse
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, nil
+}
+
+func GetPage() (*HostedPageResponse, error) {
+	url := conf.AdminConsoleAPIDomain + "/deployment/hostedpage?"
+
+	var resultResp HostedPageResponse
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
 	if err != nil {
 		return nil, err
