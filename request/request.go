@@ -6,11 +6,23 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/user"
+	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
 )
+
+type APIErr struct {
+	Xtoken           *string `json:"xtoken"`
+	Xsign            *string `json:"xsign"`
+	Errorcode        *int    `json:"ErrorCode"`
+	Errormessage     *string `json:"ErrorMessage"`
+	Errordescription *string `json:"ErrorDescription"`
+}
 
 func Rest(method string, url string, headers map[string]string, payload string) ([]byte, error) {
 	conf := config.GetInstance()
@@ -56,5 +68,27 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 	}
 
 	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	respData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return checkAPIError(respData)
+
+}
+
+func checkAPIError(respData []byte) ([]byte, error) {
+	var errResp APIErr
+	_ = json.Unmarshal(respData, &errResp)
+	if errResp.Xsign != nil && *errResp.Xsign == "" {
+		user, _ := user.Current()
+		dirName := filepath.Join(user.HomeDir, ".lrcli")
+		dir, _ := os.ReadDir(dirName)
+		for _, d := range dir {
+			os.RemoveAll(path.Join([]string{dirName, d.Name()}...))
+		}
+		return nil, errors.New("Your access token is expried, Kindly relogin to continue")
+	} else if errResp.Errorcode != nil {
+		return nil, errors.New(*errResp.Errormessage)
+	}
+	return respData, nil
 }
