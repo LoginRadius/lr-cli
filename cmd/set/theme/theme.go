@@ -194,17 +194,15 @@ func otherCalls() error {
 	var app api.LoginResponse
 	appInfo, err1 := cmdutil.GetCreds()
 	if err1 != nil {
-		return err
+		return err1
 	}
 	err = json.Unmarshal(appInfo, &app)
 	if err != nil {
 		return err
 	}
-
-	appName := app.AppName
 	auth := conf.AdminConsoleAPIDomain + "/deployment/hostedPage/script/Auth"
 	bodyAuth, _ := json.Marshal(map[string]string{
-		"url": "https://hosted-pages.lrcontent.com/" + appName + "/lr-interface-options.js",
+		"url": "https://hosted-pages.lrcontent.com/" + app.AppName + "/lr-interface-options.js",
 	})
 	_, err = request.Rest(http.MethodPost, auth, nil, string(bodyAuth))
 	if err != nil {
