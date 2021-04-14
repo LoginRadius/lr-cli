@@ -3,6 +3,7 @@ package cmdutil
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"os"
@@ -27,7 +28,7 @@ func StoreCreds(cred []byte) error {
 	os.Mkdir(filepath.Join(user.HomeDir, ".lrcli"), 0755)
 	fileName := filepath.Join(user.HomeDir, ".lrcli", "token.json")
 
-	return os.WriteFile(fileName, cred, 0644)
+	return ioutil.WriteFile(fileName, cred, 0644)
 
 }
 func GetCreds() ([]byte, error) {
@@ -37,14 +38,14 @@ func GetCreds() ([]byte, error) {
 	if os.IsNotExist(err) {
 		return nil, err
 	}
-	return os.ReadFile(fileName)
+	return ioutil.ReadFile(fileName)
 }
 
 func StoreAPICreds(cred *APICred) error {
 	user, _ := user.Current()
 	fileName := filepath.Join(user.HomeDir, ".lrcli", "creds.json")
 	dataBytes, _ := json.Marshal(cred)
-	return os.WriteFile(fileName, dataBytes, 0644)
+	return ioutil.WriteFile(fileName, dataBytes, 0644)
 
 }
 
@@ -57,7 +58,7 @@ func GetAPICreds() (*APICred, error) {
 		return nil, err
 	}
 
-	file, _ := os.ReadFile(fileName)
+	file, _ := ioutil.ReadFile(fileName)
 	json.Unmarshal(file, &v)
 	return &v, nil
 }

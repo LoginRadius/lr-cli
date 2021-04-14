@@ -163,7 +163,6 @@ func updateCalls() error {
 	}
 	customJSAuth.CustomJS = append(customJSAuth.CustomJS, cjs)
 	customJSProf.CustomJS = append(customJSProf.CustomJS, cjs)
-
 	customJSAuth.PageType = "Auth"
 	body1, _ := json.Marshal(customJSAuth)
 	_, err := request.Rest(http.MethodPost, update, nil, string(body1))
