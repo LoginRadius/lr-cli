@@ -1,7 +1,11 @@
 package get
 
 import (
+	"github.com/loginradius/lr-cli/cmd/get/account"
+	"github.com/loginradius/lr-cli/cmd/get/accountPassword"
 	"github.com/loginradius/lr-cli/cmd/get/config"
+	"github.com/loginradius/lr-cli/cmd/get/profiles"
+
 	"github.com/loginradius/lr-cli/cmd/get/domain"
 	"github.com/loginradius/lr-cli/cmd/get/email"
 	"github.com/loginradius/lr-cli/cmd/get/servertime"
@@ -36,5 +40,14 @@ func NewGetCmd() *cobra.Command {
 
 	socialCmd := social.NewsocialCmd()
 	cmd.AddCommand(socialCmd)
+
+	accountCmd := account.NewaccountCmd()
+	cmd.AddCommand(accountCmd)
+
+	accountPasswordCmd := accountPassword.NewaccountPasswordCmd()
+	cmd.AddCommand(accountPasswordCmd)
+
+	profilesCmd := profiles.NewprofilesCmd()
+	cmd.AddCommand(profilesCmd)
 	return cmd
 }

@@ -1,8 +1,10 @@
 package add
 
 import (
+	"github.com/loginradius/lr-cli/cmd/add/account"
 	"github.com/loginradius/lr-cli/cmd/add/domain"
 	"github.com/loginradius/lr-cli/cmd/add/social"
+
 	"github.com/spf13/cobra"
 )
 
@@ -19,6 +21,9 @@ func NewaddCmd() *cobra.Command {
 
 	socialCmd := social.NewsocialCmd()
 	cmd.AddCommand(socialCmd)
+
+	accountCmd := account.NewaccountCmd()
+	cmd.AddCommand(accountCmd)
 
 	return cmd
 }
