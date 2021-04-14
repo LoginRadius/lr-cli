@@ -36,6 +36,12 @@ func NewThemeCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr set theme --theme <theme>
+			Previous changes will be lost. Press Y to continue:
+			(Y)
+			.......
+			.......
+			
+			Your theme has been changed
 			
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -71,26 +77,31 @@ func themes() error {
 		}
 	}
 
+	fmt.Println("Reseting current theme...")
 	err = resetCalls()
 	if err != nil {
 		return err
 	}
 
+	fmt.Println("Fetching Auth theme url...")
 	err = themeurl()
 	if err != nil {
 		return err
 	}
 
+	fmt.Println("Updating CSS based on new theme...")
 	err = hostedPageCalls()
 	if err != nil {
 		return err
 	}
 
+	fmt.Println("Fetching data...")
 	err = otherCalls()
 	if err != nil {
 		return err
 	}
 
+	fmt.Println("Updating to new theme...")
 	err = updateCalls()
 	if err != nil {
 		return err
@@ -115,13 +126,8 @@ func getTheme() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	themeMap := map[string]string{
-		"1": "London",
-		"2": "Tokyo",
-		"3": "Helsinki",
-	}
 	index := resp.Pages[0].Status
-	return themeMap[index], nil
+	return cmdutil.ThemeMap[index], nil
 }
 
 func resetCalls() error {
@@ -185,9 +191,20 @@ func otherCalls() error {
 		return err
 	}
 
+	var app api.LoginResponse
+	appInfo, err1 := cmdutil.GetCreds()
+	if err1 != nil {
+		return err
+	}
+	err = json.Unmarshal(appInfo, &app)
+	if err != nil {
+		return err
+	}
+
+	appName := app.AppName
 	auth := conf.AdminConsoleAPIDomain + "/deployment/hostedPage/script/Auth"
 	bodyAuth, _ := json.Marshal(map[string]string{
-		"url": "https://hosted-pages.lrcontent.com/lrcli/lr-interface-options.js",
+		"url": "https://hosted-pages.lrcontent.com/" + appName + "/lr-interface-options.js",
 	})
 	_, err = request.Rest(http.MethodPost, auth, nil, string(bodyAuth))
 	if err != nil {
@@ -199,24 +216,14 @@ func otherCalls() error {
 func hostedPageCalls() error {
 	conf := config.GetInstance()
 	hosted := conf.AdminConsoleAPIDomain + "/deployment/hostedpage"
-	auths := map[string]cmdutil.ThemeType{
-		"London":   cmdutil.Theme1Auth,
-		"Tokyo":    cmdutil.Theme2Auth,
-		"Helsinki": cmdutil.Theme3Auth,
-	}
-
-	body1, _ := json.Marshal(auths[theme])
+	authTheme, profileTheme := cmdutil.ThemeConstants(theme)
+	body1, _ := json.Marshal(authTheme)
 	_, err := request.Rest(http.MethodPut, hosted, nil, string(body1))
 	if err != nil {
 		return err
 	}
 
-	profiles := map[string]cmdutil.ThemeType{
-		"London":   cmdutil.Theme1Profile,
-		"Tokyo":    cmdutil.Theme2Profile,
-		"Helsinki": cmdutil.Theme3Profile,
-	}
-	body2, _ := json.Marshal(profiles[theme])
+	body2, _ := json.Marshal(profileTheme)
 	_, err = request.Rest(http.MethodPut, hosted, nil, string(body2))
 	if err != nil {
 		return err

@@ -93,3 +93,18 @@ func GeneratePassword() string {
 	return retVal + "1@aA"
 
 }
+
+func ThemeConstants(theme string) (ThemeType, ThemeType) {
+	auths := map[string]ThemeType{
+		"London":   Theme1Auth,
+		"Tokyo":    Theme2Auth,
+		"Helsinki": Theme3Auth,
+	}
+
+	profiles := map[string]ThemeType{
+		"London":   Theme1Profile,
+		"Tokyo":    Theme2Profile,
+		"Helsinki": Theme3Profile,
+	}
+	return auths[theme], profiles[theme]
+}

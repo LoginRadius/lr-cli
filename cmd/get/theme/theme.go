@@ -5,6 +5,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/spf13/cobra"
 )
 
@@ -50,15 +51,9 @@ func themes() error {
 		if err != nil {
 			return err
 		}
-		theme := map[string]string{
-			"0": "test",
-			"1": "London",
-			"2": "Tokyo",
-			"3": "Helsinki",
-		}
 		index := resp.Pages[0].Status
 
-		fmt.Println("Current Theme:", theme[index])
+		fmt.Println("Current Theme:", cmdutil.ThemeMap[index])
 	} else {
 		fmt.Println("Use exactly One flag")
 	}

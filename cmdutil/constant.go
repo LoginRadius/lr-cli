@@ -1,5 +1,11 @@
 package cmdutil
 
+var ThemeMap = map[string]string{
+	"1": "London",
+	"2": "Tokyo",
+	"3": "Helsinki",
+}
+
 type ThemeType struct {
 	PageType     string        `json:"PageType"`
 	CustomCss    []string      `json:"CustomCss"`
