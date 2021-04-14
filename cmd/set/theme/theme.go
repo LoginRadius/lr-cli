@@ -15,6 +15,7 @@ import (
 )
 
 var theme string
+var option string
 var ListTheme = []string{"London", "Tokyo", "Helsinki"}
 
 type body struct {
@@ -63,8 +64,11 @@ func themes() error {
 		fmt.Println("You are already using this theme")
 		return nil
 	} else {
-		fmt.Println("Previous changes will be lost. If you wish to proceed press Enter")
-		fmt.Scanln()
+		fmt.Printf("Previous changes will be lost. Press Y to continue: ")
+		fmt.Scanf("%s", &option)
+		if option != "Y" {
+			return nil
+		}
 	}
 
 	err = resetCalls()
@@ -77,7 +81,12 @@ func themes() error {
 		return err
 	}
 
-	err = otherCalls() //might be a mistake in order
+	err = hostedPageCalls()
+	if err != nil {
+		return err
+	}
+
+	err = otherCalls()
 	if err != nil {
 		return err
 	}
@@ -148,6 +157,7 @@ func updateCalls() error {
 	}
 	customJSAuth.CustomJS = append(customJSAuth.CustomJS, cjs)
 	customJSProf.CustomJS = append(customJSProf.CustomJS, cjs)
+
 	customJSAuth.PageType = "Auth"
 	body1, _ := json.Marshal(customJSAuth)
 	_, err := request.Rest(http.MethodPost, update, nil, string(body1))
@@ -186,25 +196,33 @@ func otherCalls() error {
 	return nil
 }
 
-/*func hostedPageCalls() error {
+func hostedPageCalls() error {
 	conf := config.GetInstance()
 	hosted := conf.AdminConsoleAPIDomain + "/deployment/hostedpage"
-	auths := map[string]cmdutil.ThemeType {
-		"London": cmdutil.theme1Auth
-	 	"Tokyo": cmdutil.theme2Auth
-	 	"Helsinki": cmdutil.theme3Auth
+	auths := map[string]cmdutil.ThemeType{
+		"London":   cmdutil.Theme1Auth,
+		"Tokyo":    cmdutil.Theme2Auth,
+		"Helsinki": cmdutil.Theme3Auth,
 	}
-	_, err := request.Rest(http.MethodPut, hosted, nil, string())
+
+	body1, _ := json.Marshal(auths[theme])
+	_, err := request.Rest(http.MethodPut, hosted, nil, string(body1))
 	if err != nil {
 		return err
 	}
 
-	profiles := map[string]cmdutil.ThemeType {
-		"London": cmdutil.theme1Profile
-	 	"Tokyo": cmdutil.theme2Profile
-	 	"Helsinki": cmdutil.theme3Profile
+	profiles := map[string]cmdutil.ThemeType{
+		"London":   cmdutil.Theme1Profile,
+		"Tokyo":    cmdutil.Theme2Profile,
+		"Helsinki": cmdutil.Theme3Profile,
 	}
-}*/
+	body2, _ := json.Marshal(profiles[theme])
+	_, err = request.Rest(http.MethodPut, hosted, nil, string(body2))
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func themeurl() error {
 	conf := config.GetInstance()

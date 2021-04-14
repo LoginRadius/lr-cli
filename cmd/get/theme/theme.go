@@ -33,8 +33,8 @@ func NewThemeCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	all = fl.Bool("all", true, "Lists all available themes")
-	active = fl.Bool("active", true, "Shows current theme")
+	all = fl.Bool("all", false, "Lists all available themes")
+	active = fl.Bool("active", false, "Shows current theme")
 
 	return cmd
 }
@@ -51,11 +51,13 @@ func themes() error {
 			return err
 		}
 		theme := map[string]string{
+			"0": "test",
 			"1": "London",
 			"2": "Tokyo",
 			"3": "Helsinki",
 		}
 		index := resp.Pages[0].Status
+
 		fmt.Println("Current Theme:", theme[index])
 	} else {
 		fmt.Println("Use exactly One flag")
