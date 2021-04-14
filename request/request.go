@@ -82,7 +82,7 @@ func checkAPIError(respData []byte) ([]byte, error) {
 	if errResp.Xsign != nil && *errResp.Xsign == "" {
 		user, _ := user.Current()
 		dirName := filepath.Join(user.HomeDir, ".lrcli")
-		dir, _ := os.ReadDir(dirName)
+		dir, _ := ioutil.ReadDir(dirName)
 		for _, d := range dir {
 			os.RemoveAll(path.Join([]string{dirName, d.Name()}...))
 		}
