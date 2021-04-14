@@ -43,8 +43,15 @@ func NewdomainCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			domain := strings.ReplaceAll(p.Callbackurl, (";" + opts.Domain), "")
-			return delete(domain)
+			urls := strings.Split(p.Callbackurl, ";")
+			for index, url := range urls {
+				if url == opts.Domain {
+					urls = append(urls[:index], urls[index+1:]...)
+					break
+				}
+			}
+			newdomain := strings.Join(urls, ";")
+			return delete(opts.Domain, newdomain)
 
 		},
 	}
@@ -55,11 +62,11 @@ func NewdomainCmd() *cobra.Command {
 	return cmd
 }
 
-func delete(domain string) error {
+func delete(remVal string, allDomain string) error {
 	var url string
 	body, _ := json.Marshal(map[string]string{
 		"domain":     "http://127.0.0.1",
-		"production": domain,
+		"production": allDomain,
 		"staging":    "",
 	})
 	conf := config.GetInstance()
@@ -72,6 +79,6 @@ func delete(domain string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(resultResp.CallbackUrl)
+	fmt.Println(remVal + " is now removed from whitelisted domain.")
 	return nil
 }
