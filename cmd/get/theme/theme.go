@@ -5,6 +5,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/spf13/cobra"
 )
 
@@ -33,8 +34,8 @@ func NewThemeCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	all = fl.Bool("all", true, "Lists all available themes")
-	active = fl.Bool("active", true, "Shows current theme")
+	all = fl.Bool("all", false, "Lists all available themes")
+	active = fl.Bool("active", false, "Shows current theme")
 
 	return cmd
 }
@@ -50,13 +51,9 @@ func themes() error {
 		if err != nil {
 			return err
 		}
-		theme := map[string]string{
-			"1": "London",
-			"2": "Tokyo",
-			"3": "Helsinki",
-		}
 		index := resp.Pages[0].Status
-		fmt.Println("Current Theme:", theme[index])
+
+		fmt.Println("Current Theme:", cmdutil.ThemeMap[index])
 	} else {
 		fmt.Println("Use exactly One flag")
 	}
