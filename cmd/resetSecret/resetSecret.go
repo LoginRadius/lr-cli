@@ -43,6 +43,9 @@ func reset() error {
 	changeURL := conf.AdminConsoleAPIDomain + "/security-configuration/api-credentials/change?"
 
 	resp, err := request.Rest(http.MethodGet, changeURL, nil, "")
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal(resp, &resObj) //store reset response
 	if err != nil {
 		return err
@@ -57,24 +60,12 @@ func reset() error {
 			return err
 		}
 	}
-
-	err = update()
+	credResp, _ := json.Marshal(resObj)
+	err = cmdutil.StoreCreds(credResp)
 	if err != nil {
 		return err
 	}
 	log.Println("API Secret reset successfully")
 
 	return nil
-}
-
-func update() error { //for token.json
-	token, _ := cmdutil.GetCreds()
-	token.XSign = resObj.XSign
-	token.XToken = resObj.XToken
-	err := cmdutil.StoreCreds(token)
-	if err != nil {
-		return err
-	}
-	return nil
-
 }

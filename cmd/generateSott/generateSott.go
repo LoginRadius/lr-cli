@@ -73,6 +73,9 @@ func generate(opts *sott) error {
 	body, _ := json.Marshal(opts)
 	var resultResp Resp
 	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal(resp, &resultResp)
 	if err != nil {
 		return err

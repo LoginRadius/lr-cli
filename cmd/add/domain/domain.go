@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/loginradius/lr-cli/cmdutil"
@@ -42,14 +43,13 @@ func NewdomainCmd() *cobra.Command {
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
 			}
-
-			var p, _ = get()
-			fmt.Printf(p.CallbackUrl)
-			s := strings.Split(p.CallbackUrl, ";")
+			p, err := api.GetSites()
+			if err != nil {
+				return err
+			}
+			s := strings.Split(p.Callbackurl, ";")
 			if len(s) < 3 {
-				domain := p.CallbackUrl + ";" + opts.Domain
-
-				return add(domain)
+				return add(p.Callbackurl, opts.Domain)
 			} else {
 				return &cmdutil.FlagError{Err: errors.New("more than 3 domains cannot be added in free plan")}
 			}
@@ -63,24 +63,9 @@ func NewdomainCmd() *cobra.Command {
 	return cmd
 }
 
-func get() (*domainManagement, error) {
-	conf := config.GetInstance()
+func add(allDomains string, newDomain string) error {
+	domain := allDomains + ";" + newDomain
 	var url string
-	url = conf.AdminConsoleAPIDomain + "/deployment/sites?"
-
-	var resultResp *domainManagement
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
-	err = json.Unmarshal(resp, &resultResp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resultResp, nil
-}
-
-func add(domain string) error {
-	var url string
-	fmt.Printf("domain=%s", domain)
 	body, _ := json.Marshal(map[string]string{
 		"domain":     "http://localhost",
 		"production": domain,
@@ -96,6 +81,6 @@ func add(domain string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(resultResp.CallbackUrl)
+	fmt.Println("Your Domain " + newDomain + "is now whitelisted")
 	return nil
 }

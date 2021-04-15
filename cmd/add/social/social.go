@@ -87,6 +87,9 @@ func add1(opts1 *socialProvider) error {
 	fmt.Println(string(body))
 	var resultResp socialProviderList
 	resp1, err := request.Rest(http.MethodPost, url1, nil, string(body))
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal(resp1, &resultResp)
 	if err != nil {
 		return err

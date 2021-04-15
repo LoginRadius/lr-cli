@@ -1,14 +1,28 @@
 package request
 
 import (
+	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/user"
+	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
 )
+
+type APIErr struct {
+	Xtoken           *string `json:"xtoken"`
+	Xsign            *string `json:"xsign"`
+	Errorcode        *int    `json:"ErrorCode"`
+	Errormessage     *string `json:"ErrorMessage"`
+	Errordescription *string `json:"ErrorDescription"`
+}
 
 func Rest(method string, url string, headers map[string]string, payload string) ([]byte, error) {
 	conf := config.GetInstance()
@@ -20,11 +34,22 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 		return nil, err
 	}
 
+	type TokenResp struct {
+		AppName string `json:"app_name"`
+		XSign   string `json:"xsign"`
+		XToken  string `json:"xtoken"`
+	}
+
+	var token TokenResp
+
 	// LoginRadius Default Headers
 	v2, err := cmdutil.GetCreds()
-	if err == nil && v2.AppName != "" {
-		req.Header.Set("x-is-loginradius--sign", v2.XSign)
-		req.Header.Set("x-is-loginradius--token", v2.XToken)
+	err = json.Unmarshal(v2, &token)
+	if err == nil && token.AppName != "" {
+		req.Header.Set("x-is-loginradius--sign", token.XSign)
+		req.Header.Set("x-is-loginradius--token", token.XToken)
+	} else if !strings.Contains(url, "auth/login") {
+		return nil, errors.New("Please Login to execute this command")
 	}
 	req.Header.Set("Origin", conf.DashboardDomain)
 	req.Header.Set("x-is-loginradius-ajax", "true")
@@ -43,5 +68,31 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 	}
 
 	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	respData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return checkAPIError(respData)
+
+}
+
+func checkAPIError(respData []byte) ([]byte, error) {
+	var errResp APIErr
+	_ = json.Unmarshal(respData, &errResp)
+	if errResp.Xsign != nil && *errResp.Xsign == "" {
+		user, _ := user.Current()
+		dirName := filepath.Join(user.HomeDir, ".lrcli")
+		dir, _ := ioutil.ReadDir(dirName)
+		for _, d := range dir {
+			os.RemoveAll(path.Join([]string{dirName, d.Name()}...))
+		}
+		return nil, errors.New("Your access token is expried, Kindly relogin to continue")
+	} else if errResp.Errorcode != nil {
+		if errResp.Errormessage != nil {
+			return nil, errors.New(*errResp.Errormessage)
+		} else {
+			return nil, errors.New("Something went wrong at our end, please try again.")
+		}
+	}
+	return respData, nil
 }

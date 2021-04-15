@@ -2,6 +2,7 @@ package root
 
 import (
 	"github.com/loginradius/lr-cli/cmd/add"
+	"github.com/loginradius/lr-cli/cmd/demo"
 	"github.com/loginradius/lr-cli/cmd/generateSott"
 	"github.com/loginradius/lr-cli/cmd/resetSecret"
 	"github.com/loginradius/lr-cli/cmd/set"
@@ -37,6 +38,9 @@ func NewRootCmd() *cobra.Command {
 
 	logoutCmd := logout.NewLogoutCmd()
 	rootCmd.AddCommand((logoutCmd))
+
+	demoCmd := demo.NewDemoCmd()
+	rootCmd.AddCommand(demoCmd)
 
 	registerCmd := register.NewRegisterCmd()
 	rootCmd.AddCommand((registerCmd))

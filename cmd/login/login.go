@@ -9,9 +9,9 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
-	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
 
@@ -67,23 +67,14 @@ func getAccessToken(w http.ResponseWriter, r *http.Request) {
 }
 
 func doLogin(accessToken string) error {
-	conf := config.GetInstance()
 
-	// Admin Console Backend API
-	var resObj cmdutil.LoginResponse
-
-	backendURL := conf.AdminConsoleAPIDomain + "/auth/login"
-	body, _ := json.Marshal(map[string]string{
-		"accesstoken": accessToken,
-	})
-	resp, err := request.Rest(http.MethodPost, backendURL, nil, string(body))
-
-	err = json.Unmarshal(resp, &resObj)
+	resObj, err := api.AuthLogin(accessToken)
 	if err != nil {
 		return err
 	}
 	log.Println("Successfully Logged In")
-	return cmdutil.StoreCreds(&resObj)
+	creds, _ := json.Marshal(resObj)
+	return cmdutil.StoreCreds(creds)
 }
 
 func validateLogin() (bool, error) {
@@ -91,15 +82,8 @@ func validateLogin() (bool, error) {
 	if err != nil {
 		return false, nil
 	}
-	conf := config.GetInstance()
-	validateURL := conf.AdminConsoleAPIDomain + "/auth/validatetoken"
-	resp, err := request.Rest(http.MethodGet, validateURL, nil, "")
-	if err != nil {
-		return false, err
-	}
-	var v1 cmdutil.Token
-	err = json.Unmarshal(resp, &v1)
-	if v1.AccessToken != "" {
+	resObj, err := api.AuthValidateToken()
+	if resObj.AccessToken != "" {
 		return true, nil
 	}
 	return false, nil

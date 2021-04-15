@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/loginradius/lr-cli/cmdutil"
@@ -18,12 +19,7 @@ import (
 
 var fileName string
 
-type domainManagement struct {
-	CallbackUrl string `json:"CallbackUrl"`
-}
-
 type domain struct {
-	// CallbackUrl string `json:"CallbackUrl"`
 	Domain string `json:"domain"`
 }
 
@@ -43,9 +39,19 @@ func NewdomainCmd() *cobra.Command {
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
 			}
-			var p, _ = get()
-			domain := strings.ReplaceAll(p.CallbackUrl, (";" + opts.Domain), "")
-			return delete(domain)
+			p, err := api.GetSites()
+			if err != nil {
+				return err
+			}
+			urls := strings.Split(p.Callbackurl, ";")
+			for index, url := range urls {
+				if url == opts.Domain {
+					urls = append(urls[:index], urls[index+1:]...)
+					break
+				}
+			}
+			newdomain := strings.Join(urls, ";")
+			return delete(opts.Domain, newdomain)
 
 		},
 	}
@@ -56,27 +62,11 @@ func NewdomainCmd() *cobra.Command {
 	return cmd
 }
 
-func get() (*domainManagement, error) {
-	conf := config.GetInstance()
+func delete(remVal string, allDomain string) error {
 	var url string
-	url = conf.AdminConsoleAPIDomain + "/deployment/sites?"
-
-	var resultResp *domainManagement
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
-	err = json.Unmarshal(resp, &resultResp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resultResp, nil
-}
-
-func delete(domain string) error {
-	var url string
-	fmt.Printf("domain=%s", domain)
 	body, _ := json.Marshal(map[string]string{
-		"domain":     "http://localhost",
-		"production": domain,
+		"domain":     "http://127.0.0.1",
+		"production": allDomain,
 		"staging":    "",
 	})
 	conf := config.GetInstance()
@@ -89,6 +79,6 @@ func delete(domain string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(resultResp.CallbackUrl)
+	fmt.Println(remVal + " is now removed from whitelisted domain.")
 	return nil
 }

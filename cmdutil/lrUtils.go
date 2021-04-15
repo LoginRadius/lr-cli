@@ -5,18 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"os/exec"
 	"os/user"
 	"path/filepath"
 	"runtime"
 )
-
-type LoginResponse struct {
-	XSign   string `json:"xsign"`
-	XToken  string `json:"xtoken"`
-	AppName string `json:"app_name"`
-}
 
 type Token struct {
 	AccessToken string `json:"access_token"`
@@ -27,29 +22,23 @@ type APICred struct {
 	Secret string `json:"Secret"`
 }
 
-func StoreCreds(cred *LoginResponse) error {
+func StoreCreds(cred []byte) error {
 	user, _ := user.Current()
 
 	os.Mkdir(filepath.Join(user.HomeDir, ".lrcli"), 0755)
 	fileName := filepath.Join(user.HomeDir, ".lrcli", "token.json")
 
-	dataBytes, _ := json.Marshal(cred)
-
-	return ioutil.WriteFile(fileName, dataBytes, 0644)
+	return ioutil.WriteFile(fileName, cred, 0644)
 
 }
-func GetCreds() (*LoginResponse, error) {
-	var v2 LoginResponse
+func GetCreds() ([]byte, error) {
 	user, _ := user.Current()
 	fileName := filepath.Join(user.HomeDir, ".lrcli", "token.json")
 	_, err := os.Stat(fileName)
 	if os.IsNotExist(err) {
 		return nil, err
 	}
-
-	file, _ := ioutil.ReadFile(fileName)
-	json.Unmarshal(file, &v2)
-	return &v2, nil
+	return ioutil.ReadFile(fileName)
 }
 
 func StoreAPICreds(cred *APICred) error {
@@ -91,4 +80,31 @@ func Openbrowser(url string) {
 		log.Fatal(err)
 	}
 
+}
+
+func GeneratePassword() string {
+	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var retVal string
+	length := 0
+	for length < 8 {
+		retVal += string(charset[rand.Intn(len(charset))])
+		length++
+	}
+	return retVal + "1@aA"
+
+}
+
+func ThemeConstants(theme string) (ThemeType, ThemeType) {
+	auths := map[string]ThemeType{
+		"London":   Theme1Auth,
+		"Tokyo":    Theme2Auth,
+		"Helsinki": Theme3Auth,
+	}
+
+	profiles := map[string]ThemeType{
+		"London":   Theme1Profile,
+		"Tokyo":    Theme2Profile,
+		"Helsinki": Theme3Profile,
+	}
+	return auths[theme], profiles[theme]
 }

@@ -63,6 +63,9 @@ func verify(opts *VerifyOpts) error {
 	}
 	var resultResp Result
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return err
+	}
 	err = json.Unmarshal(resp, &resultResp)
 	if err != nil {
 		return err
