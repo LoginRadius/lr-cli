@@ -88,7 +88,11 @@ func checkAPIError(respData []byte) ([]byte, error) {
 		}
 		return nil, errors.New("Your access token is expried, Kindly relogin to continue")
 	} else if errResp.Errorcode != nil {
-		return nil, errors.New(*errResp.Errormessage)
+		if errResp.Errormessage != nil {
+			return nil, errors.New(*errResp.Errormessage)
+		} else {
+			return nil, errors.New("Something went wrong at our end, please try again.")
+		}
 	}
 	return respData, nil
 }

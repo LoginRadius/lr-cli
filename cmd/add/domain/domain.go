@@ -49,8 +49,7 @@ func NewdomainCmd() *cobra.Command {
 			}
 			s := strings.Split(p.Callbackurl, ";")
 			if len(s) < 3 {
-				domain := p.Callbackurl + ";" + opts.Domain
-				return add(domain)
+				return add(p.Callbackurl, opts.Domain)
 			} else {
 				return &cmdutil.FlagError{Err: errors.New("more than 3 domains cannot be added in free plan")}
 			}
@@ -64,9 +63,9 @@ func NewdomainCmd() *cobra.Command {
 	return cmd
 }
 
-func add(domain string) error {
+func add(allDomains string, newDomain string) error {
+	domain := allDomains + ";" + newDomain
 	var url string
-	fmt.Printf("domain=%s", domain)
 	body, _ := json.Marshal(map[string]string{
 		"domain":     "http://localhost",
 		"production": domain,
@@ -82,6 +81,6 @@ func add(domain string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(resultResp.CallbackUrl)
+	fmt.Println("Your Domain " + newDomain + "is now whitelisted")
 	return nil
 }
