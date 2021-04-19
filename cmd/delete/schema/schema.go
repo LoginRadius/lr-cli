@@ -70,7 +70,6 @@ func delete(Field string) error {
 		return nil
 	}
 
-
 	var url string
 	var url1 string
 	conf := config.GetInstance()
