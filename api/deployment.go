@@ -129,3 +129,17 @@ func GetPage() (*HostedPageResponse, error) {
 	}
 	return &resultResp, nil
 }
+
+func AppInfo() (*CoreAppData, error) {
+	coreAppData := conf.AdminConsoleAPIDomain + "/auth/core-app-data?"
+	AppData, err := request.Rest(http.MethodGet, coreAppData, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	var App CoreAppData
+	err = json.Unmarshal(AppData, &App)
+	if err != nil {
+		return nil, err
+	}
+	return &App, nil
+}

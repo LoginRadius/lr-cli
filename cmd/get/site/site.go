@@ -56,7 +56,7 @@ func NewSiteCmd() *cobra.Command {
 }
 
 func getSite() error {
-	AppInfo, err := AppInfo()
+	AppInfo, err := api.AppInfo()
 	if err != nil {
 		return err
 	}
@@ -120,21 +120,6 @@ func currentID() (*AppID, error) {
 
 	return &currentAppId, nil
 
-}
-
-func AppInfo() (*api.CoreAppData, error) {
-	conf := config.GetInstance()
-	coreAppData := conf.AdminConsoleAPIDomain + "/auth/core-app-data?"
-	AppData, err := request.Rest(http.MethodGet, coreAppData, nil, "")
-	if err != nil {
-		return nil, err
-	}
-	var App api.CoreAppData
-	err = json.Unmarshal(AppData, &App)
-	if err != nil {
-		return nil, err
-	}
-	return &App, nil
 }
 
 func Output(AppInfo *api.CoreAppData, i int) {
