@@ -55,7 +55,9 @@ func themes() error {
 
 		fmt.Println("Current Theme:", cmdutil.ThemeMap[index])
 	} else {
-		fmt.Println("Use exactly One flag")
+		fmt.Println("Use exactly one of the following flags: ")
+		fmt.Println("--all: Displays all available themes")
+		fmt.Println("--active: Displays current theme")
 	}
 	return nil
 }
