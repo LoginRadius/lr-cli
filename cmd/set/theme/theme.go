@@ -2,7 +2,6 @@ package theme
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -46,11 +45,13 @@ func NewThemeCmd() *cobra.Command {
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if theme == "" {
-				return &cmdutil.FlagError{Err: errors.New("`theme` is required argument")}
+				fmt.Println("`theme` is required argument")
+				return nil
 			}
 			valid := contains(ListTheme, theme)
 			if !valid {
-				return &cmdutil.FlagError{Err: errors.New("Please Enter a valid theme")}
+				fmt.Println("Please Enter a valid theme")
+				return nil
 			}
 			return themes()
 		},

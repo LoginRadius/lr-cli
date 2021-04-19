@@ -60,6 +60,45 @@ type HostedPageResponse struct {
 	} `json:"Pages"`
 }
 
+type CoreAppData struct {
+	Apps struct {
+		Data []struct {
+			Appname               string      `json:"AppName"`
+			Customername          interface{} `json:"CustomerName"`
+			Webtechnology         int         `json:"WebTechnology"`
+			Domain                string      `json:"Domain"`
+			Callbackurl           string      `json:"CallbackUrl"`
+			Devdomain             string      `json:"DevDomain"`
+			Ismobile              bool        `json:"IsMobile"`
+			Appid                 int         `json:"AppId"`
+			Key                   string      `json:"Key"`
+			Secret                string      `json:"Secret"`
+			Role                  string      `json:"Role"`
+			Iswelcomeemailenabled bool        `json:"IsWelcomeEmailEnabled"`
+			Ishttps               bool        `json:"Ishttps"`
+			Interfaceid           int         `json:"InterfaceId"`
+			Recurlyaccountcode    interface{} `json:"RecurlyAccountCode"`
+			Userlimit             int         `json:"UserLimit"`
+			Domainlimit           int         `json:"DomainLimit"`
+			Datecreated           time.Time   `json:"DateCreated"`
+			Datemodified          time.Time   `json:"DateModified"`
+			Status                bool        `json:"Status"`
+			Profilephoto          string      `json:"ProfilePhoto"`
+			Apiversion            string      `json:"ApiVersion"`
+			Israasenabled         bool        `json:"IsRaasEnabled"`
+			Privacypolicy         interface{} `json:"PrivacyPolicy"`
+			Termsofservice        interface{} `json:"TermsOfService"`
+			Ownerid               string      `json:"OwnerId"`
+			Productplan           struct {
+				Name         string      `json:"Name"`
+				Expirytime   time.Time   `json:"ExpiryTime"`
+				Billingcycle interface{} `json:"BillingCycle"`
+				Fromdate     time.Time   `json:"FromDate"`
+			} `json:"ProductPlan"`
+		} `json:"Data"`
+	} `json:"apps"`
+}
+
 func GetSites() (*SitesReponse, error) {
 
 	url := conf.AdminConsoleAPIDomain + "/deployment/sites?"
