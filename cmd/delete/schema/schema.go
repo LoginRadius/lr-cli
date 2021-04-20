@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/loginradius/lr-cli/cmdutil"
@@ -60,6 +61,13 @@ func NewschemaCmd() *cobra.Command {
 }
 
 func delete(Field string) error {
+	res, err2 := api.GetSites()
+	if res.Userlimit == 7000 {
+		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
+	}
+	if err2 != nil {
+		return err2
+	}
 	var url string
 	var url1 string
 	conf := config.GetInstance()

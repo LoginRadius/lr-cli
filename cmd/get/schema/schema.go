@@ -2,20 +2,18 @@ package schema
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
 )
 
-var all string
+var temp string
 
 type Schema struct {
 	Display          string `json:"Display"`
@@ -43,15 +41,22 @@ func NewschemaCmd() *cobra.Command {
 		Long:    `This commmand lists schema config`,
 		Example: heredoc.Doc(`$ lr get schema`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if all == "" {
-				return &cmdutil.FlagError{Err: errors.New("`opt` is required argument")}
+			fstatus, _ := cmd.Flags().GetBool("all")
+			if fstatus {
+				temp = "all"
+			}
+			fstatus1, _ := cmd.Flags().GetBool("active")
+			if fstatus1 {
+				temp = "active"
 			}
 			return get()
 
 		},
 	}
 	fl := cmd.Flags()
-	fl.StringVarP(&all, "opt", "o", "", "options to get active fields or all fields")
+	fl.BoolP("all", "a", false, "option to get all fields")
+	fl.BoolP("active", "c", false, "option to get active fields")
+
 	return cmd
 }
 
@@ -64,10 +69,10 @@ func get() error {
 		return err1
 	}
 	conf := config.GetInstance()
-	if all == "active" {
+	if temp == "active" {
 		url = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"
 	}
-	if all == "all" {
+	if temp == "all" {
 		url = conf.AdminConsoleAPIDomain + "/platform-configuration/platform-registration-fields?"
 	}
 
