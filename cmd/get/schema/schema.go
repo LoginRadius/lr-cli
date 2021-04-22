@@ -62,8 +62,9 @@ func NewschemaCmd() *cobra.Command {
 
 func get() error {
 	res, err1 := api.GetSites()
-	if res.Userlimit == 7000 {
+	if (res.Productplan) != res.Productplan || res.Productplan.Name == "free" {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
+		return nil
 	}
 	if err1 != nil {
 		return err1
@@ -87,30 +88,38 @@ func get() error {
 	if err != nil {
 		return err
 	}
+	var j = 0
+	var temp1 []int
 	fmt.Println("Select one of the fields to get the schema")
-
 	for i := 0; i < len(resultResp.Data); i++ {
-		fmt.Print(i + 1)
-		fmt.Println("." + resultResp.Data[i].Display)
+		if resultResp.Data[i].Parent == "" {
+			fmt.Print(j + 1)
+			fmt.Println("." + resultResp.Data[i].Display)
+			j++
+			temp1 = append(temp1, i)
+		}
 	}
 	var num int
 
 	// Taking input from user
 	fmt.Scanln(&num)
-	for 1 > num || num > len(resultResp.Data) {
-		fmt.Println("Please select a number from 1 to " + fmt.Sprint(len(resultResp.Data)))
+	for 1 > num || num > len(temp1) {
+		fmt.Println("Please select a number from 1 to " + fmt.Sprint(len(temp1)))
 		fmt.Scanln(&num)
 	}
-	fmt.Println("Display: " + resultResp.Data[num-1].Display)
-	fmt.Println("Enabled: ", resultResp.Data[num-1].Enabled)
-	fmt.Println("IsMandatory: ", resultResp.Data[num-1].IsMandatory)
-	fmt.Println("Parent: ", resultResp.Data[num-1].Parent)
-	fmt.Println("ParentDataSource: ", resultResp.Data[num-1].ParentDataSource)
-	fmt.Println("Permission: ", resultResp.Data[num-1].Permission)
-	fmt.Println("Name: ", resultResp.Data[num-1].Name)
-	fmt.Println("Rules: ", resultResp.Data[num-1].Rules)
-	fmt.Println("Status: ", resultResp.Data[num-1].Status)
-	fmt.Println("Type: ", resultResp.Data[num-1].Type)
+	if resultResp.Data[temp1[num-1]].Parent == "" {
+		fmt.Println("Display: " + resultResp.Data[temp1[num-1]].Display)
+		fmt.Println("Enabled: ", resultResp.Data[temp1[num-1]].Enabled)
+		fmt.Println("IsMandatory: ", resultResp.Data[temp1[num-1]].IsMandatory)
+		fmt.Println("Parent: ", resultResp.Data[temp1[num-1]].Parent)
+		fmt.Println("ParentDataSource: ", resultResp.Data[temp1[num-1]].ParentDataSource)
+		fmt.Println("Permission: ", resultResp.Data[temp1[num-1]].Permission)
+		fmt.Println("Name: ", resultResp.Data[temp1[num-1]].Name)
+		fmt.Println("Rules: ", resultResp.Data[temp1[num-1]].Rules)
+		fmt.Println("Status: ", resultResp.Data[temp1[num-1]].Status)
+		fmt.Println("Type: ", resultResp.Data[temp1[num-1]].Type)
+
+	}
 
 	return nil
 }
