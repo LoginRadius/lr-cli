@@ -5,6 +5,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/get/accountPassword"
 	"github.com/loginradius/lr-cli/cmd/get/config"
 	"github.com/loginradius/lr-cli/cmd/get/profiles"
+	"github.com/loginradius/lr-cli/cmd/get/schema"
 	"github.com/loginradius/lr-cli/cmd/get/site"
 
 	"github.com/loginradius/lr-cli/cmd/get/domain"
@@ -53,5 +54,8 @@ func NewGetCmd() *cobra.Command {
 
 	profilesCmd := profiles.NewprofilesCmd()
 	cmd.AddCommand(profilesCmd)
+
+	schemaCmd := schema.NewschemaCmd()
+	cmd.AddCommand(schemaCmd)
 	return cmd
 }
