@@ -62,8 +62,9 @@ func NewschemaCmd() *cobra.Command {
 
 func delete(Field string) error {
 	res, err2 := api.GetSites()
-	if res.Userlimit == 7000 {
+	if (res.Productplan) != res.Productplan || res.Productplan.Name == "free" {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
+		return nil
 	}
 	if err2 != nil {
 		return err2
