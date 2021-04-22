@@ -25,6 +25,12 @@ $ brew tap loginradius/tap
 $ brew install lr
 ```
 
+### How to Upgrade the loginradius cli using Homebrew?
+
+```sh
+$ brew upgrade loginradius/tap/lr
+```
+
 ## Other Platforms
 
 Download packaged binaries from the [release page](https://github.com/loginradius/lr-cli/releases/latest).
