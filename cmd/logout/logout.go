@@ -2,12 +2,10 @@ package logout
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/user"
-	"path"
 	"path/filepath"
 	"time"
 
@@ -36,7 +34,7 @@ func logout() error {
 	dirName := filepath.Join(user.HomeDir, ".lrcli")
 	_, err := os.Stat(dirName)
 	if os.IsNotExist(err) {
-		fmt.Println("You are already been logged out")
+		fmt.Println("You have already been logged out")
 		return nil
 	} else {
 		cmdutil.Openbrowser(conf.HubPageDomain + "/auth.aspx?action=logout&return_url=http://localhost:8089/postLogout")
@@ -46,10 +44,7 @@ func logout() error {
 			RouteName:   "/postLogout",
 		})
 		tempServer.Server.ListenAndServe()
-		dir, err := ioutil.ReadDir(dirName)
-		for _, d := range dir {
-			os.RemoveAll(path.Join([]string{dirName, d.Name()}...))
-		}
+		err := cmdutil.DeleteFiles()
 		if err != nil {
 			return err
 		}

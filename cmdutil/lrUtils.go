@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path"
 	"path/filepath"
 	"runtime"
 )
@@ -107,4 +108,17 @@ func ThemeConstants(theme string) (ThemeType, ThemeType) {
 		"Helsinki": Theme3Profile,
 	}
 	return auths[theme], profiles[theme]
+}
+
+func DeleteFiles() error {
+	user, _ := user.Current()
+	dirName := filepath.Join(user.HomeDir, ".lrcli")
+	dir, err := ioutil.ReadDir(dirName)
+	for _, d := range dir {
+		os.RemoveAll(path.Join([]string{dirName, d.Name()}...))
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
