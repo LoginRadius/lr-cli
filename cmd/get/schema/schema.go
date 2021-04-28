@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
@@ -70,7 +69,6 @@ func get() error {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
 		return nil
 	}
-
 
 	conf := config.GetInstance()
 	if temp == "active" {

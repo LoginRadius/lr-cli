@@ -53,34 +53,10 @@ func NewaccountCmd() *cobra.Command {
 
 	return cmd
 }
-func getresObj() (*cmdutil.APICred, error) {
-	var resObj *cmdutil.APICred
-	res, err := cmdutil.GetAPICreds()
-	if err == nil {
-		resObj = &cmdutil.APICred{
-			Key:    res.Key,
-			Secret: res.Secret,
-		}
-	} else {
-		resp, err := api.GetSites()
-		if err != nil {
-			return nil, err
-		}
-		resObj = &cmdutil.APICred{
-			Key:    resp.Key,
-			Secret: resp.Secret,
-		}
-		cmdutil.StoreAPICreds(resObj)
-	}
-	if err != nil {
-		return nil, err
-	}
-	return resObj, err
-}
 func deletebyEmail(Email string) error {
-	resObj, err1 := getresObj()
-	if err1 != nil {
-		return err1
+	resObj, err := api.GetSites()
+	if err != nil {
+		return err
 	}
 	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret + "&email=" + Email
 	var resultResp Result
@@ -101,9 +77,9 @@ func deletebyEmail(Email string) error {
 }
 
 func deletebyUID(UID string) error {
-	resObj, err1 := getresObj()
-	if err1 != nil {
-		return err1
+	resObj, err := api.GetSites()
+	if err != nil {
+		return err
 	}
 	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account/" + UID + "?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret
 	var resultResp Result

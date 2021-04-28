@@ -1,11 +1,10 @@
 package config
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/spf13/cobra"
 )
 
@@ -30,26 +29,11 @@ func NewConfigCmd() *cobra.Command {
 }
 
 func configure() error {
-	res, err := cmdutil.GetAPICreds()
-	if err == nil {
-		log.Println("API Key:", res.Key)
-		log.Println("API Secret:", res.Secret)
-		return nil
-	} else {
-		resp, err := api.GetSites()
-		if err != nil {
-			return err
-		}
-		resObj := &cmdutil.APICred{
-			Key:    resp.Key,
-			Secret: resp.Secret,
-		}
-		if err != nil {
-			return err
-		}
-		log.Println("API Key:", resObj.Key)
-		log.Println("API Secret:", resObj.Secret)
-		return cmdutil.StoreAPICreds(resObj) //wrote into the file
+	resp, err := api.GetSites()
+	if err != nil {
+		return err
 	}
-
+	fmt.Println("API Key:", resp.Key)
+	fmt.Println("API Secret:", resp.Secret)
+	return nil
 }

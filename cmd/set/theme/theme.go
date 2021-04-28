@@ -192,7 +192,7 @@ func otherCalls() error {
 	}
 
 	var app api.LoginResponse
-	appInfo, err1 := cmdutil.GetCreds()
+	appInfo, err1 := cmdutil.ReadFile("token.json")
 	if err1 != nil {
 		return err1
 	}

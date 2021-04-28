@@ -13,8 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var appid int
-var AppsInfo *api.CoreAppData
+var appid int64
 var option string
 
 type Delete struct {
@@ -39,24 +38,21 @@ func NewSiteCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	fl.IntVarP(&appid, "appid", "i", -1, "AppId of the site")
+	fl.Int64VarP(&appid, "appid", "i", -1, "AppId of the site")
 	return cmd
 }
 
 func deleteSite() error {
-	checkApp, err := api.CheckApp(appid)
+	siteInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
-	if !checkApp {
+	site, ok := siteInfo[appid]
+	if !ok {
 		fmt.Println("There is no site with this AppID.")
 		return nil
 	}
-	AppsInfo, err = api.AppInfo()
-	if err != nil {
-		return err
-	}
-	if len(AppsInfo.Apps.Data) == 1 {
+	if len(siteInfo) == 1 {
 		fmt.Println("Unable to delete since there is only 1 remaining App.")
 		return nil
 	}
@@ -79,11 +75,11 @@ func deleteSite() error {
 		return nil
 	}
 
-	res, err := delete()
+	isDeleted, err := delete(site)
 	if err != nil {
 		return err
 	}
-	if res {
+	if isDeleted {
 		fmt.Println("Your App has been deleted")
 	} else {
 		fmt.Println("Delete action failed")
@@ -92,12 +88,12 @@ func deleteSite() error {
 	return nil
 }
 
-func delete() (bool, error) {
+func delete(appInfo api.SitesReponse) (bool, error) {
 	conf := config.GetInstance()
 	site := conf.AdminConsoleAPIDomain + "/account/site?"
 	body, _ := json.Marshal(map[string]string{
-		"appID":      strconv.Itoa(appid),
-		"customerId": AppsInfo.Apps.Data[0].Ownerid,
+		"appID":      strconv.FormatInt(appInfo.Appid, 10),
+		"customerId": appInfo.Ownerid,
 	})
 	resp, err := request.Rest(http.MethodDelete, site, nil, string(body))
 	if err != nil {

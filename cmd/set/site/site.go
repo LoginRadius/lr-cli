@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var appid int
+var appid int64
 
 func NewSiteCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -28,24 +28,25 @@ func NewSiteCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	fl.IntVarP(&appid, "appid", "i", -1, "Switches the site")
+	fl.Int64VarP(&appid, "appid", "i", -1, "Switches the site")
 
 	return cmd
 }
 
 func setSite() error {
-	checkApp, err := api.CheckApp(appid)
+	siteInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
-	if !checkApp {
+	_, ok := siteInfo[appid]
+	if !ok {
 		fmt.Println("There is no site with this AppID.")
 		return nil
 	}
-	currentID, err := api.CurrentID()
 	if err != nil {
 		return err
 	}
+	currentID, err := api.CurrentID()
 	if currentID.CurrentAppId == appid {
 		fmt.Println("You are already using this site")
 		return nil

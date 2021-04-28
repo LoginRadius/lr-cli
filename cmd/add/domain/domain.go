@@ -1,18 +1,14 @@
 package domain
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/request"
 
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
 
 	"github.com/spf13/cobra"
 )
@@ -65,19 +61,7 @@ func NewdomainCmd() *cobra.Command {
 
 func add(allDomains string, newDomain string) error {
 	domain := allDomains + ";" + newDomain
-	var url string
-	body, _ := json.Marshal(map[string]string{
-		"domain":     "http://localhost",
-		"production": domain,
-		"staging":    "",
-	})
-	conf := config.GetInstance()
-
-	url = conf.AdminConsoleAPIDomain + "/deployment/sites?"
-
-	var resultResp Result
-	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
-	err = json.Unmarshal(resp, &resultResp)
+	err := api.UpdateDomain(domain)
 	if err != nil {
 		return err
 	}

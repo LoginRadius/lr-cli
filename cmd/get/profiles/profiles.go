@@ -54,25 +54,7 @@ func NewprofilesCmd() *cobra.Command {
 }
 
 func getbyEmail(inpEmail string) error {
-	var resObj *cmdutil.APICred
-	res, err := cmdutil.GetAPICreds()
-	if err == nil {
-		resObj = &cmdutil.APICred{
-			Key:    res.Key,
-			Secret: res.Secret,
-		}
-	} else {
-		resp, err := api.GetSites()
-		if err != nil {
-			return err
-		}
-		resObj = &cmdutil.APICred{
-			Key:    resp.Key,
-			Secret: resp.Secret,
-		}
-		cmdutil.StoreAPICreds(resObj)
-	}
-
+	resObj, err := api.GetSites()
 	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret + "&email=" + inpEmail
 	var resultResp Result
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
@@ -92,24 +74,7 @@ func getbyEmail(inpEmail string) error {
 }
 
 func getbyUID(inputUID string) error {
-	var resObj *cmdutil.APICred
-	res, err := cmdutil.GetAPICreds()
-	if err == nil {
-		resObj = &cmdutil.APICred{
-			Key:    res.Key,
-			Secret: res.Secret,
-		}
-	} else {
-		resp, err := api.GetSites()
-		if err != nil {
-			return err
-		}
-		resObj = &cmdutil.APICred{
-			Key:    resp.Key,
-			Secret: resp.Secret,
-		}
-		cmdutil.StoreAPICreds(resObj)
-	}
+	resObj, err := api.GetSites()
 
 	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account/" + inputUID + "?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret
 	var resultResp Result
