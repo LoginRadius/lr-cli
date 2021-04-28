@@ -24,7 +24,7 @@ func NewDemoCmd() *cobra.Command {
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var appCreds *api.LoginResponse
-			creds, err := cmdutil.GetCreds()
+			creds, err := cmdutil.ReadFile("token.json")
 			if err != nil {
 				return errors.New("Please Login to CLI to continue")
 			}

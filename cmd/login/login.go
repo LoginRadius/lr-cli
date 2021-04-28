@@ -72,13 +72,18 @@ func doLogin(accessToken string) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Successfully Logged In")
 	creds, _ := json.Marshal(resObj)
-	return cmdutil.StoreCreds(creds)
+	cmdutil.WriteFile("token.json", creds)
+	_, err = api.GetAppsInfo()
+	if err != nil {
+		return err
+	}
+	log.Println("Successfully Logged In")
+	return nil
 }
 
 func validateLogin() (bool, error) {
-	_, err := cmdutil.GetCreds()
+	_, err := cmdutil.ReadFile("token.json")
 	if err != nil {
 		return false, nil
 	}

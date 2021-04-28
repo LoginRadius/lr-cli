@@ -1,6 +1,7 @@
 package site
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
@@ -10,7 +11,7 @@ import (
 
 var all *bool
 var active *bool
-var appid *int
+var appid *int64
 
 func NewSiteCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -43,16 +44,15 @@ func NewSiteCmd() *cobra.Command {
 	fl := cmd.Flags()
 	all = fl.Bool("all", false, "Lists all sites")
 	active = fl.Bool("active", false, "Shows active site")
-	appid = fl.IntP("appid", "i", -1, "Filters sites based on ID")
+	appid = fl.Int64P("appid", "i", -1, "Filters sites based on ID")
 	return cmd
 }
 
 func getSite() error {
-	AppInfo, err := api.AppInfo()
+	AppInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
-	numberOfApps := len(AppInfo.Apps.Data)
 
 	if *active && (!*all && *appid == -1) {
 		currentID, err := api.CurrentID()
@@ -60,31 +60,19 @@ func getSite() error {
 			return err
 		}
 		fmt.Println("Active site: ")
-		for i := 0; i < numberOfApps; i++ {
-			if currentID.CurrentAppId == AppInfo.Apps.Data[i].Appid {
-				Output(AppInfo, i)
-			}
-		}
+		val, _ := AppInfo[currentID.CurrentAppId]
+		Output(val)
 	} else if *all && (!*active && *appid == -1) {
 		fmt.Println("All sites: ")
-		for i := 0; i < numberOfApps; i++ {
-			fmt.Println(i + 1)
-			Output(AppInfo, i)
-			if i != numberOfApps-1 {
-				fmt.Println("-------------------------------------------------")
-			}
+		for _, site := range AppInfo {
+			Output(site)
 		}
 	} else if *appid != -1 && (!*active && !*all) {
-		var temp int
-		for i := 0; i < numberOfApps; i++ {
-			if *appid == AppInfo.Apps.Data[i].Appid {
-				Output(AppInfo, i)
-				temp = 1
-			}
+		site, ok := AppInfo[*appid]
+		if !ok {
+			return errors.New("There is no site with this App ID")
 		}
-		if temp != 1 {
-			fmt.Println("There is no site with this AppID.")
-		}
+		Output(site)
 
 	} else {
 		fmt.Println("Use exactly one of the following flags: ")
@@ -97,8 +85,9 @@ func getSite() error {
 	return nil
 }
 
-func Output(AppInfo *api.CoreAppData, i int) {
-	fmt.Println("  App Name: ", AppInfo.Apps.Data[i].Appname)
-	fmt.Println("  App ID: ", AppInfo.Apps.Data[i].Appid)
-	fmt.Println("  Domain: ", AppInfo.Apps.Data[i].Domain)
+func Output(AppInfo api.SitesReponse) {
+	fmt.Println("------------------------------")
+	fmt.Println("App Name: ", AppInfo.Appname)
+	fmt.Println("App ID: ", AppInfo.Appid)
+	fmt.Println("Domain: ", AppInfo.Domain)
 }

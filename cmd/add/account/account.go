@@ -67,24 +67,7 @@ func NewaccountCmd() *cobra.Command {
 func add(Account account) error {
 	Account.Password = cmdutil.GeneratePassword()
 
-	var resObj *cmdutil.APICred
-	res, err := cmdutil.GetAPICreds()
-	if err == nil {
-		resObj = &cmdutil.APICred{
-			Key:    res.Key,
-			Secret: res.Secret,
-		}
-	} else {
-		resp, err := api.GetSites()
-		if err != nil {
-			return err
-		}
-		resObj = &cmdutil.APICred{
-			Key:    resp.Key,
-			Secret: resp.Secret,
-		}
-		cmdutil.StoreAPICreds(resObj)
-	}
+	resObj, err := api.GetSites()
 
 	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret
 	body, _ := json.Marshal(Account)
