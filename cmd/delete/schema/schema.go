@@ -18,6 +18,11 @@ import (
 
 var fieldName string
 
+/*lr add schema --feild 1
+Enter the Display Name (About): About You
+Is Required (Y/n): Y
+Do you want to set Advance Configuiration for this feild(Y/n): Yes
+Select Field Type*/
 type Schema struct {
 	Display          string `json:"Display"`
 	Enabled          bool   `json:"Enabled"`
