@@ -3,8 +3,11 @@ package add
 import (
 	"github.com/loginradius/lr-cli/cmd/add/account"
 	"github.com/loginradius/lr-cli/cmd/add/domain"
+<<<<<<< HEAD
 
 	"github.com/loginradius/lr-cli/cmd/add/hooks"
+=======
+>>>>>>> Implement registration schema commands in LoginRadius CLI
 	"github.com/loginradius/lr-cli/cmd/add/schema"
 	"github.com/loginradius/lr-cli/cmd/add/site"
 	"github.com/loginradius/lr-cli/cmd/add/social"
