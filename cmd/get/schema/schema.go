@@ -109,9 +109,10 @@ func get() error {
 	var num int
 
 	// Taking input from user
+	fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(temp1)) + " :")
 	fmt.Scanln(&num)
 	for 1 > num || num > len(temp1) {
-		fmt.Println("Please select a number from 1 to " + fmt.Sprint(len(temp1)))
+		fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(temp1)) + " :")
 		fmt.Scanln(&num)
 	}
 	if resultResp.Data[temp1[num-1]].Parent == "" {

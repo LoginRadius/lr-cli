@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
@@ -18,6 +19,11 @@ import (
 
 var fieldName string
 
+/*lr add schema --feild 1
+Enter the Display Name (About): About You
+Is Required (Y/n): Y
+Do you want to set Advance Configuiration for this feild(Y/n): Yes
+Select Field Type*/
 type Schema struct {
 	Display          string `json:"Display"`
 	Enabled          bool   `json:"Enabled"`
@@ -61,13 +67,19 @@ func NewschemaCmd() *cobra.Command {
 }
 
 func delete(Field string) error {
-	res, err2 := api.GetSites()
-	if (res.Productplan) != res.Productplan || res.Productplan.Name == "free" {
+	res, err1 := api.GetSites()
+	var re struct {
+		Name         string      "json:\"Name\""
+		Expirytime   time.Time   "json:\"ExpiryTime\""
+		Billingcycle interface{} "json:\"BillingCycle\""
+		Fromdate     interface{} "json:\"FromDate\""
+	}
+	if res.Productplan == re || res.Productplan.Name == "free" {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
 		return nil
 	}
-	if err2 != nil {
-		return err2
+	if err1 != nil {
+		return err1
 	}
 	var url string
 	var url1 string
@@ -83,6 +95,9 @@ func delete(Field string) error {
 	for i := 0; i < len(resultResp1.Data); i++ {
 		if resultResp1.Data[i].Name == Field {
 			resultResp1.Data[i].Enabled = false
+		} else {
+			fmt.Println("Please enter the correct field name")
+			return nil
 		}
 	}
 	body, _ := json.Marshal(resultResp1)
