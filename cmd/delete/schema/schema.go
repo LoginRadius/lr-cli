@@ -18,34 +18,6 @@ import (
 
 var field int
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-/*lr add schema --feild 1
-Enter the Display Name (About): About You
-Is Required (Y/n): Y
-Do you want to set Advance Configuiration for this feild(Y/n): Yes
-Select Field Type*/
-=======
->>>>>>> Implement registration schema commands in LoginRadius CLI
-type Schema struct {
-	Display          string `json:"Display"`
-	Enabled          bool   `json:"Enabled"`
-	IsMandatory      bool   `json:"IsMandatory"`
-	Parent           string `json:"Parent"`
-	ParentDataSource string `json:"ParentDataSource"`
-	Permission       string `json:"Permission"`
-	Name             string `json:"name"`
-	Rules            string `json:"rules"`
-	Status           string `json:"status"`
-	Type             string `json:"type"`
-}
-
-type Result struct {
-	Data []Schema `json:"Data"`
-}
-
->>>>>>> Implement registration schema commands in LoginRadius CLI
 func NewschemaCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
