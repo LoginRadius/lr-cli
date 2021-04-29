@@ -123,7 +123,6 @@ func add(temp int) error {
 	} else {
 		fmt.Println("please type in (y/n)")
 	}
-	fmt.Println("Do you want to set Advance Configuiration for this feild(y/n):")
 	resultResp.Data[temp1[temp-1]].Display = DisplayName
 
 	resultResp1.Data = append(resultResp1.Data, resultResp.Data[temp1[temp-1]])
