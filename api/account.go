@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/loginradius/lr-cli/request"
 )
@@ -26,4 +27,49 @@ func SetSites(appid int) (*SitesToken, error) {
 		return nil, err
 	}
 	return &switchRespObj, nil
+}
+
+type AccountPayment struct {
+	Data struct {
+		Order []struct {
+			Totalamount         int         `json:"TotalAmount"`
+			Recurringprofileid  interface{} `json:"RecurringProfileId"`
+			Basediscount        int         `json:"BaseDiscount"`
+			Promotionaldiscount int         `json:"PromotionalDiscount"`
+			Initialamount       int         `json:"InitialAmount"`
+			Tax                 int         `json:"Tax"`
+			UUID                interface{} `json:"Uuid"`
+			Invoiceno           int         `json:"InvoiceNo"`
+			Createddate         time.Time   `json:"CreatedDate"`
+			Lastmodifieddate    time.Time   `json:"LastModifiedDate"`
+			Isactive            bool        `json:"IsActive"`
+			Isdeleted           bool        `json:"IsDeleted"`
+			Orderid             int         `json:"OrderId"`
+			Paymentdetail       struct {
+				Stripecustomerid      string `json:"StripeCustomerId"`
+				Stripepaymentmethodid string `json:"StripePaymentMethodId"`
+			} `json:"PaymentDetail"`
+			Orderdetails []interface{} `json:"OrderDetails"`
+		} `json:"Order"`
+		Carddetails struct {
+			Expmonth int    `json:"expMonth"`
+			Expyear  int    `json:"expYear"`
+			Last4    string `json:"last4"`
+		} `json:"cardDetails"`
+	} `json:"data"`
+	Sharedsiteownerdata interface{} `json:"sharedSiteOwnerData"`
+}
+
+func PaymentInfo() (*AccountPayment, error) {
+	payment := conf.AdminConsoleAPIDomain + "/account/accountpaymentdetail?"
+	paymentResp, err := request.Rest(http.MethodGet, payment, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	var paymentRespObj AccountPayment
+	err = json.Unmarshal(paymentResp, &paymentRespObj)
+	if err != nil {
+		return nil, err
+	}
+	return &paymentRespObj, nil
 }
