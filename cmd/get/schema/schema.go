@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
@@ -70,6 +71,7 @@ func get() error {
 		return nil
 	}
 
+
 	conf := config.GetInstance()
 	if temp == "active" {
 		url = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"
@@ -107,6 +109,7 @@ func get() error {
 	fmt.Scanln(&num)
 	for 1 > num || num > len(temp1) {
 		fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(temp1)) + " :")
+
 		fmt.Scanln(&num)
 	}
 	if resultResp.Data[temp1[num-1]].Parent == "" {

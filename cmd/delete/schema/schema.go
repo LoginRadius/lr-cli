@@ -70,6 +70,7 @@ func delete(Field string) error {
 		return nil
 	}
 
+
 	var url string
 	var url1 string
 	conf := config.GetInstance()
@@ -92,6 +93,7 @@ func delete(Field string) error {
 		fmt.Println("Please enter the correct field name")
 		return nil
 	}
+
 	body, _ := json.Marshal(resultResp1)
 	url = conf.AdminConsoleAPIDomain + "/platform-configuration/default-fields?"
 

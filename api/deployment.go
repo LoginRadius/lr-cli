@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+
 	"net/http"
 	"time"
 
@@ -142,4 +143,19 @@ func AppInfo() (*CoreAppData, error) {
 		return nil, err
 	}
 	return &App, nil
+}
+
+func CheckApp(appid int) (bool, error) {
+	AppInfo, err := AppInfo()
+	if err != nil {
+		return false, err
+	}
+	numberOfApps := len(AppInfo.Apps.Data)
+	for i := 0; i < numberOfApps; i++ {
+		if appid == AppInfo.Apps.Data[i].Appid {
+			return true, nil
+		}
+	}
+	return false, nil
+
 }

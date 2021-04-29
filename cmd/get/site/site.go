@@ -1,20 +1,12 @@
 package site
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/config"
-	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
-
-type AppID struct {
-	CurrentAppId int `json:"currentAppId"`
-}
 
 var all *bool
 var active *bool
@@ -63,7 +55,7 @@ func getSite() error {
 	numberOfApps := len(AppInfo.Apps.Data)
 
 	if *active && (!*all && *appid == -1) {
-		currentID, err := currentID()
+		currentID, err := api.CurrentID()
 		if err != nil {
 			return err
 		}
@@ -103,23 +95,6 @@ func getSite() error {
 	}
 
 	return nil
-}
-
-func currentID() (*AppID, error) {
-	conf := config.GetInstance()
-	config := conf.AdminConsoleAPIDomain + "/auth/config?"
-	var currentAppId AppID
-	resp, err := request.Rest(http.MethodGet, config, nil, "")
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(resp, &currentAppId)
-	if err != nil {
-		return nil, err
-	}
-
-	return &currentAppId, nil
-
 }
 
 func Output(AppInfo *api.CoreAppData, i int) {
