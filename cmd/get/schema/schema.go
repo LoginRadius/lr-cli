@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
@@ -62,20 +61,15 @@ func NewschemaCmd() *cobra.Command {
 }
 
 func get() error {
-	res, err1 := api.GetSites()
-	var re struct {
-		Name         string      "json:\"Name\""
-		Expirytime   time.Time   "json:\"ExpiryTime\""
-		Billingcycle interface{} "json:\"BillingCycle\""
-		Fromdate     interface{} "json:\"FromDate\""
+	res, err := api.GetSites()
+	if err != nil {
+		return err
 	}
-	if res.Productplan == re || res.Productplan.Name == "free" {
+	if res.Productplan.Name == "free" {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
 		return nil
 	}
-	if err1 != nil {
-		return err1
-	}
+
 	conf := config.GetInstance()
 	if temp == "active" {
 		url = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"

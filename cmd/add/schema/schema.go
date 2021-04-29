@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
@@ -44,7 +43,7 @@ func NewschemaCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "schema",
 		Short:   "add schema config",
-		Long:    `This commmand lists schema config`,
+		Long:    `This commmand adds schema config field`,
 		Example: heredoc.Doc(`$ lr add schema`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if temp == 0 {
@@ -61,20 +60,16 @@ func NewschemaCmd() *cobra.Command {
 
 func add(temp int) error {
 
-	res, err1 := api.GetSites()
-	var re struct {
-		Name         string      "json:\"Name\""
-		Expirytime   time.Time   "json:\"ExpiryTime\""
-		Billingcycle interface{} "json:\"BillingCycle\""
-		Fromdate     interface{} "json:\"FromDate\""
+	res, err := api.GetSites()
+	if err != nil {
+		return err
 	}
-	if res.Productplan == re || res.Productplan.Name == "free" {
+
+	if res.Productplan.Name == "free" {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
 		return nil
 	}
-	if err1 != nil {
-		return err1
-	}
+
 	conf := config.GetInstance()
 	urlall = conf.AdminConsoleAPIDomain + "/platform-configuration/platform-registration-fields?"
 
@@ -97,15 +92,15 @@ func add(temp int) error {
 	}
 	url1 = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"
 	var resultResp1 schemaStr
-	resp1, err2 := request.Rest(http.MethodGet, url1, nil, "")
+	resp, err = request.Rest(http.MethodGet, url1, nil, "")
 
-	if err2 != nil {
-		return err2
+	if err != nil {
+		return err
 	}
 
-	err2 = json.Unmarshal(resp1, &resultResp1)
-	if err2 != nil {
-		return err2
+	err = json.Unmarshal(resp, &resultResp1)
+	if err != nil {
+		return err
 	}
 	resultResp.Data[temp1[temp-1]].Enabled = true
 	var DisplayName string
@@ -114,14 +109,19 @@ func add(temp int) error {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	DisplayName = scanner.Text()
+	if DisplayName == "" {
+		DisplayName = resultResp.Data[temp1[temp-1]].Display
+	}
 	fmt.Print("Is Required (y/n):")
 	fmt.Scanln(&req)
+	for req != "Y" && req != "y" && req != "N" && req != "n" {
+		fmt.Print("Please enter (y/n):")
+		fmt.Scanln(&req)
+	}
 	if req == "Y" || req == "y" {
 		resultResp.Data[temp1[temp-1]].IsMandatory = true
 	} else if req == "N" || req == "n" {
 		resultResp.Data[temp1[temp-1]].IsMandatory = false
-	} else {
-		fmt.Println("please type in (y/n)")
 	}
 	resultResp.Data[temp1[temp-1]].Display = DisplayName
 
@@ -129,15 +129,15 @@ func add(temp int) error {
 	body, _ := json.Marshal(resultResp1)
 	url1 = conf.AdminConsoleAPIDomain + "/platform-configuration/default-fields?"
 	var resultResp2 schemaStr
-	resp2, err3 := request.Rest(http.MethodPost, url1, nil, string(body))
+	resp, err = request.Rest(http.MethodPost, url1, nil, string(body))
 
-	if err3 != nil {
-		return err3
+	if err != nil {
+		return err
 	}
 
-	err3 = json.Unmarshal(resp2, &resultResp2)
-	if err3 != nil {
-		return err3
+	err = json.Unmarshal(resp, &resultResp2)
+	if err != nil {
+		return err
 	}
 	fmt.Println("Your field has been sucessfully added")
 

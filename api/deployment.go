@@ -35,7 +35,7 @@ type SitesReponse struct {
 	Privacypolicy         interface{} `json:"PrivacyPolicy"`
 	Termsofservice        interface{} `json:"TermsOfService"`
 	Ownerid               string      `json:"OwnerId"`
-	Productplan           struct {
+	Productplan           *struct {
 		Name         string      `json:"Name"`
 		Expirytime   time.Time   `json:"ExpiryTime"`
 		Billingcycle interface{} `json:"BillingCycle"`
