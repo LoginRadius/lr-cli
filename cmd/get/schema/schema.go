@@ -62,20 +62,16 @@ func NewschemaCmd() *cobra.Command {
 }
 
 func get() error {
-	res, err1 := api.GetSites()
-	var re struct {
-		Name         string      "json:\"Name\""
-		Expirytime   time.Time   "json:\"ExpiryTime\""
-		Billingcycle interface{} "json:\"BillingCycle\""
-		Fromdate     interface{} "json:\"FromDate\""
+	res, err := api.GetSites()
+	if err != nil {
+		return err
 	}
-	if res.Productplan == re || res.Productplan.Name == "free" {
+	if res.Productplan.Name == "free" {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
 		return nil
 	}
-	if err1 != nil {
-		return err1
-	}
+
+
 	conf := config.GetInstance()
 	if temp == "active" {
 		url = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"
@@ -109,9 +105,11 @@ func get() error {
 	var num int
 
 	// Taking input from user
+	fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(temp1)) + " :")
 	fmt.Scanln(&num)
 	for 1 > num || num > len(temp1) {
-		fmt.Println("Please select a number from 1 to " + fmt.Sprint(len(temp1)))
+		fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(temp1)) + " :")
+
 		fmt.Scanln(&num)
 	}
 	if resultResp.Data[temp1[num-1]].Parent == "" {
