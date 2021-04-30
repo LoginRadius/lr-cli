@@ -4,6 +4,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/delete/account"
 	"github.com/loginradius/lr-cli/cmd/delete/domain"
 	"github.com/loginradius/lr-cli/cmd/delete/schema"
+
 	"github.com/loginradius/lr-cli/cmd/delete/site"
 	"github.com/loginradius/lr-cli/cmd/delete/social"
 
