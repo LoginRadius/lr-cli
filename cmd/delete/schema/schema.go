@@ -61,35 +61,44 @@ func NewschemaCmd() *cobra.Command {
 }
 
 func delete(Field string) error {
-	res, err2 := api.GetSites()
-	if (res.Productplan) != res.Productplan || res.Productplan.Name == "free" {
+	res, err := api.GetSites()
+	if err != nil {
+		return err
+	}
+	if res.Productplan.Name == "free" {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
 		return nil
 	}
-	if err2 != nil {
-		return err2
-	}
+
+
 	var url string
 	var url1 string
 	conf := config.GetInstance()
 
 	url1 = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"
 	var resultResp1 Result
-	resp1, err1 := request.Rest(http.MethodGet, url1, nil, "")
-	err1 = json.Unmarshal(resp1, &resultResp1)
-	if err1 != nil {
-		return err1
+	resp, err := request.Rest(http.MethodGet, url1, nil, "")
+	err = json.Unmarshal(resp, &resultResp1)
+	if err != nil {
+		return err
 	}
+	var noMatch = true
 	for i := 0; i < len(resultResp1.Data); i++ {
 		if resultResp1.Data[i].Name == Field {
 			resultResp1.Data[i].Enabled = false
+			noMatch = false
 		}
 	}
+	if noMatch {
+		fmt.Println("Please enter the correct field name")
+		return nil
+	}
+
 	body, _ := json.Marshal(resultResp1)
 	url = conf.AdminConsoleAPIDomain + "/platform-configuration/default-fields?"
 
 	var resultResp Result
-	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
+	resp, err = request.Rest(http.MethodPost, url, nil, string(body))
 	err = json.Unmarshal(resp, &resultResp)
 	if err != nil {
 		return err
