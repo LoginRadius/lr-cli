@@ -18,6 +18,9 @@ func NewaddCmd() *cobra.Command {
 		Long:  `This commmand acts as a base command for add subcommands`,
 	}
 
+	hooksCmd := hooks.NewHooksCmd()
+	cmd.AddCommand(hooksCmd)
+
 	siteCmd := site.NewSiteCmd()
 	cmd.AddCommand(siteCmd)
 

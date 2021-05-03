@@ -41,11 +41,6 @@ func NewSiteCmd() *cobra.Command {
 	return cmd
 }
 func addSite() error {
-	checkInput := input()
-	if !checkInput {
-		fmt.Println("Please enter the input paramaters properly.")
-		return nil
-	}
 	checkPlan, err := plans()
 	if err != nil {
 		return err
@@ -54,6 +49,12 @@ func addSite() error {
 		fmt.Println("Please upgrade your plan to add more sites. ")
 		return nil
 	}
+	checkInput := input()
+	if !checkInput {
+		fmt.Println("Please enter the input paramaters properly.")
+		return nil
+	}
+
 	err = add()
 	if err != nil {
 		return err
