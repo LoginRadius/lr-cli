@@ -19,7 +19,7 @@ var planOption string
 var AppsInfo *api.CoreAppData
 
 type AddAppResponse struct {
-	AppId int `json:"appId"`
+	AppId int64 `json:"appId"`
 }
 
 func NewSiteCmd() *cobra.Command {
@@ -96,15 +96,17 @@ func input() bool {
 }
 
 func plans() (bool, error) {
-	AppsInfo, err := api.AppInfo()
+	AppsInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return false, err
 	}
-	if len(AppsInfo.Apps.Data) > 1 {
+	if len(AppsInfo) > 1 {
 		return true, nil
 	}
-	if AppsInfo.Apps.Data[0].Productplan.Name != "free" { //case for 1 App
-		return true, nil
+	for _, app := range AppsInfo {
+		if app.Productplan.Name != "free" { //case for 1 App
+			return true, nil
+		}
 	}
 	return false, nil
 }

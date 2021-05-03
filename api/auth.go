@@ -68,7 +68,7 @@ func AuthValidateToken() (*ValidateTokenResp, error) {
 }
 
 type AppID struct {
-	CurrentAppId int `json:"currentAppId"`
+	CurrentAppId int64 `json:"currentAppId"`
 }
 
 func CurrentID() (*AppID, error) {
@@ -103,7 +103,7 @@ func SitesBasic(tokens *SitesToken) error {
 	req.Header.Add("Origin", conf.DashboardDomain)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("%s", err.Error())
+		fmt.Printf("%s", err.Error())
 	}
 
 	defer resp.Body.Close()
@@ -129,7 +129,11 @@ func SitesBasic(tokens *SitesToken) error {
 	if err != nil {
 		return err
 	}
-	err = cmdutil.StoreCreds(resObj)
+	err = cmdutil.WriteFile("token.json", resObj)
+	if err != nil {
+		return err
+	}
+	_, err = GetAppsInfo()
 	if err != nil {
 		return err
 	}

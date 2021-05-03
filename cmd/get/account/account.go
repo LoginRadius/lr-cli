@@ -51,27 +51,8 @@ func NewaccountCmd() *cobra.Command {
 }
 
 func get(inpEmail string) error {
-	var resObj *cmdutil.APICred
-	res, err := cmdutil.GetAPICreds()
-	if err == nil {
-		resObj = &cmdutil.APICred{
-			Key:    res.Key,
-			Secret: res.Secret,
-		}
-	} else {
-		resp, err := api.GetSites()
-		if err != nil {
-			return err
-		}
-		resObj = &cmdutil.APICred{
-			Key:    resp.Key,
-			Secret: resp.Secret,
-		}
-		cmdutil.StoreAPICreds(resObj)
-	}
-
-	var emailstring = inpEmail
-	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account/identities?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret + "&email=" + emailstring
+	resObj, err := api.GetSites()
+	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account/identities?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret + "&email=" + inpEmail
 	var resultResp Result
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
 	if err != nil {
