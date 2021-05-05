@@ -3,6 +3,8 @@ package add
 import (
 	"github.com/loginradius/lr-cli/cmd/add/account"
 	"github.com/loginradius/lr-cli/cmd/add/domain"
+
+	"github.com/loginradius/lr-cli/cmd/add/hooks"
 	"github.com/loginradius/lr-cli/cmd/add/schema"
 	"github.com/loginradius/lr-cli/cmd/add/site"
 	"github.com/loginradius/lr-cli/cmd/add/social"
