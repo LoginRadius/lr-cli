@@ -4,6 +4,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/get/account"
 	"github.com/loginradius/lr-cli/cmd/get/accountPassword"
 	"github.com/loginradius/lr-cli/cmd/get/config"
+	"github.com/loginradius/lr-cli/cmd/get/hooks"
 	"github.com/loginradius/lr-cli/cmd/get/profiles"
 	"github.com/loginradius/lr-cli/cmd/get/schema"
 	"github.com/loginradius/lr-cli/cmd/get/site"
@@ -24,6 +25,9 @@ func NewGetCmd() *cobra.Command {
 		Short: "get command",
 		Long:  `This commmand acts as a base command for get subcommands`,
 	}
+
+	hooksCmd := hooks.NewHooksCmd()
+	cmd.AddCommand(hooksCmd)
 
 	siteCmd := site.NewSiteCmd()
 	cmd.AddCommand(siteCmd)
