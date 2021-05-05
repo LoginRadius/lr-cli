@@ -48,12 +48,9 @@ func NewHooksCmd() *cobra.Command {
 }
 
 func deleteHooks() error {
-	checkPlan, err := api.CurrentPlan()
+	err := api.CurrentPlan()
 	if err != nil {
 		return err
-	}
-	if !checkPlan {
-		return nil
 	}
 	checkHookID, err := api.CheckHookID(hookid)
 	if err != nil {

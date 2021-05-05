@@ -23,7 +23,7 @@ func NewHooksCmd() *cobra.Command {
 		This command adds webhooks which are configured to an App.
 		`),
 		Example: heredoc.Doc(`
-			$ lr adds hooks
+			$ lr adds hooks  
 
 			Webhook has been added.
  
@@ -36,18 +36,16 @@ func NewHooksCmd() *cobra.Command {
 }
 
 func addHooks() error {
+	err := api.CurrentPlan()
+	if err != nil {
+		return err
+	}
 	checkInput := input()
 	if !checkInput {
 		fmt.Println("Please enter the input paramaters properly.")
 		return nil
 	}
-	checkPlan, err := api.CurrentPlan()
-	if err != nil {
-		return err
-	}
-	if !checkPlan {
-		return nil
-	}
+
 	err = add()
 	if err != nil {
 		return err
@@ -71,6 +69,7 @@ func input() bool {
 		"4": "UpdateProfile",
 	}
 
+	//Currently supports only Developer plan event options.
 	fmt.Println("To select an Event, choose a correponding number from the following options: ")
 	fmt.Println("1 - Login")
 	fmt.Println("2 - Register")

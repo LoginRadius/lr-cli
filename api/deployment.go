@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"net/http"
 	"time"
@@ -168,14 +167,14 @@ func storeSiteInfo(data CoreAppData) map[int64]SitesReponse {
 	return siteInfo
 }
 
-func CurrentPlan() (bool, error) {
+func CurrentPlan() error {
 	sitesResp, err := GetSites()
 	if err != nil {
-		return false, err
+		return err
 	}
 	if sitesResp.Productplan.Name == "free" {
-		fmt.Println("Please switch to an app which enables this feature or upgrade your plan from Free Plan.")
-		return false, nil
+		return errors.New("Please switch to an app which enables this feature or upgrade your plan from Free Plan.")
+
 	}
-	return true, nil
+	return nil
 }
