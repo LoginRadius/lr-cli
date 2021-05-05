@@ -166,3 +166,15 @@ func storeSiteInfo(data CoreAppData) map[int64]SitesReponse {
 	}
 	return siteInfo
 }
+
+func CurrentPlan() error {
+	sitesResp, err := GetSites()
+	if err != nil {
+		return err
+	}
+	if sitesResp.Productplan.Name == "free" {
+		return errors.New("Please switch to an app which enables this feature or upgrade your plan from Free Plan.")
+
+	}
+	return nil
+}
