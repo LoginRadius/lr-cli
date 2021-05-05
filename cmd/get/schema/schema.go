@@ -15,7 +15,7 @@ func NewschemaCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "schema",
-		Short:   "get schema config",
+		Short:   "get schema",
 		Long:    `This commmand lists schema config`,
 		Example: heredoc.Doc(`$ lr get schema`),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -26,6 +26,10 @@ func NewschemaCmd() *cobra.Command {
 			fstatus1, _ := cmd.Flags().GetBool("active")
 			if fstatus1 {
 				temp = "active"
+			}
+			if !fstatus && !fstatus1 {
+				fmt.Println("Please use atleast one of the flags 'lr get schema --all' or 'lr get schema --active'")
+				return nil
 			}
 			return get()
 
