@@ -1,37 +1,15 @@
 package schema
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/config"
-	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
 )
 
 var temp string
-
-type Schema struct {
-	Display          string `json:"Display"`
-	Enabled          bool   `json:"Enabled"`
-	IsMandatory      bool   `json:"IsMandatory"`
-	Parent           string `json:"Parent"`
-	ParentDataSource string `json:"ParentDataSource"`
-	Permission       string `json:"Permission"`
-	Name             string `json:"name"`
-	Rules            string `json:"rules"`
-	Status           string `json:"status"`
-	Type             string `json:"type"`
-}
-type schemaStr struct {
-	Data []Schema `json:"Data"`
-}
-
-var url string
 
 func NewschemaCmd() *cobra.Command {
 
@@ -69,23 +47,7 @@ func get() error {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
 		return nil
 	}
-
-	conf := config.GetInstance()
-	if temp == "active" {
-		url = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"
-	}
-	if temp == "all" {
-		url = conf.AdminConsoleAPIDomain + "/platform-configuration/platform-registration-fields?"
-	}
-
-	var resultResp schemaStr
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
-
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(resp, &resultResp)
+	resultResp, err := api.GetFields(temp)
 	if err != nil {
 		return err
 	}
@@ -107,6 +69,7 @@ func get() error {
 	fmt.Scanln(&num)
 	for 1 > num || num > len(temp1) {
 		fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(temp1)) + " :")
+
 		fmt.Scanln(&num)
 	}
 	if resultResp.Data[temp1[num-1]].Parent == "" {
@@ -117,6 +80,7 @@ func get() error {
 		fmt.Println("ParentDataSource: ", resultResp.Data[temp1[num-1]].ParentDataSource)
 		fmt.Println("Permission: ", resultResp.Data[temp1[num-1]].Permission)
 		fmt.Println("Name: ", resultResp.Data[temp1[num-1]].Name)
+		fmt.Println("Options: ", resultResp.Data[temp1[num-1]].Options)
 		fmt.Println("Rules: ", resultResp.Data[temp1[num-1]].Rules)
 		fmt.Println("Status: ", resultResp.Data[temp1[num-1]].Status)
 		fmt.Println("Type: ", resultResp.Data[temp1[num-1]].Type)
