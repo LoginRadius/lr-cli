@@ -20,7 +20,6 @@ import (
 
 var temp int
 
-var urlall string
 var url1 string
 
 func NewschemaCmd() *cobra.Command {
@@ -70,6 +69,9 @@ func add(temp int) error {
 	resultResp1, err := api.GetFields("active")
 	if err != nil {
 		return err
+	}
+	if temp > len(temp1) || 0 > temp {
+		fmt.Println("please run 'lr get schema -all' first. Please enterthe field number accordingly")
 	}
 	resultResp.Data[temp1[temp-1]].Enabled = true
 
