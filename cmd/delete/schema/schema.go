@@ -29,9 +29,6 @@ func NewschemaCmd() *cobra.Command {
 			if field == 0 {
 				return &cmdutil.FlagError{Err: errors.New("`fieldname` is required argument")}
 			}
-			// if fieldName == "emailid" || fieldName == "password" {
-			// 	return &cmdutil.FlagError{Err: errors.New("EmailId and Password fields cannot be deleted")}
-			// }
 			return delete(field)
 
 		},
@@ -59,7 +56,7 @@ func delete(Field int) error {
 	resultResp1, err := api.GetFields("active")
 
 	if Field > len(resultResp1.Data) {
-		fmt.Println("please run 'lr get schema -all' first. Please enter the field number accordingly")
+		fmt.Println("please run 'lr get schema -active' first. Please enter the field number accordingly")
 		return nil
 	}
 
