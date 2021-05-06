@@ -16,7 +16,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var fieldName string
+var field int
 
 func NewschemaCmd() *cobra.Command {
 
@@ -26,24 +26,21 @@ func NewschemaCmd() *cobra.Command {
 		Long:    `This commmand deletes schema fields`,
 		Example: heredoc.Doc(`$ lr delete schema --fieldname <fieldname>`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if fieldName == "" {
+			if field == 0 {
 				return &cmdutil.FlagError{Err: errors.New("`fieldname` is required argument")}
 			}
-			if fieldName == "emailid" || fieldName == "password" {
-				return &cmdutil.FlagError{Err: errors.New("EmailId and Password fields cannot be deleted")}
-			}
-			return delete(fieldName)
+			return delete(field)
 
 		},
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&fieldName, "fieldname", "f", "", "field name")
+	fl.IntVarP(&field, "fieldname", "f", 0, "field name")
 
 	return cmd
 }
 
-func delete(Field string) error {
+func delete(Field int) error {
 	res, err := api.GetSites()
 	if err != nil {
 		return err
@@ -57,17 +54,18 @@ func delete(Field string) error {
 	conf := config.GetInstance()
 
 	resultResp1, err := api.GetFields("active")
-	var noMatch = true
-	for i := 0; i < len(resultResp1.Data); i++ {
-		if resultResp1.Data[i].Name == Field {
-			resultResp1.Data[i].Enabled = false
-			noMatch = false
-		}
-	}
-	if noMatch {
-		fmt.Println("Please enter the correct field name")
+
+	if Field > len(resultResp1.Data) {
+		fmt.Println("please run 'lr get schema -active' first. Please enter the field number accordingly")
 		return nil
 	}
+
+	if resultResp1.Data[Field-1].Name == "emailid" || resultResp1.Data[Field-1].Name == "password" {
+		fmt.Println("EmailId and Password fields cannot be deleted")
+		return nil
+	}
+
+	resultResp1.Data[Field-1].Enabled = false
 
 	body, _ := json.Marshal(resultResp1)
 	url = conf.AdminConsoleAPIDomain + "/platform-configuration/default-fields?"

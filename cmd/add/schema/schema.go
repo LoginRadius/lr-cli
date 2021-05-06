@@ -71,7 +71,8 @@ func add(temp int) error {
 		return err
 	}
 	if temp > len(temp1) || 0 > temp {
-		fmt.Println("please run 'lr get schema -all' first. Please enterthe field number accordingly")
+		fmt.Println("please run 'lr get schema -all' first. Please enter the field number accordingly")
+		return nil
 	}
 	resultResp.Data[temp1[temp-1]].Enabled = true
 
