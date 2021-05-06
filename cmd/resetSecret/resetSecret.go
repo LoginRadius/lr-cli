@@ -1,14 +1,10 @@
 package resetSecret
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
+	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
-	"github.com/loginradius/lr-cli/request"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/spf13/cobra"
 )
 
@@ -39,33 +35,11 @@ func NewResetCmd() *cobra.Command {
 }
 
 func reset() error {
-	conf := config.GetInstance()
-	changeURL := conf.AdminConsoleAPIDomain + "/security-configuration/api-credentials/change?"
-
-	resp, err := request.Rest(http.MethodGet, changeURL, nil, "")
+	err := api.ResetSecret()
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(resp, &resObj) //store reset response
-	if err != nil {
-		return err
-	}
-
-	creds, _ := cmdutil.GetAPICreds()
-
-	if creds != nil {
-		creds.Secret = resObj.Secret
-		err = cmdutil.StoreAPICreds(creds)
-		if err != nil {
-			return err
-		}
-	}
-	credResp, _ := json.Marshal(resObj)
-	err = cmdutil.StoreCreds(credResp)
-	if err != nil {
-		return err
-	}
-	log.Println("API Secret reset successfully")
+	fmt.Println("API Secret reset successfully")
 
 	return nil
 }

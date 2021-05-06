@@ -1,7 +1,6 @@
 package cmdutil
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -9,31 +8,14 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path"
 	"path/filepath"
 	"runtime"
 )
 
-type Token struct {
-	AccessToken string `json:"access_token"`
-}
-
-type APICred struct {
-	Key    string `json:"Key"`
-	Secret string `json:"Secret"`
-}
-
-func StoreCreds(cred []byte) error {
+func ReadFile(filename string) ([]byte, error) {
 	user, _ := user.Current()
-
-	os.Mkdir(filepath.Join(user.HomeDir, ".lrcli"), 0755)
-	fileName := filepath.Join(user.HomeDir, ".lrcli", "token.json")
-
-	return ioutil.WriteFile(fileName, cred, 0644)
-
-}
-func GetCreds() ([]byte, error) {
-	user, _ := user.Current()
-	fileName := filepath.Join(user.HomeDir, ".lrcli", "token.json")
+	fileName := filepath.Join(user.HomeDir, ".lrcli", filename)
 	_, err := os.Stat(fileName)
 	if os.IsNotExist(err) {
 		return nil, err
@@ -41,26 +23,11 @@ func GetCreds() ([]byte, error) {
 	return ioutil.ReadFile(fileName)
 }
 
-func StoreAPICreds(cred *APICred) error {
+func WriteFile(filename string, data []byte) error {
 	user, _ := user.Current()
-	fileName := filepath.Join(user.HomeDir, ".lrcli", "creds.json")
-	dataBytes, _ := json.Marshal(cred)
-	return ioutil.WriteFile(fileName, dataBytes, 0644)
-
-}
-
-func GetAPICreds() (*APICred, error) {
-	var v APICred
-	user, _ := user.Current()
-	fileName := filepath.Join(user.HomeDir, ".lrcli", "creds.json")
-	_, err := os.Stat(fileName)
-	if os.IsNotExist(err) {
-		return nil, err
-	}
-
-	file, _ := ioutil.ReadFile(fileName)
-	json.Unmarshal(file, &v)
-	return &v, nil
+	os.Mkdir(filepath.Join(user.HomeDir, ".lrcli"), 0755)
+	fileName := filepath.Join(user.HomeDir, ".lrcli", filename)
+	return ioutil.WriteFile(fileName, data, 0644)
 }
 
 func Openbrowser(url string) {
@@ -107,4 +74,17 @@ func ThemeConstants(theme string) (ThemeType, ThemeType) {
 		"Helsinki": Theme3Profile,
 	}
 	return auths[theme], profiles[theme]
+}
+
+func DeleteFiles() error {
+	user, _ := user.Current()
+	dirName := filepath.Join(user.HomeDir, ".lrcli")
+	dir, err := ioutil.ReadDir(dirName)
+	for _, d := range dir {
+		os.RemoveAll(path.Join([]string{dirName, d.Name()}...))
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }

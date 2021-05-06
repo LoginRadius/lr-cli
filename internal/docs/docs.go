@@ -19,7 +19,6 @@ func GenMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	buf := new(bytes.Buffer)
 	name := cmd.CommandPath()
 
-	buf.WriteString("## " + name + "\n\n")
 	buf.WriteString(cmd.Short + "\n\n")
 	if len(cmd.Long) > 0 {
 		buf.WriteString("### Synopsis\n\n")
@@ -68,7 +67,7 @@ func GenMarkdownTreeCustom(cmd *cobra.Command, dir string) error {
 	}
 	defer f.Close()
 
-	if _, err := io.WriteString(f, filePrepender(filename)); err != nil {
+	if _, err := io.WriteString(f, filePrepender(cmd.CommandPath(), cmd.Short)); err != nil {
 		return err
 	}
 	if err := GenMarkdownCustom(cmd, f, linkHandler); err != nil {
@@ -96,10 +95,10 @@ func printOptions(buf *bytes.Buffer, cmd *cobra.Command, name string) error {
 	return nil
 }
 
-func filePrepender(filename string) string {
+func filePrepender(title string, description string) string {
 	return `---
-title: Manual
-description: A LoginRadius CLI Manual
+title: ` + title + `
+description: ` + description + `
 ---
 `
 }

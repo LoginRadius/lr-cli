@@ -22,6 +22,7 @@ type APIErr struct {
 	Errorcode        *int    `json:"ErrorCode"`
 	Errormessage     *string `json:"ErrorMessage"`
 	Errordescription *string `json:"ErrorDescription"`
+	Message          *string `json:"Message"`
 }
 
 func Rest(method string, url string, headers map[string]string, payload string) ([]byte, error) {
@@ -43,7 +44,7 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 	var token TokenResp
 
 	// LoginRadius Default Headers
-	v2, err := cmdutil.GetCreds()
+	v2, err := cmdutil.ReadFile("token.json")
 	err = json.Unmarshal(v2, &token)
 	if err == nil && token.AppName != "" {
 		req.Header.Set("x-is-loginradius--sign", token.XSign)
@@ -90,6 +91,8 @@ func checkAPIError(respData []byte) ([]byte, error) {
 	} else if errResp.Errorcode != nil {
 		if errResp.Errormessage != nil {
 			return nil, errors.New(*errResp.Errormessage)
+		} else if errResp.Message != nil {
+			return nil, errors.New(*errResp.Message)
 		} else {
 			return nil, errors.New("Something went wrong at our end, please try again.")
 		}

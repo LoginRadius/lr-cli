@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/loginradius/lr-cli/cmdutil"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
@@ -52,7 +52,7 @@ func NewServerTimeCmd() *cobra.Command {
 }
 func servertime() error {
 	conf := config.GetInstance()
-	apiObj, err := getSecret()
+	apiObj, err := api.GetSites()
 	if err != nil {
 		return err
 	}
@@ -83,26 +83,4 @@ func servertime() error {
 		fmt.Println("   EndTime:", resObj.Sott["EndTime"].(string))
 	}
 	return nil
-}
-
-func getSecret() (*cmdutil.APICred, error) {
-	res, _ := cmdutil.GetAPICreds()
-	if res != nil {
-		return res, nil
-	} else {
-		var res cmdutil.APICred
-		conf := config.GetInstance()
-		siteURL := conf.AdminConsoleAPIDomain + "/deployment/sites?"
-		resp, err := request.Rest(http.MethodGet, siteURL, nil, "")
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(resp, &res)
-		err = cmdutil.StoreAPICreds(&res)
-		if err != nil {
-			return nil, err
-		}
-		return &res, nil
-	}
-
 }

@@ -2,9 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 )
@@ -61,4 +65,79 @@ func AuthValidateToken() (*ValidateTokenResp, error) {
 		return nil, err
 	}
 	return &resObj, nil
+}
+
+type AppID struct {
+	CurrentAppId int64 `json:"currentAppId"`
+}
+
+func CurrentID() (*AppID, error) {
+	conf := config.GetInstance()
+	config := conf.AdminConsoleAPIDomain + "/auth/config?"
+	var currentAppId AppID
+	resp, err := request.Rest(http.MethodGet, config, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &currentAppId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &currentAppId, nil
+}
+
+func SitesBasic(tokens *SitesToken) error {
+	conf := config.GetInstance()
+	var newToken SitesToken
+	client := &http.Client{}
+	basic := conf.AdminConsoleAPIDomain + "/auth/basicsettings?"
+	req, err := http.NewRequest(http.MethodGet, basic, nil)
+	if err != nil {
+		log.Printf("Could not make request % -v", err)
+	}
+	req.Header.Add("x-is-loginradius--sign", tokens.XSign)
+	req.Header.Add("x-is-loginradius--token", tokens.XToken)
+	req.Header.Add("x-is-loginradius-ajax", "true")
+	req.Header.Add("Content-Type", "application/json; charset=utf-8")
+	req.Header.Add("Origin", conf.DashboardDomain)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("%s", err.Error())
+	}
+
+	defer resp.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	//obtaining the new tokens
+	err = json.Unmarshal(bodyBytes, &newToken)
+	if err != nil {
+		return err
+	}
+	result := LoginResponse{
+		APIVersion:    tokens.APIVersion,
+		AppName:       tokens.AppName,
+		AppID:         tokens.AppID,
+		Authenticated: true,
+		XSign:         newToken.XSign, //switching tokens
+		XToken:        newToken.XToken,
+	}
+	resObj, err := json.Marshal(result)
+	err = cmdutil.DeleteFiles()
+	if err != nil {
+		return err
+	}
+	err = cmdutil.WriteFile("token.json", resObj)
+	if err != nil {
+		return err
+	}
+	_, err = GetAppsInfo()
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }

@@ -46,11 +46,11 @@ func NewThemeCmd() *cobra.Command {
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if theme == "" {
-				return &cmdutil.FlagError{Err: errors.New("`theme` is required argument")}
+				return errors.New("`theme` is required argument")
 			}
 			valid := contains(ListTheme, theme)
 			if !valid {
-				return &cmdutil.FlagError{Err: errors.New("Please Enter a valid theme")}
+				return errors.New("Please Enter a valid theme")
 			}
 			return themes()
 		},
@@ -192,7 +192,7 @@ func otherCalls() error {
 	}
 
 	var app api.LoginResponse
-	appInfo, err1 := cmdutil.GetCreds()
+	appInfo, err1 := cmdutil.ReadFile("token.json")
 	if err1 != nil {
 		return err1
 	}

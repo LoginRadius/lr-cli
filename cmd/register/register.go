@@ -3,7 +3,6 @@ package register
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -42,9 +41,9 @@ func register(token string) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Successfully Registered")
+	fmt.Println("Successfully Registered")
 	creds, _ := json.Marshal(resObj)
-	return cmdutil.StoreCreds(creds)
+	return cmdutil.WriteFile("token.json", creds)
 }
 
 func getAccessToken(w http.ResponseWriter, r *http.Request) {

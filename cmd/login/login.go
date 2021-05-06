@@ -31,11 +31,11 @@ func NewLoginCmd() *cobra.Command {
 		Use:   "login",
 		Short: "Login to LR account",
 		Long: heredoc.Doc(`
-			This commmand logs user into the LR account.
+		This commmand logs user into the LR account.
 		`),
 		Example: heredoc.Doc(`
-		    # Opens Interactive Mode
-			$ lr login
+		# Opens Interactive Mode
+		$ lr login
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			isValid, err := validateLogin()
@@ -72,13 +72,18 @@ func doLogin(accessToken string) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Successfully Logged In")
 	creds, _ := json.Marshal(resObj)
-	return cmdutil.StoreCreds(creds)
+	cmdutil.WriteFile("token.json", creds)
+	_, err = api.GetAppsInfo()
+	if err != nil {
+		return err
+	}
+	log.Println("Successfully Logged In")
+	return nil
 }
 
 func validateLogin() (bool, error) {
-	_, err := cmdutil.GetCreds()
+	_, err := cmdutil.ReadFile("token.json")
 	if err != nil {
 		return false, nil
 	}
