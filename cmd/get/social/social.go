@@ -54,6 +54,9 @@ func get() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(resultResp)
+	for i := 0; i < len(resultResp.Data); i++ {
+		fmt.Print(fmt.Sprint(i+1) + ".")
+		fmt.Println(resultResp.Data[i].Provider)
+	}
 	return nil
 }

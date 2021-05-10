@@ -60,7 +60,7 @@ func getSite() error {
 			return err
 		}
 		fmt.Println("Active site: ")
-		val, _ := AppInfo[currentID.CurrentAppId]
+		val, _ := AppInfo[currentID]
 		Output(val)
 	} else if *all && (!*active && *appid == -1) {
 		fmt.Println("All sites: ")

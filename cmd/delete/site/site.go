@@ -60,7 +60,7 @@ func deleteSite() error {
 	if err != nil {
 		return err
 	}
-	if currentID.CurrentAppId == appid {
+	if currentID == appid {
 		fmt.Println("This is the current active site. Please switch to another site before deleting.")
 		return nil
 	}
