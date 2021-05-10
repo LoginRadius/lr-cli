@@ -11,7 +11,7 @@ import (
 
 type SitesToken struct {
 	APIVersion    string `json:"ApiVersion"`
-	AppID         int32  `json:"AppId"`
+	AppID         int64  `json:"AppId"`
 	AppName       string `json:"AppName"`
 	Authenticated bool   `json:"authenticated"`
 	XSign         string `json:"xsign"`

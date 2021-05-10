@@ -17,7 +17,7 @@ var conf = config.GetInstance()
 
 type LoginResponse struct {
 	APIVersion    string      `json:"api_Version"`
-	AppID         int32       `json:"app_id"`
+	AppID         int64       `json:"app_id"`
 	AppName       string      `json:"app_name"`
 	Authenticated bool        `json:"authenticated"`
 	NoOfLogins    int32       `json:"no_of_logins"`
@@ -26,15 +26,25 @@ type LoginResponse struct {
 	XToken        string      `json:"xtoken"`
 }
 
-func AuthLogin(accessToken string) (*LoginResponse, error) {
+type LoginOpts struct {
+	AccessToken string `schema:"token" json:"accesstoken"`
+	AppName     string `schema:"appName"`
+	Domain      string `schema:"domain" json:"domain"`
+	DataCenter  string `schema:"dataCenter" json:"dataCenter"`
+	Plan        string `schema:"plan" json:"plan"`
+	Role        string `schema:"role" json:"role"`
+	LookingFor  string `schema:"lookingFor" json:"lookingFor"`
+}
 
-	// Admin Console Backend API
+func AuthLogin(params LoginOpts) (*LoginResponse, error) {
+
 	var resObj LoginResponse
 
 	backendURL := conf.AdminConsoleAPIDomain + "/auth/login"
-	body, _ := json.Marshal(map[string]string{
-		"accesstoken": accessToken,
-	})
+	if params.AppName != "" {
+		backendURL += "?appName=" + params.AppName
+	}
+	body, _ := json.Marshal(params)
 	resp, err := request.Rest(http.MethodPost, backendURL, nil, string(body))
 	if err != nil {
 		return nil, err
@@ -65,26 +75,6 @@ func AuthValidateToken() (*ValidateTokenResp, error) {
 		return nil, err
 	}
 	return &resObj, nil
-}
-
-type AppID struct {
-	CurrentAppId int64 `json:"currentAppId"`
-}
-
-func CurrentID() (*AppID, error) {
-	conf := config.GetInstance()
-	config := conf.AdminConsoleAPIDomain + "/auth/config?"
-	var currentAppId AppID
-	resp, err := request.Rest(http.MethodGet, config, nil, "")
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(resp, &currentAppId)
-	if err != nil {
-		return nil, err
-	}
-
-	return &currentAppId, nil
 }
 
 func SitesBasic(tokens *SitesToken) error {
@@ -140,4 +130,55 @@ func SitesBasic(tokens *SitesToken) error {
 
 	return nil
 
+}
+
+func GetAppsInfo() (map[int64]SitesReponse, error) {
+	var Apps CoreAppData
+	data, err := cmdutil.ReadFile("siteInfo.json")
+	if err != nil {
+		coreAppData := conf.AdminConsoleAPIDomain + "/auth/core-app-data?"
+		data, err = request.Rest(http.MethodGet, coreAppData, nil, "")
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(data, &Apps)
+		if err != nil {
+			return nil, err
+		}
+		return storeSiteInfo(Apps), nil
+	}
+	var siteInfo map[int64]SitesReponse
+	err = json.Unmarshal(data, &siteInfo)
+	return siteInfo, nil
+}
+
+func CurrentID() (int64, error) {
+	var loginInfo LoginResponse
+	data, err := cmdutil.ReadFile("token.json")
+	if err != nil {
+		return 0, err
+	}
+	err = json.Unmarshal(data, &loginInfo)
+	if err != nil {
+		return 0, err
+	}
+	return loginInfo.AppID, nil
+}
+
+func storeSiteInfo(data CoreAppData) map[int64]SitesReponse {
+	siteInfo := make(map[int64]SitesReponse, len(data.Apps.Data))
+	for _, app := range data.Apps.Data {
+		siteInfo[app.Appid] = app
+	}
+	obj, _ := json.Marshal(siteInfo)
+	cmdutil.WriteFile("siteInfo.json", obj)
+	currentId, err := CurrentID()
+	if err == nil {
+		site, ok := siteInfo[currentId]
+		if ok {
+			obj, _ := json.Marshal(site)
+			cmdutil.WriteFile("currentSite.json", obj)
+		}
+	}
+	return siteInfo
 }

@@ -47,7 +47,7 @@ func setSite() error {
 		return err
 	}
 	currentID, err := api.CurrentID()
-	if currentID.CurrentAppId == appid {
+	if currentID == appid {
 		fmt.Println("You are already using this site")
 		return nil
 	}

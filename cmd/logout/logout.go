@@ -2,7 +2,6 @@ package logout
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/user"
@@ -50,7 +49,7 @@ func logout() error {
 		}
 
 	}
-	log.Println("You are successfully Logged Out")
+	fmt.Println("You are successfully Logged Out")
 	return nil
 }
 
