@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/schema"
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
@@ -13,7 +14,11 @@ import (
 )
 
 var tempServer *cmdutil.TempServer
-var tempToken string
+
+var loginparams api.LoginOpts
+
+type ResigterOpts struct {
+}
 
 func NewRegisterCmd() *cobra.Command {
 
@@ -30,24 +35,35 @@ func NewRegisterCmd() *cobra.Command {
 				RouteName:   "/postLogin",
 			})
 			tempServer.Server.ListenAndServe()
-			return register(tempToken)
+			return register()
 		},
 	}
 	return cmd
 }
 
-func register(token string) error {
-	resObj, err := api.AuthLogin(token)
+func register() error {
+	resObj, err := api.AuthLogin(loginparams)
+	if err != nil {
+		return err
+	}
+	creds, _ := json.Marshal(resObj)
+	err = cmdutil.WriteFile("token.json", creds)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Successfully Authenticated, Fetching Your Site(s)...")
+	_, err = api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
 	fmt.Println("Successfully Registered")
-	creds, _ := json.Marshal(resObj)
-	return cmdutil.WriteFile("token.json", creds)
+	return nil
 }
 
 func getAccessToken(w http.ResponseWriter, r *http.Request) {
-	tempToken = r.URL.Query().Get("token")
+	if err := schema.NewDecoder().Decode(&loginparams, r.URL.Query()); err != nil {
+		fmt.Fprintf(w, err.Error())
+	}
 	fmt.Fprintf(w, "You are Successfully Authenticated, Kindly Close this browser window and go back to CLI")
 	time.AfterFunc(1*time.Second, tempServer.CloseServer)
 }

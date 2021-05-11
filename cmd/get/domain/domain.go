@@ -2,19 +2,12 @@ package domain
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
 	"github.com/spf13/cobra"
 )
-
-var fileName string
-
-type domainManagement struct {
-	CallbackUrl string `json:"CallbackUrl"`
-}
-
-var url string
 
 func NewdomainCmd() *cobra.Command {
 
@@ -29,7 +22,11 @@ func NewdomainCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(resp.Callbackurl)
+			res1 := strings.Split(resp.Callbackurl, ";")
+			for i := 0; i < len(res1); i++ {
+				fmt.Print(fmt.Sprint(i+1) + ".")
+				fmt.Println(res1[i])
+			}
 			return nil
 
 		},

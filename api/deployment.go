@@ -129,44 +129,6 @@ func UpdateDomain(domains string) error {
 	return nil
 }
 
-func GetAppsInfo() (map[int64]SitesReponse, error) {
-	var Apps CoreAppData
-	data, err := cmdutil.ReadFile("siteInfo.json")
-	if err != nil {
-		coreAppData := conf.AdminConsoleAPIDomain + "/auth/core-app-data?"
-		data, err = request.Rest(http.MethodGet, coreAppData, nil, "")
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(data, &Apps)
-		if err != nil {
-			return nil, err
-		}
-		return storeSiteInfo(Apps), nil
-	}
-	var siteInfo map[int64]SitesReponse
-	err = json.Unmarshal(data, &siteInfo)
-	return siteInfo, nil
-}
-
-func storeSiteInfo(data CoreAppData) map[int64]SitesReponse {
-	siteInfo := make(map[int64]SitesReponse, len(data.Apps.Data))
-	for _, app := range data.Apps.Data {
-		siteInfo[app.Appid] = app
-	}
-	obj, _ := json.Marshal(siteInfo)
-	cmdutil.WriteFile("siteInfo.json", obj)
-	currentId, err := CurrentID()
-	if err == nil {
-		site, ok := siteInfo[currentId.CurrentAppId]
-		if ok {
-			obj, _ := json.Marshal(site)
-			cmdutil.WriteFile("currentSite.json", obj)
-		}
-	}
-	return siteInfo
-}
-
 func CurrentPlan() error {
 	sitesResp, err := GetSites()
 	if err != nil {

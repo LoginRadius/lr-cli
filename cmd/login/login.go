@@ -3,7 +3,6 @@ package login
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -43,7 +42,7 @@ func NewLoginCmd() *cobra.Command {
 			if err != nil {
 				return err
 			} else if isValid {
-				log.Printf("%s", "You are already been logged in")
+				fmt.Printf("%s", "You are already been logged in")
 				return nil
 			}
 			cmdutil.Openbrowser(conf.HubPageDomain + "/auth.aspx?return_url=http://localhost:8089/postLogin")
@@ -68,17 +67,24 @@ func getAccessToken(w http.ResponseWriter, r *http.Request) {
 
 func doLogin(accessToken string) error {
 
-	resObj, err := api.AuthLogin(accessToken)
+	params := api.LoginOpts{
+		AccessToken: accessToken,
+	}
+	resObj, err := api.AuthLogin(params)
 	if err != nil {
 		return err
 	}
 	creds, _ := json.Marshal(resObj)
-	cmdutil.WriteFile("token.json", creds)
+	err = cmdutil.WriteFile("token.json", creds)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Successfully Authenticated, Fetching Your Site(s)...")
 	_, err = api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
-	log.Println("Successfully Logged In")
+	fmt.Println("Successfully Logged In")
 	return nil
 }
 
