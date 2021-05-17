@@ -88,3 +88,13 @@ func DeleteFiles() error {
 	}
 	return nil
 }
+
+func DeleteFile(filename string) error {
+	user, _ := user.Current()
+	fileName := filepath.Join(user.HomeDir, ".lrcli", filename)
+	err := os.Remove(fileName)
+	if err != nil {
+		return err
+	}
+	return nil
+}

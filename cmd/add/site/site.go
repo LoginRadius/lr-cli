@@ -2,11 +2,13 @@ package site
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
@@ -16,6 +18,7 @@ var AppName string
 var Domain string
 var PlanName string
 var planOption string
+var option string
 var AppsInfo *api.CoreAppData
 
 type AddAppResponse struct {
@@ -49,6 +52,15 @@ func addSite() error {
 		fmt.Println("Please upgrade your plan to add more sites. ")
 		return nil
 	}
+
+	checkCard, err := cardDetails()
+	if err != nil {
+		return err
+	}
+	if !checkCard {
+		return nil
+	}
+
 	checkInput := input()
 	if !checkInput {
 		fmt.Println("Please enter the input paramaters properly.")
@@ -110,6 +122,29 @@ func plans() (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+func cardDetails() (bool, error) {
+	conf := config.GetInstance()
+	paymentInfo, err := api.PaymentInfo()
+	if err != nil {
+		return false, err
+	}
+	paymentMethodId := paymentInfo.Data.Order[0].Paymentdetail.Stripepaymentmethodid
+	if paymentMethodId == "" {
+		fmt.Println("Adding more than one app requires valid payment information. Please update card details in dashboard via browser.")
+		fmt.Println("(Note: User must re-login after updating details in the browser)")
+		fmt.Printf("Press Y to open Browser window:")
+		fmt.Scanf("%s", &option)
+		if option != "Y" {
+			return false, errors.New("Action not possible without updating card details.")
+		}
+		cmdutil.Openbrowser(conf.DashboardDomain + "/apps")
+		fmt.Println("Please Re-Login via CLI.")
+		return false, nil
+	}
+	return true, nil
+
 }
 
 func add() error {
