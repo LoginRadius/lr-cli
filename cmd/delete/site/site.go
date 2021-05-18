@@ -8,6 +8,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
@@ -101,10 +102,20 @@ func delete(appInfo api.SitesReponse) (bool, error) {
 	}
 	var resObj Delete
 	err = json.Unmarshal(resp, &resObj)
+
 	if err != nil {
 		return false, err
 	}
+
 	if resObj.Isdeleted == true {
+		err := cmdutil.DeleteFile("siteInfo.json")
+		if err != nil {
+			return false, err
+		}
+		_, err = api.GetAppsInfo()
+		if err != nil {
+			return false, err
+		}
 		return true, nil
 	}
 	return false, nil
