@@ -7,7 +7,6 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-
 	"github.com/loginradius/lr-cli/cmdutil"
 
 	"github.com/spf13/cobra"
@@ -40,6 +39,10 @@ func NewdomainCmd() *cobra.Command {
 				return err
 			}
 			urls := strings.Split(p.Callbackurl, ";")
+			if len(urls) == 1 {
+				return &cmdutil.FlagError{Err: errors.New("Cannot delete the last domain")}
+
+			}
 			for index, url := range urls {
 				if url == opts.Domain {
 					urls = append(urls[:index], urls[index+1:]...)
