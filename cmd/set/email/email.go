@@ -50,9 +50,9 @@ func NewemailCmd() *cobra.Command {
 	}
 	fl := cmd.Flags()
 
-	fl.IntVarP(&opts.EmailLinkExpire, "link_expire", "a", 0, "email link expire")
-	fl.IntVarP(&opts.EmailNotificationCount, "notif_count", "b", 0, "number of email notifications")
-	fl.IntVarP(&opts.EmailNotificationFrequency, "notif_frequency", "c", 0, "frequency of email notification")
+	fl.IntVarP(&opts.EmailLinkExpire, "link_expire", "l", 0, "Email Token Validity (Minutes)")
+	fl.IntVarP(&opts.EmailNotificationCount, "notif_count", "c", 0, "Request Limit")
+	fl.IntVarP(&opts.EmailNotificationFrequency, "notif_frequency", "f", 0, "Request Disabled Period (Minutes)")
 
 	return cmd
 }
