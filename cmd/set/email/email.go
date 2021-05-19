@@ -50,9 +50,9 @@ func NewemailCmd() *cobra.Command {
 	}
 	fl := cmd.Flags()
 
-	fl.IntVarP(&opts.EmailLinkExpire, "email_link_expire", "a", 0, "usage")
-	fl.IntVarP(&opts.EmailNotificationCount, "email_notif_count", "b", 0, "usage")
-	fl.IntVarP(&opts.EmailNotificationFrequency, "email_notif_frequency", "c", 0, "domain name")
+	fl.IntVarP(&opts.EmailLinkExpire, "email_link_expire", "a", 0, "email link expire")
+	fl.IntVarP(&opts.EmailNotificationCount, "email_notif_count", "b", 0, "number of email notifications")
+	fl.IntVarP(&opts.EmailNotificationFrequency, "email_notif_frequency", "c", 0, "frequency of email notification")
 
 	return cmd
 }
@@ -77,7 +77,9 @@ func set(a int, b int, c int) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("{EmailLinkExpire, EmailNotificationCount, EmailNotificationFrequency}\n")
-	fmt.Println(resultResp)
+	fmt.Println("successfully configured")
+	fmt.Println("EmailLinkExpire: ", resultResp.EmailLinkExpire)
+	fmt.Println("EmailNotificationCount: ", resultResp.EmailNotificationCount)
+	fmt.Println("EmailNotificationFrequency: ", resultResp.EmailNotificationFrequency)
 	return nil
 }

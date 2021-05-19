@@ -59,7 +59,7 @@ func get(UID string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("password hash for UID:" + UID + " is" + resultResp.PasswordHash)
+	fmt.Println("password hash for UID:" + UID + " is " + resultResp.PasswordHash)
 
 	return nil
 }

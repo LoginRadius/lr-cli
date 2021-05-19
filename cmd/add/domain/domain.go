@@ -60,11 +60,16 @@ func NewdomainCmd() *cobra.Command {
 }
 
 func add(allDomains string, newDomain string) error {
-	domain := allDomains + ";" + newDomain
+	domain := ""
+	if allDomains == "" {
+		domain = newDomain
+	} else {
+		domain = allDomains + ";" + newDomain
+	}
 	err := api.UpdateDomain(domain)
 	if err != nil {
 		return err
 	}
-	fmt.Println("Your Domain " + newDomain + "is now whitelisted")
+	fmt.Println("Your Domain " + newDomain + " is now whitelisted")
 	return nil
 }

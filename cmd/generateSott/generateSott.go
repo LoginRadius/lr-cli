@@ -2,12 +2,10 @@ package generateSott
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 
@@ -39,16 +37,19 @@ func NewgenerateSottCmd() *cobra.Command {
 		Use:     "generate-sott",
 		Short:   "generates sott",
 		Long:    `This commmand generates sott`,
-		Example: heredoc.Doc(`$ lr generate sott`),
+		Example: heredoc.Doc(`$ lr generate-sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> -c <technology>`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.FromDate == "" {
-				return &cmdutil.FlagError{Err: errors.New("`FromDate` is require argument")}
-			}
-			if opts.ToDate == "" {
-				return &cmdutil.FlagError{Err: errors.New("`ToDate` is require argument")}
-			}
-			if opts.Technology == "" {
-				return &cmdutil.FlagError{Err: errors.New("`technology` is require argument")}
+			if opts.FromDate == "" || opts.ToDate == "" || opts.Technology == "" {
+				if opts.FromDate == "" {
+					fmt.Println("FromDate (mm/dd/yyyy) is a required argument")
+				}
+				if opts.ToDate == "" {
+					fmt.Println("ToDate (mm/dd/yyyy) is a required argument")
+				}
+				if opts.Technology == "" {
+					fmt.Println("technology is a required argument")
+				}
+				return nil
 			}
 			return generate(opts)
 
@@ -81,7 +82,9 @@ func generate(opts *sott) error {
 		return err
 	}
 	fmt.Println("sott generated successfully")
-	fmt.Println("{AuthenticityToken, Comment, Sott, Technology}")
-	fmt.Println(resultResp)
+	fmt.Println("AunthenticityToken: " + resultResp.AuthenticityToken)
+	fmt.Println("Comment: " + resultResp.Comment)
+	fmt.Println("Sott: " + resultResp.Sott)
+	fmt.Println("Technology: " + resultResp.Technology)
 	return nil
 }
