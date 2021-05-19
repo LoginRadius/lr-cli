@@ -84,7 +84,6 @@ func add1(opts1 *socialProvider) error {
 	var requestBody socialProviderList
 	requestBody.Data = append(requestBody.Data, *opts1)
 	body, _ := json.Marshal(requestBody)
-	fmt.Println(string(body))
 	var resultResp socialProviderList
 	resp1, err := request.Rest(http.MethodPost, url1, nil, string(body))
 	if err != nil {
@@ -99,7 +98,6 @@ func add1(opts1 *socialProvider) error {
 	var requestBody2 socialProviderList2
 	requestBody2.Data = append(requestBody2.Data, *opts2)
 	body1, _ := json.Marshal(requestBody2)
-	fmt.Println(string(body1))
 
 	var resultResp2 socialProviderList2
 	resp, err1 := request.Rest(http.MethodPost, url2, nil, string(body1))
