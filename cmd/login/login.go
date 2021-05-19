@@ -37,12 +37,10 @@ func NewLoginCmd() *cobra.Command {
 		$ lr login
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isValid, err := validateLogin()
+			isValid := validateLogin()
 
-			if err != nil {
-				return err
-			} else if isValid {
-				fmt.Printf("%s", "You are already been logged in")
+			if isValid {
+				fmt.Println("You are already logged in")
 				return nil
 			}
 			cmdutil.Openbrowser(conf.HubPageDomain + "/auth.aspx?return_url=http://localhost:8089/postLogin")
@@ -88,14 +86,17 @@ func doLogin(accessToken string) error {
 	return nil
 }
 
-func validateLogin() (bool, error) {
+func validateLogin() bool {
 	_, err := cmdutil.ReadFile("token.json")
 	if err != nil {
-		return false, nil
+		return false
 	}
 	resObj, err := api.AuthValidateToken()
-	if resObj.AccessToken != "" {
-		return true, nil
+	if err != nil {
+		return false
 	}
-	return false, nil
+	if resObj.AccessToken != "" {
+		return true
+	}
+	return false
 }
