@@ -53,7 +53,8 @@ func get() error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("{EmailLinkExpire, EmailNotificationCount, EmailNotificationFrequency}\n")
-	fmt.Println(resultResp)
+	fmt.Println("EmailLinkExpire: ", resultResp.EmailLinkExpire)
+	fmt.Println("EmailNotificationCount: ", resultResp.EmailNotificationCount)
+	fmt.Println("EmailNotificationFrequency: ", resultResp.EmailNotificationFrequency)
 	return nil
 }

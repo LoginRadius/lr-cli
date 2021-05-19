@@ -40,7 +40,11 @@ var tasks = map[string]func(string) error{
 			return nil
 		}
 
-		return run("go", "build", "-o", exe, "./app/lr")
+		ldflags := os.Getenv("GO_LDFLAGS")
+		ldflags = fmt.Sprintf("-X github.com/loginradius/lr-cli/internal/build.Version=%s %s", version(), ldflags)
+		ldflags = fmt.Sprintf("-X github.com/loginradius/lr-cli/internal/build.Date=%s %s", date(), ldflags)
+
+		return run("go", "build", "-trimpath", "-ldflags", ldflags, "-o", exe, "./app/lr")
 	},
 	"clean": func(_ string) error {
 		return rmrf("bin", "share")
@@ -87,6 +91,17 @@ func version() string {
 	}
 	rev, _ := cmdOutput("git", "rev-parse", "--short", "HEAD")
 	return rev
+}
+
+func cmdOutput(args ...string) (string, error) {
+	exe, err := safeexec.LookPath(args[0])
+	if err != nil {
+		return "", err
+	}
+	cmd := exec.Command(exe, args[1:]...)
+	cmd.Stderr = ioutil.Discard
+	out, err := cmd.Output()
+	return strings.TrimSuffix(string(out), "\n"), err
 }
 
 func date() string {
@@ -153,17 +168,6 @@ func run(args ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
-}
-
-func cmdOutput(args ...string) (string, error) {
-	exe, err := safeexec.LookPath(args[0])
-	if err != nil {
-		return "", err
-	}
-	cmd := exec.Command(exe, args[1:]...)
-	cmd.Stderr = ioutil.Discard
-	out, err := cmd.Output()
-	return strings.TrimSuffix(string(out), "\n"), err
 }
 
 func shellInspect(args []string) string {

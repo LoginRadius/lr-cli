@@ -6,6 +6,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/generateSott"
 	"github.com/loginradius/lr-cli/cmd/resetSecret"
 	"github.com/loginradius/lr-cli/cmd/set"
+	"github.com/loginradius/lr-cli/cmd/version"
 
 	"github.com/loginradius/lr-cli/cmd/delete"
 	"github.com/loginradius/lr-cli/cmd/get"
@@ -13,6 +14,8 @@ import (
 	"github.com/loginradius/lr-cli/cmd/logout"
 	"github.com/loginradius/lr-cli/cmd/register"
 	"github.com/loginradius/lr-cli/cmd/verify"
+
+	"github.com/loginradius/lr-cli/internal/build"
 	"github.com/spf13/cobra"
 )
 
@@ -30,10 +33,18 @@ func NewRootCmd() *cobra.Command {
 	helpHelper := func(command *cobra.Command, args []string) {
 		rootHelpFunc(command, args)
 	}
-
+	rootCmd.PersistentFlags().Bool("help", false, "Show help for command")
 	rootCmd.SetHelpFunc(helpHelper)
 
-	// Authentication Commands
+	formattedVersion := version.Format(build.Version, build.Date)
+	rootCmd.SetVersionTemplate(formattedVersion)
+	rootCmd.Version = formattedVersion
+	rootCmd.Flags().Bool("version", false, "Show lr version")
+
+	// Child Commands
+	versionCmd := version.NewCmdVersion(build.Version, build.Date)
+	rootCmd.AddCommand(versionCmd)
+
 	loginCmd := login.NewLoginCmd()
 	rootCmd.AddCommand((loginCmd))
 

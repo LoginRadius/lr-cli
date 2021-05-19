@@ -11,6 +11,10 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+
+	"github.com/shirou/gopsutil/host"
+
+	"github.com/loginradius/lr-cli/internal/build"
 )
 
 func ReadFile(filename string) ([]byte, error) {
@@ -97,4 +101,10 @@ func DeleteFile(filename string) error {
 		return err
 	}
 	return nil
+}
+func UAString() string {
+	if info, err := host.Info(); err == nil {
+		return `LRCLI/` + build.Version + " (" + info.Platform + "; " + info.KernelArch + ") " + info.OS + "/" + info.PlatformVersion + " (" + info.Hostname + ")"
+	}
+	return ""
 }
