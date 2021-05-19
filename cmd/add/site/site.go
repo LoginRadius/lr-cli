@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
@@ -77,13 +78,13 @@ func addSite() error {
 
 func input() bool {
 	fmt.Printf("Enter the App Name: ")
-	fmt.Scanf("%s", &AppName)
+	fmt.Scanf("%s\n", &AppName)
 	if AppName == "" {
 		fmt.Println("App Name is a required entry")
 		return false
 	}
 	fmt.Printf("Enter the Domain: ")
-	fmt.Scanf("%s", &Domain)
+	fmt.Scanf("%s\n", &Domain)
 	if Domain == "" {
 		fmt.Println("Domain is a required entry")
 		return false
@@ -93,12 +94,12 @@ func input() bool {
 		"2": "developer",
 		"3": "business",
 	}
-	fmt.Println("To select a plan, choose a correponding number from the following options: ")
+	fmt.Println("To select a plan, choose a corresponding number from the following options: ")
 	fmt.Println("1 - Free plan")
 	fmt.Println("2 - Developer plan")
 	fmt.Println("3 - Developer Pro plan")
 	fmt.Printf("Option: ")
-	fmt.Scanf("%s", &planOption)
+	fmt.Scanf("%s\n", &planOption)
 	if planOption == "" {
 		fmt.Println("Plan is a required entry")
 		return false
@@ -153,10 +154,16 @@ func add() error {
 	if err != nil {
 		return err
 	}
+	appInfo, err := api.GetAppsInfo()
+	if err != nil {
+		return err
+	}
+	appCount := len(appInfo)
 	newApp := conf.AdminConsoleAPIDomain + "/auth/create-new-app?"
 	body, _ := json.Marshal(map[string]string{
 		"appName":         AppName,
 		"domain":          Domain,
+		"ownedAppCount":   strconv.Itoa(appCount),
 		"paymentMethodId": paymentInfo.Data.Order[0].Paymentdetail.Stripepaymentmethodid,
 		"planName":        PlanName,
 	})
