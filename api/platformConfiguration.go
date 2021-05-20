@@ -9,7 +9,7 @@ import (
 	"github.com/loginradius/lr-cli/request"
 )
 
-type Provider1 struct {
+type Provider struct {
 	HtmlFileName   string   `json:"HtmlFileName"`
 	Provider       string   `json:"Provider"`
 	ProviderId     int      `json:"ProviderId"`
@@ -19,8 +19,8 @@ type Provider1 struct {
 	Status         bool     `json:"Status"`
 }
 
-type List1 struct {
-	Data1 []Provider1 `json:"Data"`
+type ProviderList struct {
+	Data1 []Provider `json:"Data"`
 }
 type FieldTypeConfig struct {
 	Name                             string
@@ -112,11 +112,11 @@ func GetFields(tem string) (*ResultResp, error) {
 	}
 	return &resultResp, nil
 }
-func GetActiveProviders() (*List1, error) {
+func GetActiveProviders() (*ProviderList, error) {
 	conf := config.GetInstance()
 	Url = conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options?"
 
-	var R1 List1
+	var R1 ProviderList
 	resp, err := request.Rest(http.MethodGet, Url, nil, "")
 
 	if err != nil {

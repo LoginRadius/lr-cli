@@ -45,10 +45,23 @@ func NewsocialCmd() *cobra.Command {
 	opts1.Status = true
 
 	cmd := &cobra.Command{
-		Use:     "social",
-		Short:   "add social provider",
-		Long:    `This commmand adds social provider`,
-		Example: `$ lr add social`,
+		Use:   "social",
+		Short: "add social provider",
+		Long:  `This commmand adds social provider`,
+		Example: `$ lr add social
+1 Facebook
+2 Google
+3 Twitter
+4 LinkedIn
+5 GitHub
+Please select a number from 1 to 5
+ :2
+Please enter the provider key:
+<key>
+Please enter the provider secret:
+<secret>
+social provider added successfully
+		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			return add1(opts1)
@@ -78,8 +91,7 @@ func add1(opts1 *socialProvider) error {
 
 			fmt.Scanln(&num)
 		}
-	}
-	if res.Productplan.Name == "developer" {
+	} else if res.Productplan.Name == "developer" {
 		for i := 0; i < len(arr); i++ {
 			fmt.Println(i+1, arr[i])
 		}
@@ -91,6 +103,8 @@ func add1(opts1 *socialProvider) error {
 			fmt.Scanln(&num)
 		}
 
+	} else {
+		fmt.Println("The plan needs to be either 'free' or 'developer' to use this")
 	}
 	Match, err := verify(arr[num-1])
 	if err != nil {
