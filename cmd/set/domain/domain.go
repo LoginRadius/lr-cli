@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/loginradius/lr-cli/cmdutil"
@@ -84,6 +85,14 @@ func get() (*domainManagement, error) {
 }
 
 func set(domain string) error {
+	Match, err := api.Verify(domain)
+	if err != nil {
+		return err
+	}
+	if !Match {
+		fmt.Println("Please verify the domain you have entered")
+		return nil
+	}
 	var url string
 	body, _ := json.Marshal(map[string]string{
 		"domain":     "http://localhost",

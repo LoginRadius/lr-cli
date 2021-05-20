@@ -62,7 +62,15 @@ func NewdomainCmd() *cobra.Command {
 }
 
 func delete(remVal string, allDomain string) error {
-	err := api.UpdateDomain(allDomain)
+	Match, err := api.Verify(remVal)
+	if err != nil {
+		return err
+	}
+	if !Match {
+		fmt.Println("Please verify the domain you have entered")
+		return nil
+	}
+	err = api.UpdateDomain(allDomain)
 	if err != nil {
 		return err
 	}
