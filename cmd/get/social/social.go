@@ -1,31 +1,13 @@
 package social
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/config"
-	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
 
 var temp string
-
-type socialProvider struct {
-	HtmlFileName   string   `json:"HtmlFileName"`
-	Provider       string   `json:"Provider"`
-	ProviderId     int      `json:"ProviderId"`
-	ProviderKey    string   `json:"ProviderKey"`
-	ProviderSecret string   `json:"ProviderSecret"`
-	Scope          []string `json:"Scope"`
-	Status         bool     `json:"Status"`
-}
-
-type socialProviderList struct {
-	Data []socialProvider `json:"Data"`
-}
 
 var Url string
 
@@ -81,7 +63,7 @@ func get() error {
 		}
 	}
 	if temp == "active" {
-		resultResp, err := GetActiveProviders()
+		resultResp, err := api.GetActiveProviders()
 		if err != nil {
 			return err
 		}
@@ -112,22 +94,4 @@ func get() error {
 	}
 
 	return nil
-}
-
-func GetActiveProviders() (*socialProviderList, error) {
-	conf := config.GetInstance()
-	Url = conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options?"
-
-	var R1 socialProviderList
-	resp, err := request.Rest(http.MethodGet, Url, nil, "")
-
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(resp, &R1)
-	if err != nil {
-		return nil, err
-	}
-	return &R1, nil
 }
