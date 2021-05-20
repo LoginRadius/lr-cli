@@ -3,11 +3,25 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 )
 
+type Provider1 struct {
+	HtmlFileName   string   `json:"HtmlFileName"`
+	Provider       string   `json:"Provider"`
+	ProviderId     int      `json:"ProviderId"`
+	ProviderKey    string   `json:"ProviderKey"`
+	ProviderSecret string   `json:"ProviderSecret"`
+	Scope          []string `json:"Scope"`
+	Status         bool     `json:"Status"`
+}
+
+type List1 struct {
+	Data1 []Provider1 `json:"Data"`
+}
 type FieldTypeConfig struct {
 	Name                             string
 	ShouldDisplayValidaitonRuleInput bool
@@ -97,4 +111,33 @@ func GetFields(tem string) (*ResultResp, error) {
 		return nil, err
 	}
 	return &resultResp, nil
+}
+func GetActiveProviders() (*List1, error) {
+	conf := config.GetInstance()
+	Url = conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options?"
+
+	var R1 List1
+	resp, err := request.Rest(http.MethodGet, Url, nil, "")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(resp, &R1)
+	if err != nil {
+		return nil, err
+	}
+	return &R1, nil
+}
+func Verify(str string) (bool, error) {
+	var match = false
+	resp, err := GetSites()
+
+	res1 := strings.Split(resp.Callbackurl, ";")
+	for i := 0; i < len(res1); i++ {
+		if str == res1[i] {
+			match = true
+		}
+	}
+	return match, err
 }
