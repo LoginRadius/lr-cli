@@ -57,7 +57,7 @@ func addHooks() error {
 
 func input() bool {
 	fmt.Printf("Enter Name: ")
-	fmt.Scanf("%s", &Name)
+	fmt.Scanf("%s\n", &Name)
 	if Name == "" {
 		fmt.Println("Name is a required entry")
 		return false
@@ -76,7 +76,7 @@ func input() bool {
 	fmt.Println("3 - ResetPassword")
 	fmt.Println("4 - UpdateProfile")
 	fmt.Printf("Option: ")
-	fmt.Scanf("%s", &eventOption)
+	fmt.Scanf("%s\n", &eventOption)
 	if eventOption == "" {
 		fmt.Println("Event is a required entry")
 		return false
@@ -84,7 +84,7 @@ func input() bool {
 	Event = event[eventOption]
 
 	fmt.Printf("Enter TargetUrl: ")
-	fmt.Scanf("%s", &TargetUrl)
+	fmt.Scanf("%s\n", &TargetUrl)
 	if TargetUrl == "" {
 		fmt.Println("TargetUrl is a required entry")
 		return false
