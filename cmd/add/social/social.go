@@ -160,8 +160,8 @@ func add1(opts1 *socialProvider) error {
 func verify(str string) (bool, error) {
 	result, err := api.GetActiveProviders()
 	var match = false
-	for i := 0; i < len(result.Data1); i++ {
-		if str == result.Data1[i].Provider {
+	for i := 0; i < len(result.Data); i++ {
+		if str == result.Data[i].Provider {
 			match = true
 		}
 	}
