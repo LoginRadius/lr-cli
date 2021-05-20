@@ -9,6 +9,9 @@ builds:
   - <<: &build_defaults
       binary: lr
       main: ./app/lr
+      ldflags:
+        - -s -w -X github.com/loginradius/lr-cli/internal/build.Version={{.Version}} -X github.com/loginradius/lr-cli/internal/build.Date={{time "2006-01-02"}}
+        - -X main.updaterEnabled=cli/cli
     id: macos
     goos: [darwin]
     goarch: [amd64]

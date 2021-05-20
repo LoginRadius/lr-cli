@@ -6,10 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"os/user"
-	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/loginradius/lr-cli/cmdutil"
@@ -53,6 +49,7 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 		return nil, errors.New("Please Login to execute this command")
 	}
 	req.Header.Set("Origin", conf.DashboardDomain)
+	req.Header.Set("User-Agent", cmdutil.UAString())
 	req.Header.Set("x-is-loginradius-ajax", "true")
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
@@ -81,12 +78,7 @@ func checkAPIError(respData []byte) ([]byte, error) {
 	var errResp APIErr
 	_ = json.Unmarshal(respData, &errResp)
 	if errResp.Xsign != nil && *errResp.Xsign == "" {
-		user, _ := user.Current()
-		dirName := filepath.Join(user.HomeDir, ".lrcli")
-		dir, _ := ioutil.ReadDir(dirName)
-		for _, d := range dir {
-			os.RemoveAll(path.Join([]string{dirName, d.Name()}...))
-		}
+		cmdutil.DeleteFiles()
 		return nil, errors.New("Your access token is expried, Kindly relogin to continue")
 	} else if errResp.Errorcode != nil {
 		if errResp.Errormessage != nil {
