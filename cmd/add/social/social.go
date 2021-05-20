@@ -2,11 +2,10 @@ package social
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/loginradius/lr-cli/cmdutil"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 
@@ -14,6 +13,8 @@ import (
 )
 
 var fileName string
+var arr = [5]string{"Facebook", "Google", "Twitter", "LinkedIn", "GitHub"}
+var Url string
 
 type socialProvider struct {
 	Provider       string    `json:"Provider"`
@@ -44,41 +45,87 @@ func NewsocialCmd() *cobra.Command {
 	opts1.Status = true
 
 	cmd := &cobra.Command{
-		Use:     "social",
-		Short:   "add social provider",
-		Long:    `This commmand adds social provider`,
-		Example: `$ lr add social --provider <provider>`,
+		Use:   "social",
+		Short: "add social provider",
+		Long:  `This commmand adds social provider`,
+		Example: `$ lr add social
+1 Facebook
+2 Google
+3 Twitter
+4 LinkedIn
+5 GitHub
+Please select a number from 1 to 5
+ :2
+Please enter the provider key:
+<key>
+Please enter the provider secret:
+<secret>
+social provider added successfully
+		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts1.Provider == "" {
-				return &cmdutil.FlagError{Err: errors.New("`provider` is require argument")}
-			}
 
-			if opts1.ProviderKey == "" {
-				return &cmdutil.FlagError{Err: errors.New("`ProviderKey` is require argument")}
-			}
-
-			if opts1.ProviderSecret == "" {
-				return &cmdutil.FlagError{Err: errors.New("`ProviderSecret` is require argument")}
-			}
 			return add1(opts1)
 
 		},
 	}
 
-	fl := cmd.Flags()
-	fl.StringVarP(&opts1.Provider, "provider", "p", "", "provider name")
-	fl.StringVarP(&opts1.ProviderKey, "ProviderKey", "k", "", "ProviderKey")
-	fl.StringVarP(&opts1.ProviderSecret, "ProviderSecret", "s", "", "ProviderSecret")
 	return cmd
 }
 
 func add1(opts1 *socialProvider) error {
-	opts2 := &Result{}
-	opts2.Status = true
-
-	opts2.ProviderName = opts1.Provider
-
 	conf := config.GetInstance()
+
+	res, err := api.GetSites()
+	if err != nil {
+		return err
+	}
+	var num int
+	if res.Productplan.Name == "free" {
+		for i := 0; i < 3; i++ {
+			fmt.Println(i+1, arr[i])
+		}
+		fmt.Print("Please select a number from 1 to 3 :")
+		fmt.Scanln(&num)
+		for 1 > num || num > 3 {
+			fmt.Print("Please select a number from 1 to 3 :")
+
+			fmt.Scanln(&num)
+		}
+	} else if res.Productplan.Name == "developer" {
+		for i := 0; i < len(arr); i++ {
+			fmt.Println(i+1, arr[i])
+		}
+		fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(arr)) + " :")
+		fmt.Scanln(&num)
+		for 1 > num || num > 5 {
+			fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(arr)) + " :")
+
+			fmt.Scanln(&num)
+		}
+
+	} else {
+		fmt.Println("The plan needs to be either 'free' or 'developer' to use this")
+	}
+	Match, err := verify(arr[num-1])
+	if err != nil {
+		return err
+	}
+	if Match {
+		fmt.Println("The social Provider already exists")
+		return nil
+	}
+	opts1.Provider = arr[num-1]
+	opts2 := &Result{}
+	var key string
+	var secret string
+	fmt.Println("Please enter the provider key:")
+	fmt.Scanln(&key)
+	fmt.Println("Please enter the provider secret:")
+	fmt.Scanln(&secret)
+	opts2.Status = true
+	opts1.ProviderKey = key
+	opts1.ProviderSecret = secret
+	opts2.ProviderName = opts1.Provider
 
 	url1 = conf.AdminConsoleAPIDomain + "/platform-configuration/social-provider/options?"
 	var requestBody socialProviderList
@@ -108,4 +155,15 @@ func add1(opts1 *socialProvider) error {
 	fmt.Println("social provider added successfully")
 	return nil
 
+}
+
+func verify(str string) (bool, error) {
+	result, err := api.GetActiveProviders()
+	var match = false
+	for i := 0; i < len(result.Data1); i++ {
+		if str == result.Data1[i].Provider {
+			match = true
+		}
+	}
+	return match, err
 }
