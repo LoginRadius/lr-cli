@@ -20,7 +20,7 @@ type Provider struct {
 }
 
 type ProviderList struct {
-	Data1 []Provider `json:"Data"`
+	Data []Provider `json:"Data"`
 }
 type FieldTypeConfig struct {
 	Name                             string
@@ -29,37 +29,37 @@ type FieldTypeConfig struct {
 }
 
 var TypeMap = map[int]FieldTypeConfig{
-	1: FieldTypeConfig{
+	1: {
 		Name:                             "String",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
 	},
-	2: FieldTypeConfig{
+	2: {
 		Name:                             "CheckBox",
 		ShouldDisplayValidaitonRuleInput: false,
 		ShouldShowOption:                 false,
 	},
-	3: FieldTypeConfig{
+	3: {
 		Name:                             "Option",
 		ShouldDisplayValidaitonRuleInput: false,
 		ShouldShowOption:                 true,
 	},
-	4: FieldTypeConfig{
+	4: {
 		Name:                             "Password",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
 	},
-	5: FieldTypeConfig{
+	5: {
 		Name:                             "Hidden",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
 	},
-	6: FieldTypeConfig{
+	6: {
 		Name:                             "Email",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
 	},
-	7: FieldTypeConfig{
+	7: {
 		Name:                             "Text",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,

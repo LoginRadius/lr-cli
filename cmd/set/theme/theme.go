@@ -24,7 +24,7 @@ type body struct {
 }
 type CustomJS struct {
 	Content  string `json:"Content"`
-	fileName string `json:"fileName"`
+	FileName string `json:"fileName"`
 }
 
 func NewThemeCmd() *cobra.Command {
@@ -159,7 +159,7 @@ func updateCalls() error {
 	var customJSProf body
 	cjs := CustomJS{
 		Content:  "options = {\n    \"language\": \"English\"\n}",
-		fileName: "lr-interface-options",
+		FileName: "lr-interface-options",
 	}
 	customJSAuth.CustomJS = append(customJSAuth.CustomJS, cjs)
 	customJSProf.CustomJS = append(customJSProf.CustomJS, cjs)
