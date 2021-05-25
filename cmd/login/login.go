@@ -21,6 +21,7 @@ type LoginOpts struct {
 
 // temparary Server
 var tempToken string
+var appid int64
 var tempServer *cmdutil.TempServer
 
 func NewLoginCmd() *cobra.Command {
@@ -72,17 +73,64 @@ func doLogin(accessToken string) error {
 	if err != nil {
 		return err
 	}
+	appid = int64(resObj.AppID)
 	creds, _ := json.Marshal(resObj)
 	err = cmdutil.WriteFile("token.json", creds)
 	if err != nil {
 		return err
 	}
 	fmt.Println("Successfully Authenticated, Fetching Your Site(s)...")
-	_, err = api.GetAppsInfo()
+	err = listSites()
 	if err != nil {
 		return err
 	}
 	fmt.Println("Successfully Logged In")
+	return nil
+}
+
+func listSites() error {
+	m := make(map[int]int64)
+	var option string
+	var siteChoice int
+	appInfo, err := api.GetAppsInfo()
+	if err != nil {
+		return err
+	}
+	var i int
+	fmt.Println("List of sites: ")
+	for ID, App := range appInfo {
+		i = i + 1
+		if appid == ID {
+			fmt.Println(i, "-", App.Appname, "(Default site)")
+		} else {
+			fmt.Println(i, "-", App.Appname)
+			m[i] = ID //store ID into map except for the default site
+		}
+	}
+	fmt.Printf("Do you wish to start with a different site ?(Y/N): ")
+	fmt.Scanf("%s\n", &option)
+	if option != "Y" {
+		return nil
+	}
+
+	fmt.Printf("Enter the corresponding number of the site as displayed above: ")
+	fmt.Scanf("%d\n", &siteChoice)
+	if siteChoice > len(appInfo) || siteChoice <= 0 {
+		fmt.Println("Invalid choice")
+		return nil
+	}
+	if m[siteChoice] == 0 {
+		fmt.Println("This is already the current active site.")
+		return nil
+	}
+	switchId := m[siteChoice]
+	switchRespObj, err := api.SetSites(switchId)
+	err = api.SitesBasic(switchRespObj)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Site has been updated.")
+
 	return nil
 }
 
