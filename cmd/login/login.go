@@ -107,6 +107,9 @@ func listSites() error {
 			m[i] = ID //store ID into map except for the default site
 		}
 	}
+	if len(appInfo) == 1 {
+		return nil
+	}
 	fmt.Printf("Do you wish to start with a different site ?(Y/N): ")
 	fmt.Scanf("%s\n", &option)
 	if option != "Y" {
@@ -116,7 +119,7 @@ func listSites() error {
 	fmt.Printf("Enter the corresponding number of the site as displayed above: ")
 	fmt.Scanf("%d\n", &siteChoice)
 	if siteChoice > len(appInfo) || siteChoice <= 0 {
-		fmt.Println("Invalid choice")
+		fmt.Println("Invalid choice. Switching to default site.")
 		return nil
 	}
 	if m[siteChoice] == 0 {
