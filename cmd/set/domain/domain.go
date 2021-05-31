@@ -36,10 +36,13 @@ func NewdomainCmd() *cobra.Command {
 	opts := &domain{}
 
 	cmd := &cobra.Command{
-		Use:     "domain",
-		Short:   "set domain",
-		Long:    `This commmand sets domain`,
-		Example: heredoc.Doc(`$ lr set domain --domain <domain> --domainmod <domainmodified>`),
+		Use:   "domain",
+		Short: "set domain",
+		Long:  `This commmand sets domain`,
+		Example: heredoc.Doc(`$ lr set domain --domain <domain> --domainmod <domainmodified>
+		domain successfully updated
+		http://localhost;...
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is require argument")}
@@ -109,6 +112,7 @@ func set(domain string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("domain successfully updated")
 	fmt.Println(resultResp.CallbackUrl)
 	return nil
 }

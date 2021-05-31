@@ -25,10 +25,12 @@ type Result struct {
 func NewaccountPasswordCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "accountPassword",
-		Short:   "get accountPassword",
-		Long:    `This commmand gets accountPassword`,
-		Example: heredoc.Doc(`$ lr get accountPassword --uid <uid>`),
+		Use:   "accountPassword",
+		Short: "get accountPassword",
+		Long:  `This commmand gets accountPassword`,
+		Example: heredoc.Doc(`$ lr get accountPassword --uid <uid>
+		password hash for UID:<UID> is <hash> 
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inpUID == "" {
 				return &cmdutil.FlagError{Err: errors.New("`uid` is required argument")}

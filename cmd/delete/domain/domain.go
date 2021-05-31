@@ -26,10 +26,12 @@ func NewdomainCmd() *cobra.Command {
 	opts := &domain{}
 
 	cmd := &cobra.Command{
-		Use:     "domain",
-		Short:   "delete domain",
-		Long:    `This commmand deletes domain`,
-		Example: heredoc.Doc(`$ lr delete domain --domain <domain>`),
+		Use:   "domain",
+		Short: "delete domain",
+		Long:  `This commmand deletes domain`,
+		Example: heredoc.Doc(`$ lr delete domain --domain <domain>
+		<doamin> is now removed from whitelisted domain."
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}

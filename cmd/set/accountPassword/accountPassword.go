@@ -28,10 +28,12 @@ type Result struct {
 func NewaccountPasswordCmd() *cobra.Command {
 	opts := &Password{}
 	cmd := &cobra.Command{
-		Use:     "accountPassword",
-		Short:   "set accountPassword",
-		Long:    `This commmand sets accountPassword`,
-		Example: heredoc.Doc(`$ lr set accountPassword --uid <uid> --password <password>`),
+		Use:   "accountPassword",
+		Short: "set accountPassword",
+		Long:  `This commmand sets accountPassword`,
+		Example: heredoc.Doc(`$ lr set accountPassword --uid <uid> --password <password>
+		New password hash is: <hash>
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inpUID == "" {
 				return &cmdutil.FlagError{Err: errors.New("`uid` is required argument")}
@@ -66,6 +68,6 @@ func set(UID string, password Password) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("New password hash is:" + resultResp.PasswordHash)
+	fmt.Println("New password hash is: " + resultResp.PasswordHash)
 	return nil
 }
