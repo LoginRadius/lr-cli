@@ -16,10 +16,16 @@ var arr = [5]string{"Facebook", "Google", "Twitter", "LinkedIn", "GitHub"}
 func NewsocialCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "social",
-		Short:   "get social providers",
-		Long:    `This commmand lists social providers`,
-		Example: `$ lr get social`,
+		Use:   "social",
+		Short: "get social providers",
+		Long:  `This commmand lists social providers`,
+		Example: `$ lr get social
+		1.Facebook
+		...
+		Please select a number from 1 to <number of social providers>: <number>
+		HtmlFileName: 
+		...
+		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fstatus, _ := cmd.Flags().GetBool("all")
 			if fstatus {

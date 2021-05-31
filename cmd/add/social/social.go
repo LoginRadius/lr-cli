@@ -49,18 +49,15 @@ func NewsocialCmd() *cobra.Command {
 		Short: "add social provider",
 		Long:  `This commmand adds social provider`,
 		Example: `$ lr add social
-1 Facebook
-2 Google
-3 Twitter
-4 LinkedIn
-5 GitHub
-Please select a number from 1 to 5
- :2
-Please enter the provider key:
-<key>
-Please enter the provider secret:
-<secret>
-social provider added successfully
+		1 Facebook
+		...
+		Please select a number from 1 to 5
+		 :2
+		Please enter the provider key:
+		<key>
+		Please enter the provider secret:
+		<secret>
+		social provider added successfully
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 

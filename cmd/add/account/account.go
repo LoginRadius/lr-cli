@@ -41,10 +41,15 @@ func NewaccountCmd() *cobra.Command {
 	opts := &account{}
 	opts.Email = append(opts.Email, *EmailObj)
 	cmd := &cobra.Command{
-		Use:     "account",
-		Short:   "add account",
-		Long:    `This commmand adds account`,
-		Example: heredoc.Doc(`$ lr add account --name <name> --email <email>`),
+		Use:   "account",
+		Short: "add account",
+		Long:  `This commmand adds account`,
+		Example: heredoc.Doc(`$ lr add account --name <name> --email <email>
+		User Account is successfully created
+		First name is: <first name>
+		Uid is: <uid>
+		ID is: <id>
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Email[0].Value == "" {
 				return &cmdutil.FlagError{Err: errors.New("`email` is required argument")}

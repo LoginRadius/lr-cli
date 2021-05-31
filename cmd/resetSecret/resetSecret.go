@@ -26,6 +26,7 @@ func NewResetCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr reset-secret
+			API Secret reset successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return reset()
