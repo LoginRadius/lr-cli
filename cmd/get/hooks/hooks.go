@@ -18,7 +18,10 @@ func NewHooksCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr get hooks
- 
+			ID:  <id>
+			Name:  <name>
+			Event:  <event>
+			TargetUrl:  <target url>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return getHooks()

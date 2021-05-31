@@ -25,9 +25,13 @@ var url string
 func NewemailCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "email",
-		Short:   "get email config",
-		Long:    `This commmand lists email config`,
+		Use:   "email",
+		Short: "get email config",
+		Long: `This commmand lists email config
+		EmailLinkExpire:  <Token Validity>
+		EmailNotificationCount:  <Request Limit>
+		EmailNotificationFrequency:  <Request Disabled Period>
+		`,
 		Example: heredoc.Doc(`$ lr get email`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 

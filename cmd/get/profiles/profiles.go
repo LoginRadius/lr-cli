@@ -27,10 +27,14 @@ type Result struct {
 func NewprofilesCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "profiles",
-		Short:   "get profiles",
-		Long:    `This commmand gets profiles`,
-		Example: heredoc.Doc(`$ lr get profiles --email <email> (or) --uid <uid>`),
+		Use:   "profiles",
+		Short: "get profiles",
+		Long:  `This commmand gets profiles`,
+		Example: heredoc.Doc(`$ lr get profiles --email <email> (or) --uid <uid>
+		First name is:<firstname>
+		Uid is:<uid>
+		ID is:<id>
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inpEmail == "" && inputUID != "" {
 				return getbyUID(inputUID)
