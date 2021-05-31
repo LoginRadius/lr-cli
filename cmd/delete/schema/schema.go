@@ -21,10 +21,12 @@ var field int
 func NewschemaCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "schema",
-		Short:   "delete schema",
-		Long:    `This commmand deletes schema fields`,
-		Example: heredoc.Doc(`$ lr delete schema --fieldname <fieldname>`),
+		Use:   "schema",
+		Short: "delete schema",
+		Long:  `This commmand deletes schema fields`,
+		Example: heredoc.Doc(`$ lr delete schema --fieldname <fieldname>
+		The field has been sucessfully deleted
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if field == 0 {
 				return &cmdutil.FlagError{Err: errors.New("`fieldname` is required argument")}

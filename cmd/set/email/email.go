@@ -26,10 +26,14 @@ var url string
 func NewemailCmd() *cobra.Command {
 	opts := &email{}
 	cmd := &cobra.Command{
-		Use:     "email",
-		Short:   "set email config",
-		Long:    `This commmand sets email config`,
-		Example: `$ lr set email --link_expire <link_expire> --notif_count <notif_count> --notif_frequency <notif_frequency>`,
+		Use:   "email",
+		Short: "set email config",
+		Long:  `This commmand sets email config`,
+		Example: `$ lr set email --link_expire <link_expire> --notif_count <notif_count> --notif_frequency <notif_frequency>
+		EmailLinkExpire:  <Token Validity>
+		EmailNotificationCount:  <Request Limit>
+		EmailNotificationFrequency:  <Request Disabled Period>
+		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if opts.EmailLinkExpire == 0 {

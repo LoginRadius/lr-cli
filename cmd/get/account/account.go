@@ -30,10 +30,14 @@ type Result struct {
 func NewaccountCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "account",
-		Short:   "get account",
-		Long:    `This commmand gets account`,
-		Example: heredoc.Doc(`$ lr get account --email <email>`),
+		Use:   "account",
+		Short: "get account",
+		Long:  `This commmand gets account`,
+		Example: heredoc.Doc(`$ lr get account --email <email>
+		First name is:<firstname>
+		Uid is:<uid>
+		ID is:<id>
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inpEmail == "" {
 				return &cmdutil.FlagError{Err: errors.New("`email` is required argument")}

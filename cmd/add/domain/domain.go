@@ -31,10 +31,12 @@ func NewdomainCmd() *cobra.Command {
 	opts := &domain{}
 
 	cmd := &cobra.Command{
-		Use:     "domain",
-		Short:   "add doamin",
-		Long:    `This commmand adds domain`,
-		Example: heredoc.Doc(`$ lr add domain --domain <domain>`),
+		Use:   "domain",
+		Short: "add doamin",
+		Long:  `This commmand adds domain`,
+		Example: heredoc.Doc(`$ lr add domain --domain <domain>
+		Your Domain  <newDomain>  is now whitelisted
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
