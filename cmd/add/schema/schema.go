@@ -25,10 +25,15 @@ var url1 string
 func NewschemaCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "schema",
-		Short:   "add schema config",
-		Long:    `This commmand adds schema config field`,
-		Example: heredoc.Doc(`$ lr add schema`),
+		Use:   "schema",
+		Short: "add schema config",
+		Long:  `This commmand adds schema config field`,
+		Example: heredoc.Doc(`$ lr add schema
+		Enter the Display Name (<Name>) :<Display Name>
+		Is Required (y/n):<y/n>
+		Do you want to setup advance configuration (y/n):<y/n>
+		Your field has been sucessfully added
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if temp == 0 {
 				return &cmdutil.FlagError{Err: errors.New("`field` is required argument")}

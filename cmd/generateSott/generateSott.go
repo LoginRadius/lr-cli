@@ -34,10 +34,16 @@ var url string
 func NewgenerateSottCmd() *cobra.Command {
 	opts := &sott{}
 	cmd := &cobra.Command{
-		Use:     "generate-sott",
-		Short:   "generates sott",
-		Long:    `This commmand generates sott`,
-		Example: heredoc.Doc(`$ lr generate-sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> -c <technology>`),
+		Use:   "generate-sott",
+		Short: "generates sott",
+		Long:  `This commmand generates sott`,
+		Example: heredoc.Doc(`$ lr generate-sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> -c <technology>
+		sott generated successfully
+		AunthenticityToken: <token>
+		Comment: <comment>
+		Sott: <sott>
+		Technology: <tech>
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.FromDate == "" || opts.ToDate == "" || opts.Technology == "" {
 				if opts.FromDate == "" {

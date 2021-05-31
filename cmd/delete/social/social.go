@@ -27,10 +27,12 @@ func NewsocialCmd() *cobra.Command {
 	opts := &provider{}
 
 	cmd := &cobra.Command{
-		Use:     "social",
-		Short:   "delete social provider",
-		Long:    `This commmand deletes social provider`,
-		Example: `$ lr delete social --provider <provider>`,
+		Use:   "social",
+		Short: "delete social provider",
+		Long:  `This commmand deletes social provider`,
+		Example: `$ lr delete social --provider <provider>
+		successfully deleted
+		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.ProviderName == "" {
 				return &cmdutil.FlagError{Err: errors.New("`provider` is require argument")}

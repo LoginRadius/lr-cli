@@ -12,10 +12,13 @@ import (
 func NewdomainCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "domain",
-		Short:   "get domains added",
-		Long:    `This commmand lists domains added`,
-		Example: heredoc.Doc(`$ lr get domain`),
+		Use:   "domain",
+		Short: "get domains added",
+		Long:  `This commmand lists domains added`,
+		Example: heredoc.Doc(`$ lr get domain
+		1. http://localhost
+		...
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			resp, err := api.GetSites()

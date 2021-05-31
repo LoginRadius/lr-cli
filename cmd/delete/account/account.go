@@ -31,10 +31,12 @@ type Result struct {
 func NewaccountCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "account",
-		Short:   "delete account",
-		Long:    `This commmand deletes account`,
-		Example: heredoc.Doc(`$ lr delete account --email <email> (or) --uid <uid>`),
+		Use:   "account",
+		Short: "delete account",
+		Long:  `This commmand deletes account`,
+		Example: heredoc.Doc(`$ lr delete account --email <email> (or) --uid <uid>
+		User account sucessfully deleted
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inpEmail == "" && inpUID != "" {
 				return deletebyUID(inpUID)

@@ -14,10 +14,17 @@ var temp string
 func NewschemaCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:     "schema",
-		Short:   "get schema",
-		Long:    `This commmand lists schema config`,
-		Example: heredoc.Doc(`$ lr get schema`),
+		Use:   "schema",
+		Short: "get schema",
+		Long:  `This commmand lists schema config`,
+		Example: heredoc.Doc(`$ lr get schema
+		Select one of the fields to get the schema
+		1.First Name
+		...
+		Please select a number from 1 to <number of fields>: <number>
+		Display: 
+		...
+		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fstatus, _ := cmd.Flags().GetBool("all")
 			if fstatus {
