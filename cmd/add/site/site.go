@@ -105,6 +105,10 @@ func input() bool {
 		return false
 	}
 	PlanName = plan[planOption]
+	if PlanName == "" {
+		fmt.Println("Invalid Choice of Plan")
+		return false
+	}
 	return true
 
 }
