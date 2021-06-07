@@ -17,6 +17,7 @@ vendor/
 tmp/
 /bin
 /script/build
+.history/
 
 ## Documentation
 manual/
