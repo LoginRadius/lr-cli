@@ -90,4 +90,5 @@ func Output(AppInfo api.SitesReponse) {
 	fmt.Println("App Name: ", AppInfo.Appname)
 	fmt.Println("App ID: ", AppInfo.Appid)
 	fmt.Println("Domain: ", AppInfo.Domain)
+	fmt.Println("Plan: ", AppInfo.Productplan.Name)
 }

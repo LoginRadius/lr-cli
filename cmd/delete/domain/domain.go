@@ -41,9 +41,11 @@ func NewdomainCmd() *cobra.Command {
 				return err
 			}
 			urls := strings.Split(p.Callbackurl, ";")
+			if !strings.Contains(p.Callbackurl, opts.Domain) {
+				return &cmdutil.FlagError{Err: errors.New("Entered Domain not found")}
+			}
 			if len(urls) == 1 {
 				return &cmdutil.FlagError{Err: errors.New("Cannot delete the last domain")}
-
 			}
 			for index, url := range urls {
 				if url == opts.Domain {
@@ -51,28 +53,19 @@ func NewdomainCmd() *cobra.Command {
 					break
 				}
 			}
-			newdomain := strings.Join(urls, ";")
-			return delete(opts.Domain, newdomain)
+			return delete(opts.Domain, urls)
 
 		},
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&opts.Domain, "domain", "d", "", "domain name")
+	fl.StringVarP(&opts.Domain, "domain", "d", "", "Enter Domain Value")
 
 	return cmd
 }
 
-func delete(remVal string, allDomain string) error {
-	Match, err := api.Verify(remVal)
-	if err != nil {
-		return err
-	}
-	if !Match {
-		fmt.Println("Please verify the domain you have entered")
-		return nil
-	}
-	err = api.UpdateDomain(allDomain)
+func delete(remVal string, allDomain []string) error {
+	err := api.UpdateDomain(allDomain)
 	if err != nil {
 		return err
 	}

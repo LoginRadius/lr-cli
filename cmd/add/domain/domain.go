@@ -45,33 +45,27 @@ func NewdomainCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			s := strings.Split(p.Callbackurl, ";")
-			if len(s) < 3 {
-				return add(p.Callbackurl, opts.Domain)
+			if strings.Contains(p.Callbackurl, opts.Domain) {
+				return &cmdutil.FlagError{Err: errors.New("Entered Domain is already added")}
+			}
+			urls := strings.Split(p.Callbackurl, ";")
+			plan := p.Productplan.Name
+			if (plan == "free" && len(urls) < 3) || (plan == "developer" && len(urls) < 5) {
+				urls = append(urls, opts.Domain)
+				err := api.UpdateDomain(urls)
+				if err != nil {
+					return err
+				}
+				fmt.Println(opts.Domain, "is now whitelisted.")
+				return nil
 			} else {
-				return &cmdutil.FlagError{Err: errors.New("more than 3 domains cannot be added in free plan")}
+				return &cmdutil.FlagError{Err: errors.New("To add more domains, plan upgradation is required")}
 			}
 
 		},
 	}
-
 	fl := cmd.Flags()
-	fl.StringVarP(&opts.Domain, "domain", "d", "", "domain name")
+	fl.StringVarP(&opts.Domain, "domain", "d", "", "Enter Domain Value")
 
 	return cmd
-}
-
-func add(allDomains string, newDomain string) error {
-	domain := ""
-	if allDomains == "" {
-		domain = newDomain
-	} else {
-		domain = allDomains + ";" + newDomain
-	}
-	err := api.UpdateDomain(domain)
-	if err != nil {
-		return err
-	}
-	fmt.Println("Your Domain " + newDomain + " is now whitelisted")
-	return nil
 }
