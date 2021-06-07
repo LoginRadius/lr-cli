@@ -45,15 +45,12 @@ func NewgenerateSottCmd() *cobra.Command {
 		Technology: <tech>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.FromDate == "" || opts.ToDate == "" || opts.Technology == "" {
+			if opts.FromDate == "" || opts.ToDate == "" {
 				if opts.FromDate == "" {
 					fmt.Println("FromDate (mm/dd/yyyy) is a required argument")
 				}
 				if opts.ToDate == "" {
 					fmt.Println("ToDate (mm/dd/yyyy) is a required argument")
-				}
-				if opts.Technology == "" {
-					fmt.Println("technology is a required argument")
 				}
 				return nil
 			}
@@ -67,8 +64,6 @@ func NewgenerateSottCmd() *cobra.Command {
 
 	fl.StringVarP(&opts.ToDate, "ToDate", "t", "", "To Date")
 
-	fl.StringVarP(&opts.Technology, "technology", "c", "", "technology")
-
 	return cmd
 }
 
@@ -76,6 +71,10 @@ func generate(opts *sott) error {
 	conf := config.GetInstance()
 	opts.Comment = ""
 	opts.Encoded = false
+	opts.Technology = getTech()
+	if opts.Technology == "" {
+		return nil
+	}
 	url = conf.AdminConsoleAPIDomain + "/deployment/sott?"
 	body, _ := json.Marshal(opts)
 	var resultResp Resp
@@ -93,4 +92,27 @@ func generate(opts *sott) error {
 	fmt.Println("Sott: " + resultResp.Sott)
 	fmt.Println("Technology: " + resultResp.Technology)
 	return nil
+}
+
+func getTech() string {
+	var option string
+	tech := map[string]string{
+		"1": "android",
+		"2": "ios",
+	}
+	fmt.Println("To select a Technology, choose a correponding number from the following options:")
+	fmt.Println("1 - Android")
+	fmt.Println("2 - iOS")
+	fmt.Printf("Option: ")
+	fmt.Scanf("%s\n", &option)
+	if option == "" {
+		fmt.Println("Technology is a required argument")
+		return ""
+	}
+	Tech := tech[option]
+	if Tech == "" {
+		fmt.Println("Invalid Choice of Technology")
+		return ""
+	}
+	return Tech
 }
