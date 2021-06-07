@@ -82,7 +82,10 @@ func input() bool {
 		return false
 	}
 	Event = event[eventOption]
-
+	if Event == "" {
+		fmt.Println("Invalid Choice of Event")
+		return false
+	}
 	fmt.Printf("Enter TargetUrl: ")
 	fmt.Scanf("%s\n", &TargetUrl)
 	if TargetUrl == "" {
