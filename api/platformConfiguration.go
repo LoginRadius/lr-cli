@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
@@ -128,16 +127,4 @@ func GetActiveProviders() (*ProviderList, error) {
 		return nil, err
 	}
 	return &R1, nil
-}
-func Verify(str string) (bool, error) {
-	var match = false
-	resp, err := GetSites()
-
-	res1 := strings.Split(resp.Callbackurl, ";")
-	for i := 0; i < len(res1); i++ {
-		if str == res1[i] {
-			match = true
-		}
-	}
-	return match, err
 }

@@ -31,7 +31,7 @@ func NewHooksCmd() *cobra.Command {
 }
 
 func getHooks() error {
-	err := api.CurrentPlan()
+	err := api.CheckPlan()
 	if err != nil {
 		return err
 	}

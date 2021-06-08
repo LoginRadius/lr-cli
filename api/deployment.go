@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 
 	"net/http"
 	"time"
@@ -98,16 +99,22 @@ func GetPage() (*HostedPageResponse, error) {
 	return &resultResp, nil
 }
 
-func UpdateDomain(domains string) error {
+func UpdateDomain(domains []string) error {
 	var url string
+
 	body, _ := json.Marshal(map[string]string{
-		"domain":     "http://localhost",
-		"production": domains,
+		"domain":     domains[0],
+		"production": strings.Join(domains, ";"),
 		"staging":    "",
 	})
 
 	url = conf.AdminConsoleAPIDomain + "/deployment/sites?"
-	_, err := request.Rest(http.MethodPost, url, nil, string(body))
+	domainResp, err := request.Rest(http.MethodPost, url, nil, string(body))
+	if err != nil {
+		return err
+	}
+	var dInfo SitesReponse
+	err = json.Unmarshal(domainResp, &dInfo)
 	if err != nil {
 		return err
 	}
@@ -122,21 +129,22 @@ func UpdateDomain(domains string) error {
 	if err != nil {
 		return err
 	}
-	siteInfo.Callbackurl = domains
+	siteInfo.Devdomain = dInfo.Devdomain
+	siteInfo.Callbackurl = dInfo.Callbackurl
+	siteInfo.Domain = dInfo.Domain
 	sInfo, _ := json.Marshal(siteInfo)
 	_ = cmdutil.WriteFile("currentSite.json", sInfo)
 
 	return nil
 }
 
-func CurrentPlan() error {
+func CheckPlan() error {
 	sitesResp, err := GetSites()
 	if err != nil {
 		return err
 	}
 	if sitesResp.Productplan.Name == "free" {
-		return errors.New("Please switch to an app which enables this feature or upgrade your plan from Free Plan.")
-
+		return errors.New("Please switch to developer/developer pro app or upgrade your plan to enable this feature.")
 	}
 	return nil
 }
