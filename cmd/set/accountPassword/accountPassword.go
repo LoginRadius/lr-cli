@@ -8,9 +8,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 
-	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
@@ -19,7 +17,7 @@ import (
 var inpUID string
 
 type Password struct {
-	inpPassword string `json:"password"`
+	InpPassword string `json:"password"`
 }
 type Result struct {
 	PasswordHash string `json:"PasswordHash"`
@@ -28,17 +26,17 @@ type Result struct {
 func NewaccountPasswordCmd() *cobra.Command {
 	opts := &Password{}
 	cmd := &cobra.Command{
-		Use:   "accountPassword",
-		Short: "set accountPassword",
-		Long:  `This commmand sets accountPassword`,
-		Example: heredoc.Doc(`$ lr set accountPassword --uid <uid> --password <password>
+		Use:   "account-password",
+		Short: "set account-password",
+		Long:  `This commmand sets account-password`,
+		Example: heredoc.Doc(`$ lr set account-password --uid <uid> --password <password>
 		New password hash is: <hash>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inpUID == "" {
 				return &cmdutil.FlagError{Err: errors.New("`uid` is required argument")}
 			}
-			if opts.inpPassword == "" {
+			if opts.InpPassword == "" {
 				return &cmdutil.FlagError{Err: errors.New("`password` is required argument")}
 			}
 
@@ -49,17 +47,15 @@ func NewaccountPasswordCmd() *cobra.Command {
 
 	fl := cmd.Flags()
 	fl.StringVarP(&inpUID, "uid", "u", "", "UID")
-	fl.StringVarP(&opts.inpPassword, "password", "p", "", "new password")
+	fl.StringVarP(&opts.InpPassword, "password", "p", "", "new password")
 
 	return cmd
 }
 
 func set(UID string, password Password) error {
-	resObj, err := api.GetSites()
-
-	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account/" + UID + "/password?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret
 	var resultResp Result
-	resp, err := request.Rest(http.MethodGet, url, nil, password.inpPassword)
+	body, _ := json.Marshal(password)
+	resp, err := request.RestLRAPI(http.MethodGet, "/identity/v2/manage/account/"+UID+"/password", nil, string(body))
 
 	if err != nil {
 		return err

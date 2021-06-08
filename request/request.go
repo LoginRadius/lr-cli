@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 
@@ -21,13 +20,61 @@ type APIErr struct {
 	Message          *string `json:"Message"`
 }
 
+var conf = config.GetInstance()
+
+func RestLRAPI(method string, url string, headers map[string]string, payload string) ([]byte, error) {
+	creds, err := getLRCreds()
+	if err != nil {
+		return nil, errors.New("Please Login to execute this command")
+	}
+	client := &http.Client{}
+	urlObj := strings.Split(url, "?")
+	fUrl := conf.LoginRadiusAPIDomain + urlObj[0]
+
+	if len(urlObj) == 1 {
+		fUrl += "?" + creds
+	} else {
+		fUrl += "?" + creds + "&" + urlObj[1]
+	}
+	req, _ := http.NewRequest(method, fUrl, strings.NewReader(payload))
+	req.Header.Set("User-Agent", cmdutil.UAString())
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	if headers != nil {
+		for key, value := range headers {
+			req.Header.Set(key, value)
+		}
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	respData, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	type LRAPIErr struct {
+		Errorcode   *int    `json:"ErrorCode"`
+		Message     *string `json:"Message"`
+		Description *string `json:"Description"`
+	}
+	var errResp LRAPIErr
+	_ = json.Unmarshal(respData, &errResp)
+	if errResp.Message != nil {
+		return nil, errors.New(*errResp.Message)
+	}
+	return respData, nil
+}
+
 func Rest(method string, url string, headers map[string]string, payload string) ([]byte, error) {
-	conf := config.GetInstance()
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, strings.NewReader(payload))
 
 	if err != nil {
-		log.Printf("error while Performing the Request: %s", err.Error())
 		return nil, err
 	}
 
@@ -62,7 +109,7 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 	resp, err := client.Do(req)
 
 	if err != nil {
-		log.Printf("%s", err.Error())
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -90,4 +137,22 @@ func checkAPIError(respData []byte) ([]byte, error) {
 		}
 	}
 	return respData, nil
+}
+
+func getLRCreds() (string, error) {
+	type LRCreds struct {
+		Key    string `json:"Key"`
+		Secret string `json:"Secret"`
+	}
+
+	var creds LRCreds
+	data, err := cmdutil.ReadFile("currentSite.json")
+	if err != nil {
+		return "", err
+	}
+	err = json.Unmarshal(data, &creds)
+	if err != nil {
+		return "", err
+	}
+	return "apikey=" + creds.Key + "&apisecret=" + creds.Secret, nil
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/get/accountPassword"
 	"github.com/loginradius/lr-cli/cmd/get/config"
 	"github.com/loginradius/lr-cli/cmd/get/hooks"
-	"github.com/loginradius/lr-cli/cmd/get/profiles"
+	profiles "github.com/loginradius/lr-cli/cmd/get/profile"
 	"github.com/loginradius/lr-cli/cmd/get/schema"
 	"github.com/loginradius/lr-cli/cmd/get/site"
 
