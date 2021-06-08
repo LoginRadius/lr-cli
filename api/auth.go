@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 
@@ -84,7 +83,7 @@ func SitesBasic(tokens *SitesToken) error {
 	basic := conf.AdminConsoleAPIDomain + "/auth/basicsettings?"
 	req, err := http.NewRequest(http.MethodGet, basic, nil)
 	if err != nil {
-		log.Printf("Could not make request % -v", err)
+		return err
 	}
 	req.Header.Add("x-is-loginradius--sign", tokens.XSign)
 	req.Header.Add("x-is-loginradius--token", tokens.XToken)

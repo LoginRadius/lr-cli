@@ -8,9 +8,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 
-	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
@@ -25,10 +23,10 @@ type Result struct {
 func NewaccountPasswordCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "accountPassword",
-		Short: "get accountPassword",
-		Long:  `This commmand gets accountPassword`,
-		Example: heredoc.Doc(`$ lr get accountPassword --uid <uid>
+		Use:   "account-password",
+		Short: "get account-password",
+		Long:  `This commmand gets account-password`,
+		Example: heredoc.Doc(`$ lr get account-password --uid <uid>
 		password hash for UID:<UID> is <hash> 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -48,11 +46,8 @@ func NewaccountPasswordCmd() *cobra.Command {
 }
 
 func get(UID string) error {
-	resObj, err := api.GetSites()
-
-	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account/" + UID + "/password?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret
 	var resultResp Result
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	resp, err := request.RestLRAPI(http.MethodGet, "/identity/v2/manage/account/"+UID+"/password", nil, "")
 
 	if err != nil {
 		return err

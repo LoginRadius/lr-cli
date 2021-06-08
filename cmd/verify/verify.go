@@ -7,10 +7,8 @@ import (
 	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmd/verify/resend"
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
@@ -54,16 +52,8 @@ func NewVerifyCmd() *cobra.Command {
 }
 
 func verify(opts *VerifyOpts) error {
-	conf := config.GetInstance()
-	apiObj, err := api.GetSites()
-	if err != nil {
-		return err
-	}
-	if opts.Email != "" {
-		url = conf.LoginRadiusAPIDomain + "/identity/v2/auth/email?apikey=" + apiObj.Key + "&email=" + opts.Email
-	}
 	var resultResp Result
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	resp, err := request.RestLRAPI(http.MethodGet, "/identity/v2/auth/email?email="+opts.Email, nil, "")
 	if err != nil {
 		return err
 	}
