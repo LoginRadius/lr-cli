@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
@@ -42,27 +40,19 @@ func NewResendCmd() *cobra.Command {
 }
 
 func resend(opts *ResendOpts) error {
-	conf := config.GetInstance()
-	apiObj, err := api.GetSites()
+	body, _ := json.Marshal(map[string]string{
+		"Email": opts.Email,
+	})
+	var resendResp ResendResponse
+	resp, err := request.RestLRAPI(http.MethodPut, "/identity/v2/auth/register", nil, string(body))
 	if err != nil {
 		return err
 	}
-	if opts.Email != "" {
-		url := conf.LoginRadiusAPIDomain + "/identity/v2/auth/register?apikey=" + apiObj.Key + "&verificationurl=&emailtemplate="
-		body, _ := json.Marshal(map[string]string{
-			"Email": opts.Email,
-		})
-		var resendResp ResendResponse
-		resp, err := request.Rest(http.MethodPut, url, nil, string(body))
-		if err != nil {
-			return err
-		}
-		err = json.Unmarshal(resp, &resendResp)
-		fmt.Println(resendResp.IsPosted)
-		if err != nil {
-			return err
-		}
-
+	err = json.Unmarshal(resp, &resendResp)
+	if err != nil {
+		return err
 	}
+
+	fmt.Println("Verification Email sent successfully")
 	return nil
 }

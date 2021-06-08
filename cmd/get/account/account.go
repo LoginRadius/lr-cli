@@ -8,9 +8,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 
-	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
@@ -18,10 +16,16 @@ import (
 
 var inpEmail string
 
+type EmailVal struct {
+	Type  string `json:"Type"`
+	Value string `json:"Value"`
+}
+
 type Identities struct {
-	FirstName string `json:"FirstName"`
-	Uid       string `json:"Uid"`
-	ID        string `json:"ID"`
+	FirstName string     `json:"FirstName"`
+	Email     []EmailVal `json:"Email"`
+	Uid       string     `json:"Uid"`
+	ID        string     `json:"ID"`
 }
 type Result struct {
 	Data []Identities `json:"Data"`
@@ -34,9 +38,10 @@ func NewaccountCmd() *cobra.Command {
 		Short: "get account",
 		Long:  `This commmand gets account`,
 		Example: heredoc.Doc(`$ lr get account --email <email>
-		First name is:<firstname>
-		Uid is:<uid>
-		ID is:<id>
+		First name: <firstname>
+		Email: <email>
+		Uid: <uid>
+		ID: <id>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inpEmail == "" {
@@ -55,10 +60,8 @@ func NewaccountCmd() *cobra.Command {
 }
 
 func get(inpEmail string) error {
-	resObj, err := api.GetSites()
-	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account/identities?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret + "&email=" + inpEmail
 	var resultResp Result
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	resp, err := request.RestLRAPI(http.MethodGet, "/identity/v2/manage/account/identities?email="+inpEmail, nil, "")
 	if err != nil {
 		return err
 	}
@@ -66,8 +69,11 @@ func get(inpEmail string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("First name is:" + resultResp.Data[0].FirstName)
-	fmt.Println("Uid is:" + resultResp.Data[0].Uid)
-	fmt.Println("ID is:" + resultResp.Data[0].ID)
+	if resultResp.Data[0].FirstName != "" {
+		fmt.Println("First name is:" + resultResp.Data[0].FirstName)
+	}
+	fmt.Println("Email: " + resultResp.Data[0].Email[0].Value)
+	fmt.Println("Uid: " + resultResp.Data[0].Uid)
+	fmt.Println("ID: " + resultResp.Data[0].ID)
 	return nil
 }

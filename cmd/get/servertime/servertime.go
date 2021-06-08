@@ -6,8 +6,6 @@ import (
 	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
@@ -51,15 +49,8 @@ func NewServerTimeCmd() *cobra.Command {
 	return cmd
 }
 func servertime() error {
-	conf := config.GetInstance()
-	apiObj, err := api.GetSites()
-	if err != nil {
-		return err
-	}
-
 	var resObj Server
-	serverURL := conf.LoginRadiusAPIDomain + "/identity/v2/serverinfo?apikey=" + apiObj.Key + "&timedifference=" + *timediff
-	resp, err := request.Rest(http.MethodGet, serverURL, nil, "")
+	resp, err := request.RestLRAPI(http.MethodGet, "/identity/v2/serverinfo?timedifference="+*timediff, nil, "")
 	if err != nil {
 		return err
 	}

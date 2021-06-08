@@ -8,9 +8,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 
-	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
@@ -39,9 +37,9 @@ func NewaccountCmd() *cobra.Command {
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if inpEmail == "" && inpUID != "" {
-				return deletebyUID(inpUID)
+				return delete(inpUID, "uid")
 			} else if inpUID == "" && inpEmail != "" {
-				return deletebyEmail(inpEmail)
+				return delete(inpEmail, "email")
 			} else {
 				return &cmdutil.FlagError{Err: errors.New("Please enter exact one flag for this command")}
 			}
@@ -55,37 +53,15 @@ func NewaccountCmd() *cobra.Command {
 
 	return cmd
 }
-func deletebyEmail(Email string) error {
-	resObj, err := api.GetSites()
-	if err != nil {
-		return err
+func delete(value string, field string) error {
+	url := ""
+	if field == "email" {
+		url = "/identity/v2/manage/account?email=" + value
+	} else if field == "uid" {
+		url = "/identity/v2/manage/account/" + value
 	}
-	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret + "&email=" + Email
 	var resultResp Result
-	resp, err := request.Rest(http.MethodDelete, url, nil, "")
-
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(resp, &resultResp)
-	if err != nil {
-		return err
-	}
-	fmt.Println("User account sucessfully deleted")
-	fmt.Print("number of records deleted = ")
-	fmt.Println((resultResp.RecordsDeleted))
-
-	return nil
-}
-
-func deletebyUID(UID string) error {
-	resObj, err := api.GetSites()
-	if err != nil {
-		return err
-	}
-	url := config.GetInstance().LoginRadiusAPIDomain + "/identity/v2/manage/account/" + UID + "?apikey=" + resObj.Key + "&apisecret=" + resObj.Secret
-	var resultResp Result
-	resp, err := request.Rest(http.MethodDelete, url, nil, "")
+	resp, err := request.RestLRAPI(http.MethodDelete, url, nil, "")
 
 	if err != nil {
 		return err
