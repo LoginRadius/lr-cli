@@ -112,7 +112,7 @@ func listSites() error {
 	}
 	fmt.Printf("Do you wish to start with a different site ?(Y/N): ")
 	fmt.Scanf("%s\n", &option)
-	if option != "Y" {
+	if option != "Y" && option != "y" {
 		return nil
 	}
 

@@ -1,19 +1,13 @@
 package domain
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/request"
-
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
-
 	"github.com/spf13/cobra"
 )
 
@@ -39,9 +33,8 @@ func NewdomainCmd() *cobra.Command {
 		Use:   "domain",
 		Short: "set domain",
 		Long:  `This commmand sets domain`,
-		Example: heredoc.Doc(`$ lr set domain --domain <domain> --domainmod <domainmodified>
-		domain successfully updated
-		http://localhost;...
+		Example: heredoc.Doc(`$ lr set domain --domain <domain> --new-domain <new domain>
+		Domain successfully updated
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Domain == "" {
@@ -49,70 +42,38 @@ func NewdomainCmd() *cobra.Command {
 			}
 
 			if opts.DomainMod == "" {
-				return &cmdutil.FlagError{Err: errors.New("`domainmod` is require argument")}
+				return &cmdutil.FlagError{Err: errors.New("`new-domain` is require argument")}
 			}
 
-			var p, err = get()
+			p, err := api.GetSites()
 			if err != nil {
 				return err
 			}
-			domain := strings.ReplaceAll(p.CallbackUrl, (";" + opts.Domain), (";" + opts.DomainMod))
+			if !strings.Contains(p.Callbackurl, opts.Domain) {
+				return &cmdutil.FlagError{Err: errors.New("Entered Domain Not Found")}
+			}
+			if opts.Domain == "http://localhost" || opts.Domain == "http://127.0.0.1" {
+				return &cmdutil.FlagError{Err: errors.New("Cannot Update Default Domains")}
+			}
+			domain := strings.ReplaceAll(p.Callbackurl, opts.Domain, opts.DomainMod)
 			return set(domain)
 
 		},
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&opts.Domain, "domain", "d", "", "domain name")
-	fl.StringVarP(&opts.DomainMod, "domainmod", "m", "", "domain modified name")
+	fl.StringVarP(&opts.Domain, "domain", "d", "", "Enter Old Domain Value")
+	fl.StringVarP(&opts.DomainMod, "new-domain", "n", "", "Enter New Domain Value")
 
 	return cmd
 }
 
-func get() (*domainManagement, error) {
-	conf := config.GetInstance()
-	var url string
-	url = conf.AdminConsoleAPIDomain + "/deployment/sites?"
-
-	var resultResp *domainManagement
-	resp, err := request.Rest(http.MethodGet, url, nil, "")
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(resp, &resultResp)
-	if err != nil {
-		return nil, err
-	}
-
-	return resultResp, nil
-}
-
 func set(domain string) error {
-	Match, err := api.Verify(domain)
+	urls := strings.Split(domain, ";")
+	err := api.UpdateDomain(urls)
 	if err != nil {
 		return err
 	}
-	if !Match {
-		fmt.Println("Please verify the domain you have entered")
-		return nil
-	}
-	var url string
-	body, _ := json.Marshal(map[string]string{
-		"domain":     "http://localhost",
-		"production": domain,
-		"staging":    "",
-	})
-	conf := config.GetInstance()
-
-	url = conf.AdminConsoleAPIDomain + "/deployment/sites?"
-
-	var resultResp Result
-	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
-	err = json.Unmarshal(resp, &resultResp)
-	if err != nil {
-		return err
-	}
-	fmt.Println("domain successfully updated")
-	fmt.Println(resultResp.CallbackUrl)
+	fmt.Println("Domain Successfully Updated")
 	return nil
 }
