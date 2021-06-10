@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
@@ -89,22 +91,24 @@ func input() bool {
 		fmt.Println("Domain is a required entry")
 		return false
 	}
-	plan := map[string]string{
-		"1": "free",
-		"2": "developer",
-		"3": "business",
+
+	plan := map[int]string{
+		0: "free",
+		1: "developer",
+		2: "business",
 	}
-	fmt.Println("To select a plan, choose a corresponding number from the following options: ")
-	fmt.Println("1 - Free plan")
-	fmt.Println("2 - Developer plan")
-	fmt.Println("3 - Developer Pro plan")
-	fmt.Printf("Option: ")
-	fmt.Scanf("%s\n", &planOption)
-	if planOption == "" {
-		fmt.Println("Plan is a required entry")
-		return false
-	}
-	PlanName = plan[planOption]
+
+	var planChoice int
+	_ = prompt.SurveyAskOne(&survey.Select{
+		Message: "Select a plan",
+		Options: []string{
+			"Free",
+			"Developer",
+			"Business",
+		},
+	}, &planChoice)
+
+	PlanName = plan[planChoice]
 	if PlanName == "" {
 		fmt.Println("Invalid Choice of Plan")
 		return false
