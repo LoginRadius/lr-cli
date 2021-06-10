@@ -37,7 +37,9 @@ func NewgenerateSottCmd() *cobra.Command {
 		Use:   "generate-sott",
 		Short: "generates sott",
 		Long:  `This commmand generates sott`,
-		Example: heredoc.Doc(`$ lr generate-sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> -c <technology>
+		Example: heredoc.Doc(`$ lr generate-sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> 
+		.....
+		.....
 		sott generated successfully
 		AunthenticityToken: <token>
 		Comment: <comment>
