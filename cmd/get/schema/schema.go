@@ -3,8 +3,10 @@ package schema
 import (
 	"fmt"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/prompt"
 
 	"github.com/spf13/cobra"
 )
@@ -17,13 +19,20 @@ func NewschemaCmd() *cobra.Command {
 		Use:   "schema",
 		Short: "get schema",
 		Long:  `This commmand lists schema config`,
-		Example: heredoc.Doc(`$ lr get schema
-		Select one of the fields to get the schema
-		1.First Name
-		...
-		Please select a number from 1 to <number of fields>: <number>
-		Display: 
-		...
+		Example: heredoc.Doc(`$ lr get schema --active
+		? Select one of the fields to get the schema:  Email Id
+		---------- Configuration ----------
+		Display: Email Id
+		Enabled:  true
+		IsMandatory:  false
+		Parent:
+		ParentDataSource:
+		Permission:  w
+		Name:  emailid
+		Options:  []
+		Rules:  valid_email|required
+		Status:
+		Type:  string
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fstatus, _ := cmd.Flags().GetBool("all")
@@ -58,45 +67,39 @@ func get() error {
 		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
 		return nil
 	}
-	resultResp, err := api.GetFields(temp)
+	resultResp, err := api.GetStandardFields(temp)
 	if err != nil {
 		return err
 	}
-	var j = 0
-	var temp1 []int
-	fmt.Println("Select one of the fields to get the schema")
+
+	var options []string
 	for i := 0; i < len(resultResp.Data); i++ {
-		if resultResp.Data[i].Parent == "" {
-			fmt.Print(j + 1)
-			fmt.Println("." + resultResp.Data[i].Display)
-			j++
-			temp1 = append(temp1, i)
-		}
+		options = append(options, resultResp.Data[i].Display)
 	}
-	var num int
 
-	// Taking input from user
-	fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(temp1)) + " :")
-	fmt.Scanln(&num)
-	for 1 > num || num > len(temp1) {
-		fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(temp1)) + " :")
-
-		fmt.Scanln(&num)
+	var ind int
+	err = prompt.SurveyAskOne(&survey.Select{
+		Message: "Select one of the fields to get the schema: ",
+		Options: options,
+	}, &ind, survey.WithPageSize(15))
+	if err != nil {
+		return nil
 	}
-	if resultResp.Data[temp1[num-1]].Parent == "" {
-		fmt.Println("Display: " + resultResp.Data[temp1[num-1]].Display)
-		fmt.Println("Enabled: ", resultResp.Data[temp1[num-1]].Enabled)
-		fmt.Println("IsMandatory: ", resultResp.Data[temp1[num-1]].IsMandatory)
-		fmt.Println("Parent: ", resultResp.Data[temp1[num-1]].Parent)
-		fmt.Println("ParentDataSource: ", resultResp.Data[temp1[num-1]].ParentDataSource)
-		fmt.Println("Permission: ", resultResp.Data[temp1[num-1]].Permission)
-		fmt.Println("Name: ", resultResp.Data[temp1[num-1]].Name)
-		fmt.Println("Options: ", resultResp.Data[temp1[num-1]].Options)
-		fmt.Println("Rules: ", resultResp.Data[temp1[num-1]].Rules)
-		fmt.Println("Status: ", resultResp.Data[temp1[num-1]].Status)
-		fmt.Println("Type: ", resultResp.Data[temp1[num-1]].Type)
 
-	}
+	field := resultResp.Data[ind]
+
+	fmt.Println("---------- Configuration ----------")
+	fmt.Println("Display: " + field.Display)
+	fmt.Println("Enabled: ", field.Enabled)
+	fmt.Println("IsMandatory: ", field.IsMandatory)
+	fmt.Println("Parent: ", field.Parent)
+	fmt.Println("ParentDataSource: ", field.ParentDataSource)
+	fmt.Println("Permission: ", field.Permission)
+	fmt.Println("Name: ", field.Name)
+	fmt.Println("Options: ", field.Options)
+	fmt.Println("Rules: ", field.Rules)
+	fmt.Println("Status: ", field.Status)
+	fmt.Println("Type: ", field.Type)
 
 	return nil
 }

@@ -26,14 +26,14 @@ func NewHooksCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr add hooks
-			Enter Name:
-			Select a plan
-			....
-			....
-			Enter TargetUrl: 
-
+			Enter Name: <hook-name>
+			? Select a plan  [Use arrows to move, type to filter]
+			> Login
+			Register
+			ResetPassword
+			UpdateProfile
+			Enter TargetUrl: <url>
 			Webhook has been added.
- 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return addHooks()

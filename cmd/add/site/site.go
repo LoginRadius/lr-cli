@@ -36,13 +36,13 @@ func NewSiteCmd() *cobra.Command {
 		This command enables user to add a site depending on the subscribed plan. 
 		`),
 		Example: heredoc.Doc(`
-			$ lr add site
-			Enter the App Name: 
-			Enter the Domain:
-			Select a plan
-			....
-			.... 
-
+			$ lr add site 
+			Enter the App Name: <app_name>
+			Enter the Domain: <domain>
+			? Select a plan  [Use arrows to move, type to filter]
+			  Free
+			> Developer
+			  Business
 			Your site has been added 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {

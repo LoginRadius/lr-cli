@@ -38,6 +38,15 @@ func NewLoginCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 		# Opens Interactive Mode
 		$ lr login
+		? Successfully Authenticated, Fetching Your Site(s)...
+		? Current Site is: <current-site>, Want to Switch? (Y/n)
+		? Select the site from the list: 
+		> site1
+		...
+		...
+		siteN
+		Site has been updated.
+		Successfully Logged In
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			isValid := validateLogin()
@@ -82,7 +91,7 @@ func doLogin() error {
 		return err
 	}
 	fmt.Println("Successfully Authenticated, Fetching Your Site(s)...")
-	err = listSites()
+	err = listSites(resObj.AppName)
 	if err != nil {
 		return err
 	}
@@ -90,7 +99,7 @@ func doLogin() error {
 	return nil
 }
 
-func listSites() error {
+func listSites(currSiteName string) error {
 	m := make(map[int]int64)
 	appInfo, err := api.GetAppsInfo()
 	if err != nil {
@@ -112,14 +121,14 @@ func listSites() error {
 	}
 
 	var option bool
-	err = prompt.Confirm("Do you wish to switch from the default site?", &option)
+	err = prompt.Confirm("Current Site is: "+currSiteName+", Want to Switch?", &option)
 	if !option {
 		return nil
 	}
 
 	var siteChoice int
 	err = prompt.SurveyAskOne(&survey.Select{
-		Message: "Select the site from the list",
+		Message: "Select the site from the list:",
 		Options: options,
 	}, &siteChoice)
 	switchId := m[siteChoice]

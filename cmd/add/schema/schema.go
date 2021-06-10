@@ -3,22 +3,20 @@ package schema
 import (
 	"bufio"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
 )
-
-var temp int
 
 var url1 string
 
@@ -29,25 +27,21 @@ func NewschemaCmd() *cobra.Command {
 		Short: "add schema config",
 		Long:  `This commmand adds schema config field`,
 		Example: heredoc.Doc(`$ lr add schema
-		Enter the Display Name (<Name>) :<Display Name>
-		Is Required (y/n):<y/n>
-		Do you want to setup advance configuration (y/n):<y/n>
+		? Select the feild you Want to add from the list: Date of Birth
+		Enter the Display Name (Date of Birth) :
+		? Is Mandatory? No
+		? Do you want to setup advance configuration? No
 		Your field has been sucessfully added
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if temp == 0 {
-				return &cmdutil.FlagError{Err: errors.New("`field` is required argument")}
-			}
-			return add(temp)
+			return add()
 
 		},
 	}
-	fl := cmd.Flags()
-	fl.IntVarP(&temp, "field", "f", 0, "field number")
 	return cmd
 }
 
-func add(temp int) error {
+func add() error {
 	//checking if it is devoloper plan
 	res, err := api.GetSites()
 	if err != nil {
@@ -60,41 +54,53 @@ func add(temp int) error {
 	}
 
 	//changing enabled to true based on field number entered
-	conf := config.GetInstance()
-	resultResp, err := api.GetFields("all")
+	allFieldResp, err := api.GetStandardFields("all")
 	if err != nil {
 		return nil
 	}
-	var temp1 []int
-	for i := 0; i < len(resultResp.Data); i++ {
-		if resultResp.Data[i].Parent == "" {
-			temp1 = append(temp1, i)
-		}
-	}
-	resultResp1, err := api.GetFields("active")
+	activeFieldResp, err := api.GetStandardFields("active")
 	if err != nil {
 		return err
 	}
-	if temp > len(temp1) || 0 > temp {
-		fmt.Println("please run 'lr get schema -all' first. Please enter the field number accordingly")
+
+	var options []string
+	for i := 0; i < len(allFieldResp.Data); i++ {
+		options = append(options, allFieldResp.Data[i].Display)
+	}
+
+	var ind int
+	err = prompt.SurveyAskOne(&survey.Select{
+		Message: "Select the feild you Want to add from the list:",
+		Options: options,
+	}, &ind)
+	if err != nil {
 		return nil
 	}
-	resultResp.Data[temp1[temp-1]].Enabled = true
+
+	newField := allFieldResp.Data[ind]
+	newField.Enabled = true
 
 	//Changing the display name
-	ChangeDisplay(resultResp, temp1, temp)
+	ChangeDisplay(&newField)
 
 	//Required or not
-	IsRequired(resultResp, temp1, temp)
+	err = IsRequired(&newField)
+	if err != nil {
+		return nil
+	}
 
 	//Advance configuration setup
-	AdvancedConfig(resultResp, temp1, temp)
+	err = AdvancedConfig(&newField)
+	if err != nil {
+		return nil
+	}
 
 	//Adding the field to the configuration
-	resultResp1.Data = append(resultResp1.Data, resultResp.Data[temp1[temp-1]])
-	body, _ := json.Marshal(resultResp1)
+	var conf = config.GetInstance()
+	activeFieldResp.Data = append(activeFieldResp.Data, newField)
+	body, _ := json.Marshal(activeFieldResp)
 	url1 = conf.AdminConsoleAPIDomain + "/platform-configuration/default-fields?"
-	var resultResp2 api.ResultResp
+	var resultResp2 api.StandardFields
 	resp, err := request.Rest(http.MethodPost, url1, nil, string(body))
 
 	if err != nil {
@@ -110,69 +116,65 @@ func add(temp int) error {
 	return nil
 }
 
-func ChangeDisplay(resultResp *api.ResultResp, temp1 []int, temp int) {
+func ChangeDisplay(field *api.Schema) {
 	var DisplayName string
-	fmt.Print("Enter the Display Name (" + resultResp.Data[temp1[temp-1]].Display + ") :")
+	fmt.Print("Enter the Display Name (" + field.Display + ") :")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	DisplayName = scanner.Text()
 	if DisplayName == "" {
-		DisplayName = resultResp.Data[temp1[temp-1]].Display
+		DisplayName = field.Display
 	}
-	resultResp.Data[temp1[temp-1]].Display = DisplayName
+	field.Display = DisplayName
 }
 
-func IsRequired(resultResp *api.ResultResp, temp1 []int, temp int) {
-	var req string
-	fmt.Print("Is Required (y/n):")
-	fmt.Scanln(&req)
-	for req != "Y" && req != "y" && req != "N" && req != "n" {
-		fmt.Print("Please enter (y/n):")
-		fmt.Scanln(&req)
+func IsRequired(field *api.Schema) error {
+	var option bool
+	err := prompt.Confirm("Is Mandatory?", &option)
+	if err != nil {
+		return err
 	}
-	if req == "Y" || req == "y" {
-		resultResp.Data[temp1[temp-1]].IsMandatory = true
-	} else if req == "N" || req == "n" {
-		resultResp.Data[temp1[temp-1]].IsMandatory = false
-	}
+	field.IsMandatory = option
+	return nil
+
 }
 
-func AdvancedConfig(resultResp *api.ResultResp, temp1 []int, temp int) {
-	var req string
-	var ind int
+func AdvancedConfig(field *api.Schema) error {
+	var option bool
+	err := prompt.Confirm("Do you want to setup advance configuration?", &option)
+	if err != nil {
+		return err
+	}
 	var valStr string
-	fmt.Print("Do you want to setup advance configuration (y/n):")
-	fmt.Scanln(&req)
-	for req != "Y" && req != "y" && req != "N" && req != "n" {
-		fmt.Print("Please enter (y/n):")
-		fmt.Scanln(&req)
-	}
-	if req == "Y" || req == "y" {
-		fmt.Println("select feild type")
+	if option {
+		var options []string
 		for i := 0; i < len(api.TypeMap); i++ {
-			fmt.Print(i + 1)
-			fmt.Println(": " + api.TypeMap[i+1].Name)
+			options = append(options, api.TypeMap[i].Name)
 		}
 
-		fmt.Print("Select a number from 1 to " + fmt.Sprint(len(api.TypeMap)) + ":")
-		fmt.Scanln(&ind)
-		resultResp.Data[temp1[temp-1]].Type = api.TypeMap[ind].Name
+		var ind int
+		err = prompt.SurveyAskOne(&survey.Select{
+			Message: "Select Feild Type",
+			Options: options,
+		}, &ind)
+
+		field.Type = api.TypeMap[ind].Name
 		if api.TypeMap[ind].ShouldDisplayValidaitonRuleInput {
 			fmt.Print("Enter the validation string(for more info check https://www.loginradius.com/docs/libraries/js-libraries/javascript-hooks/#customvalidationhook15):")
-			fmt.Scanln(&valStr)
-			resultResp.Data[temp1[temp-1]].Rules = valStr
+			fmt.Scanf("%s\n", &valStr)
+			field.Rules = valStr
 		}
 		if api.TypeMap[ind].ShouldShowOption {
 			fmt.Print("Enter the key value json object(example ")
 			fmt.Println(`[{"value":"one","text":" hyd"},{"value":"two","text":" vij"},{"value":"three","text":" viz"}])`)
-
-			var record []api.Array
+			var record []api.OptSchema
 
 			err := json.NewDecoder(os.Stdin).Decode(&record)
 			if err != nil {
 				log.Fatal(err)
 			}
-			resultResp.Data[temp1[temp-1]].Options = record
+			field.Options = record
 		}
 	}
+	return nil
 }
