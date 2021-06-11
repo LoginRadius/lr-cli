@@ -31,6 +31,7 @@ func NewHooksCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr delete hooks --hookid <hookid>
+			Are you sure you want to proceed ?
 			(Y)
 
 			Webhook has been deleted.

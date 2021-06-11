@@ -31,7 +31,8 @@ func NewSiteCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr delete site --appid <appid>
-			Take note of the following changes. Press Y to continue: (Y)
+			Take note of the following changes. Do you still wish to continue?
+			(Y)
 			
 			Your site has been deleted
 		`),

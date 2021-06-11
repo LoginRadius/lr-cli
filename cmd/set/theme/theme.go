@@ -37,7 +37,7 @@ func NewThemeCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr set theme --theme <theme>
-			Previous changes will be lost. Press Y to continue:
+			Previous changes will be lost. Do you wish to continue?
 			(Y)
 			.......
 			.......

@@ -36,7 +36,12 @@ func NewSiteCmd() *cobra.Command {
 		This command enables user to add a site depending on the subscribed plan. 
 		`),
 		Example: heredoc.Doc(`
-			$ lr add site 
+			$ lr add site
+			Enter the App Name: 
+			Enter the Domain:
+			Select a plan
+			....
+			.... 
 
 			Your site has been added 
 		`),
