@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
 
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -36,6 +38,15 @@ func NewLoginCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 		# Opens Interactive Mode
 		$ lr login
+		? Successfully Authenticated, Fetching Your Site(s)...
+		? Current Site is: <current-site>, Want to Switch? (Y/n)
+		? Select the site from the list: 
+		> site1
+		...
+		...
+		siteN
+		Site has been updated.
+		Successfully Logged In
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			isValid := validateLogin()
@@ -51,7 +62,7 @@ func NewLoginCmd() *cobra.Command {
 				RouteName:   "/postLogin",
 			})
 			tempServer.Server.ListenAndServe()
-			return doLogin(tempToken)
+			return doLogin()
 		},
 	}
 
@@ -64,10 +75,10 @@ func getAccessToken(w http.ResponseWriter, r *http.Request) {
 	time.AfterFunc(1*time.Second, tempServer.CloseServer)
 }
 
-func doLogin(accessToken string) error {
+func doLogin() error {
 
 	params := api.LoginOpts{
-		AccessToken: accessToken,
+		AccessToken: tempToken,
 	}
 	resObj, err := api.AuthLogin(params)
 	if err != nil {
@@ -80,7 +91,7 @@ func doLogin(accessToken string) error {
 		return err
 	}
 	fmt.Println("Successfully Authenticated, Fetching Your Site(s)...")
-	err = listSites()
+	err = listSites(resObj.AppName)
 	if err != nil {
 		return err
 	}
@@ -88,46 +99,41 @@ func doLogin(accessToken string) error {
 	return nil
 }
 
-func listSites() error {
+func listSites(currSiteName string) error {
 	m := make(map[int]int64)
-	var option string
-	var siteChoice int
 	appInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
-	var i int
-	fmt.Println("List of sites: ")
-	for ID, App := range appInfo {
-		i = i + 1
-		if appid == ID {
-			fmt.Println(i, "-", App.Appname, "(Default site)")
-		} else {
-			fmt.Println(i, "-", App.Appname)
-			m[i] = ID //store ID into map except for the default site
-		}
-	}
 	if len(appInfo) == 1 {
 		return nil
 	}
-	fmt.Printf("Do you wish to start with a different site ?(Y/N): ")
-	fmt.Scanf("%s\n", &option)
-	if option != "Y" && option != "y" {
+	var i int
+	var options []string
+	for ID, App := range appInfo {
+		m[i] = ID
+		if appid == ID {
+			options = append(options, App.Appname+" (Default site)")
+		} else {
+			options = append(options, App.Appname)
+		}
+		i += 1
+	}
+
+	var option bool
+	err = prompt.Confirm("Current Site is: "+currSiteName+", Want to Switch?", &option)
+	if !option {
 		return nil
 	}
 
-	fmt.Printf("Enter the corresponding number of the site as displayed above: ")
-	fmt.Scanf("%d\n", &siteChoice)
-	if siteChoice > len(appInfo) || siteChoice <= 0 {
-		fmt.Println("Invalid choice. Switching to default site.")
-		return nil
-	}
-	if m[siteChoice] == 0 {
-		fmt.Println("This is already the current active site.")
-		return nil
-	}
+	var siteChoice int
+	err = prompt.SurveyAskOne(&survey.Select{
+		Message: "Select the site from the list:",
+		Options: options,
+	}, &siteChoice)
 	switchId := m[siteChoice]
 	switchRespObj, err := api.SetSites(switchId)
+
 	err = api.SitesBasic(switchRespObj)
 	if err != nil {
 		return err

@@ -10,6 +10,7 @@ import (
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
@@ -19,7 +20,7 @@ type Delete struct {
 }
 
 var hookid string
-var option string
+var option bool
 
 func NewHooksCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -30,6 +31,7 @@ func NewHooksCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr delete hooks --hookid <hookid>
+			Are you sure you want to proceed ?
 			(Y)
 
 			Webhook has been deleted.
@@ -60,9 +62,8 @@ func deleteHooks() error {
 		fmt.Println("Hook ID does not exist.")
 		return nil
 	}
-	fmt.Printf("Are you sure you want to proceed ? Press Y to continue: ")
-	fmt.Scanf("%s", &option)
-	if option != "Y" {
+	err = prompt.Confirm("Are you sure you want to proceed ?", &option)
+	if !option {
 		return nil
 	}
 	isDeleted, err := delete()

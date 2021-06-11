@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -23,10 +25,15 @@ func NewHooksCmd() *cobra.Command {
 		This command adds webhooks which are configured to an App.
 		`),
 		Example: heredoc.Doc(`
-			$ lr add hooks  
-
+			$ lr add hooks
+			Enter Name: <hook-name>
+			? Select a plan  [Use arrows to move, type to filter]
+			> Login
+			Register
+			ResetPassword
+			UpdateProfile
+			Enter TargetUrl: <url>
 			Webhook has been added.
- 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return addHooks()
@@ -62,30 +69,30 @@ func input() bool {
 		fmt.Println("Name is a required entry")
 		return false
 	}
-	event := map[string]string{
-		"1": "Login",
-		"2": "Register",
-		"3": "ResetPassword",
-		"4": "UpdateProfile",
+	event := map[int]string{
+		0: "Login",
+		1: "Register",
+		2: "ResetPassword",
+		3: "UpdateProfile",
 	}
 
 	//Currently supports only Developer plan event options.
-	fmt.Println("To select an Event, choose a correponding number from the following options: ")
-	fmt.Println("1 - Login")
-	fmt.Println("2 - Register")
-	fmt.Println("3 - ResetPassword")
-	fmt.Println("4 - UpdateProfile")
-	fmt.Printf("Option: ")
-	fmt.Scanf("%s\n", &eventOption)
-	if eventOption == "" {
-		fmt.Println("Event is a required entry")
+	var eventChoice int
+	err := prompt.SurveyAskOne(&survey.Select{
+		Message: "Select a plan",
+		Options: []string{
+			"Login",
+			"Register",
+			"ResetPassword",
+			"UpdateProfile",
+		},
+	}, &eventChoice)
+	if err != nil {
 		return false
 	}
-	Event = event[eventOption]
-	if Event == "" {
-		fmt.Println("Invalid Choice of Event")
-		return false
-	}
+
+	Event = event[eventChoice]
+
 	fmt.Printf("Enter TargetUrl: ")
 	fmt.Scanf("%s\n", &TargetUrl)
 	if TargetUrl == "" {

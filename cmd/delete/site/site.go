@@ -10,12 +10,13 @@ import (
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
 
 var appid int64
-var option string
+var option bool
 
 type Delete struct {
 	Isdeleted bool `json:"isdeleted"`
@@ -30,7 +31,8 @@ func NewSiteCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr delete site --appid <appid>
-			Take note of the following changes. Press Y to continue: (Y)
+			Take note of the following changes. Do you still wish to continue?
+			(Y)
 			
 			Your site has been deleted
 		`),
@@ -69,10 +71,8 @@ func deleteSite() error {
 	fmt.Println("1. All configuration for the App will be lost.")
 	fmt.Println("2. All active user data will be removed.")
 	fmt.Println("3. You will not be able to create new app with same name.")
-
-	fmt.Printf("Take note of the following changes. Press Y to continue: ")
-	fmt.Scanf("%s", &option)
-	if option != "Y" {
+	err = prompt.Confirm("Take note of the following changes. Do you still wish to continue?", &option)
+	if !option {
 		return nil
 	}
 

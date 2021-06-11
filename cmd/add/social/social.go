@@ -2,18 +2,21 @@ package social
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
 )
 
 var fileName string
-var arr = [5]string{"Facebook", "Google", "Twitter", "LinkedIn", "GitHub"}
+var availableProvider = [5]string{"Facebook", "Google", "Twitter", "LinkedIn", "GitHub"}
 var Url string
 
 type socialProvider struct {
@@ -49,15 +52,12 @@ func NewsocialCmd() *cobra.Command {
 		Short: "add social provider",
 		Long:  `This commmand adds social provider`,
 		Example: `$ lr add social
-		1 Facebook
-		...
-		Please select a number from 1 to 5
-		 :2
+		? Select the provider from the list: Facebook
 		Please enter the provider key:
-		<key>
+		*******
 		Please enter the provider secret:
-		<secret>
-		social provider added successfully
+		*******
+		Social Provider added successfully
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
@@ -77,41 +77,30 @@ func add1(opts1 *socialProvider) error {
 		return err
 	}
 	var num int
+	var options []string
 	if res.Productplan.Name == "free" {
-		for i := 0; i < 3; i++ {
-			fmt.Println(i+1, arr[i])
-		}
-		fmt.Print("Please select a number from 1 to 3 :")
-		fmt.Scanln(&num)
-		for 1 > num || num > 3 {
-			fmt.Print("Please select a number from 1 to 3 :")
-
-			fmt.Scanln(&num)
-		}
+		options = availableProvider[0:3]
 	} else if res.Productplan.Name == "developer" {
-		for i := 0; i < len(arr); i++ {
-			fmt.Println(i+1, arr[i])
-		}
-		fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(arr)) + " :")
-		fmt.Scanln(&num)
-		for 1 > num || num > 5 {
-			fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(arr)) + " :")
-
-			fmt.Scanln(&num)
-		}
-
+		options = availableProvider[0:]
 	} else {
-		fmt.Println("The plan needs to be either 'free' or 'developer' to use this")
+		return errors.New("No Valid Plans for this Site")
 	}
-	Match, err := verify(arr[num-1])
+	err = prompt.SurveyAskOne(&survey.Select{
+		Message: "Select the provider from the list:",
+		Options: options,
+	}, &num)
+	if err != nil {
+		return nil
+	}
+	Match, err := verify(availableProvider[num])
 	if err != nil {
 		return err
 	}
 	if Match {
-		fmt.Println("The social Provider already exists")
+		fmt.Println("The social Provider already added")
 		return nil
 	}
-	opts1.Provider = arr[num-1]
+	opts1.Provider = availableProvider[num]
 	opts2 := &Result{}
 	var key string
 	var secret string
@@ -149,7 +138,7 @@ func add1(opts1 *socialProvider) error {
 	if err1 != nil {
 		return err
 	}
-	fmt.Println("social provider added successfully")
+	fmt.Println("Social Provider added successfully")
 	return nil
 
 }
