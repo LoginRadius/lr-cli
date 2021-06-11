@@ -10,12 +10,13 @@ import (
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
 
 var theme string
-var option string
+var option bool
 var ListTheme = []string{"London", "Tokyo", "Helsinki"}
 
 type body struct {
@@ -70,9 +71,8 @@ func themes() error {
 		fmt.Println("You are already using this theme")
 		return nil
 	} else {
-		fmt.Printf("Previous changes will be lost. Press Y to continue: ")
-		fmt.Scanf("%s", &option)
-		if option != "Y" {
+		err = prompt.Confirm("Previous changes will be lost. Do you wish to continue?", &option)
+		if !option {
 			return nil
 		}
 	}

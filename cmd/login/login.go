@@ -112,8 +112,8 @@ func listSites() error {
 	}
 
 	var option bool
-	err = prompt.Confirm("Do you wish to continue with the default site?", &option)
-	if option {
+	err = prompt.Confirm("Do you wish to switch from the default site?", &option)
+	if !option {
 		return nil
 	}
 

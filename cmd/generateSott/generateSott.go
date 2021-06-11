@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
@@ -38,8 +40,11 @@ func NewgenerateSottCmd() *cobra.Command {
 		Short: "generates sott",
 		Long:  `This commmand generates sott`,
 		Example: heredoc.Doc(`$ lr generate-sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> 
+		To select a Technology, choose a corresponding number from the following options:
 		.....
 		.....
+		Option:<value>
+		
 		sott generated successfully
 		AunthenticityToken: <token>
 		Comment: <comment>
@@ -97,24 +102,21 @@ func generate(opts *sott) error {
 }
 
 func getTech() string {
-	var option string
-	tech := map[string]string{
-		"1": "android",
-		"2": "ios",
+	tech := map[int]string{
+		0: "android",
+		1: "ios",
 	}
-	fmt.Println("To select a Technology, choose a correponding number from the following options:")
-	fmt.Println("1 - Android")
-	fmt.Println("2 - iOS")
-	fmt.Printf("Option: ")
-	fmt.Scanf("%s\n", &option)
-	if option == "" {
-		fmt.Println("Technology is a required argument")
+	var techChoice int
+	err := prompt.SurveyAskOne(&survey.Select{
+		Message: "Select a plan",
+		Options: []string{
+			"Android",
+			"iOS",
+		},
+	}, &techChoice)
+	if err != nil {
 		return ""
 	}
-	Tech := tech[option]
-	if Tech == "" {
-		fmt.Println("Invalid Choice of Technology")
-		return ""
-	}
+	Tech := tech[techChoice]
 	return Tech
 }

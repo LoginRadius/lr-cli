@@ -99,7 +99,7 @@ func input() bool {
 	}
 
 	var planChoice int
-	_ = prompt.SurveyAskOne(&survey.Select{
+	err := prompt.SurveyAskOne(&survey.Select{
 		Message: "Select a plan",
 		Options: []string{
 			"Free",
@@ -107,6 +107,9 @@ func input() bool {
 			"Business",
 		},
 	}, &planChoice)
+	if err != nil {
+		return false
+	}
 
 	PlanName = plan[planChoice]
 	if PlanName == "" {
