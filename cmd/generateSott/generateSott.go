@@ -40,10 +40,9 @@ func NewgenerateSottCmd() *cobra.Command {
 		Short: "generates sott",
 		Long:  `This commmand generates sott`,
 		Example: heredoc.Doc(`$ lr generate-sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> 
-		To select a Technology, choose a corresponding number from the following options:
+		Select a technology
 		.....
 		.....
-		Option:<value>
 		
 		sott generated successfully
 		AunthenticityToken: <token>
@@ -108,7 +107,7 @@ func getTech() string {
 	}
 	var techChoice int
 	err := prompt.SurveyAskOne(&survey.Select{
-		Message: "Select a plan",
+		Message: "Select a technology",
 		Options: []string{
 			"Android",
 			"iOS",
