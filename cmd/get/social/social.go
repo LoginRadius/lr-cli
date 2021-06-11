@@ -3,7 +3,9 @@ package social
 import (
 	"fmt"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -42,26 +44,28 @@ func get() error {
 		fmt.Println("There is no social configuration")
 		return nil
 	}
-	var num int
+	var options []string
 	for i := 0; i < len(resultResp.Data); i++ {
-		fmt.Print(fmt.Sprint(i+1) + ".")
-		fmt.Println(resultResp.Data[i].Provider)
+		options = append(options, resultResp.Data[i].Provider)
 	}
-	// Taking input from user
-	fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(resultResp.Data)) + " :")
-	fmt.Scanln(&num)
-	for 1 > num || num > len(resultResp.Data) {
-		fmt.Print("Please select a number from 1 to " + fmt.Sprint(len(resultResp.Data)) + " :")
 
-		fmt.Scanln(&num)
+	// Taking input from user
+	var ind int
+	err = prompt.SurveyAskOne(&survey.Select{
+		Message: "Please find Active Providers below, Select to show more details:",
+		Options: options,
+	}, &ind)
+	if err != nil {
+		return nil
 	}
-	fmt.Println("HtmlFileName: " + resultResp.Data[num-1].HtmlFileName)
-	fmt.Println("Provider: ", resultResp.Data[num-1].Provider)
-	fmt.Println("ProviderId: ", resultResp.Data[num-1].ProviderId)
-	fmt.Println("ProviderKey: ", resultResp.Data[num-1].ProviderKey)
-	fmt.Println("ProviderSecret: ", resultResp.Data[num-1].ProviderSecret)
-	fmt.Println("Scope: ", resultResp.Data[num-1].Scope)
-	fmt.Println("Status: ", resultResp.Data[num-1].Status)
+	sProvider := resultResp.Data[ind]
+	fmt.Println("########## Configuration ##########")
+	fmt.Println("Provider: ", sProvider.Provider)
+	fmt.Println("ProviderId: ", sProvider.ProviderId)
+	fmt.Println("ProviderKey: ", sProvider.ProviderKey)
+	fmt.Println("ProviderSecret: ", sProvider.ProviderSecret)
+	fmt.Println("Scope: ", sProvider.Scope)
+	fmt.Println("Status: ", sProvider.Status)
 
 	return nil
 }

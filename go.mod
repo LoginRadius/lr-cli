@@ -3,6 +3,7 @@ module github.com/loginradius/lr-cli
 go 1.16
 
 require (
+	github.com/AlecAivazis/survey/v2 v2.2.12
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/cli/safeexec v1.0.0

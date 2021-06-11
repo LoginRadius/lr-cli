@@ -7,10 +7,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
@@ -35,7 +37,12 @@ func NewSiteCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr add site 
-
+			Enter the App Name: <app_name>
+			Enter the Domain: <domain>
+			? Select a plan  [Use arrows to move, type to filter]
+			  Free
+			> Developer
+			  Business
 			Your site has been added 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -89,22 +96,27 @@ func input() bool {
 		fmt.Println("Domain is a required entry")
 		return false
 	}
-	plan := map[string]string{
-		"1": "free",
-		"2": "developer",
-		"3": "business",
+
+	plan := map[int]string{
+		0: "free",
+		1: "developer",
+		2: "business",
 	}
-	fmt.Println("To select a plan, choose a corresponding number from the following options: ")
-	fmt.Println("1 - Free plan")
-	fmt.Println("2 - Developer plan")
-	fmt.Println("3 - Developer Pro plan")
-	fmt.Printf("Option: ")
-	fmt.Scanf("%s\n", &planOption)
-	if planOption == "" {
-		fmt.Println("Plan is a required entry")
+
+	var planChoice int
+	err := prompt.SurveyAskOne(&survey.Select{
+		Message: "Select a plan",
+		Options: []string{
+			"Free",
+			"Developer",
+			"Business",
+		},
+	}, &planChoice)
+	if err != nil {
 		return false
 	}
-	PlanName = plan[planOption]
+
+	PlanName = plan[planChoice]
 	if PlanName == "" {
 		fmt.Println("Invalid Choice of Plan")
 		return false

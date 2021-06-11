@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/request"
 )
 
@@ -28,37 +27,37 @@ type FieldTypeConfig struct {
 }
 
 var TypeMap = map[int]FieldTypeConfig{
-	1: {
+	0: {
 		Name:                             "String",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
 	},
-	2: {
+	1: {
 		Name:                             "CheckBox",
 		ShouldDisplayValidaitonRuleInput: false,
 		ShouldShowOption:                 false,
 	},
-	3: {
+	2: {
 		Name:                             "Option",
 		ShouldDisplayValidaitonRuleInput: false,
 		ShouldShowOption:                 true,
 	},
-	4: {
+	3: {
 		Name:                             "Password",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
 	},
-	5: {
+	4: {
 		Name:                             "Hidden",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
 	},
-	6: {
+	5: {
 		Name:                             "Email",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
 	},
-	7: {
+	6: {
 		Name:                             "Text",
 		ShouldDisplayValidaitonRuleInput: true,
 		ShouldShowOption:                 false,
@@ -66,41 +65,38 @@ var TypeMap = map[int]FieldTypeConfig{
 }
 
 type Schema struct {
-	Display          string  `json:"Display"`
-	Enabled          bool    `json:"Enabled"`
-	IsMandatory      bool    `json:"IsMandatory"`
-	Parent           string  `json:"Parent"`
-	ParentDataSource string  `json:"ParentDataSource"`
-	Permission       string  `json:"Permission"`
-	Name             string  `json:"name"`
-	Options          []Array `json:"options"`
-	Rules            string  `json:"rules"`
-	Status           string  `json:"status"`
-	Type             string  `json:"type"`
+	Display          string      `json:"Display"`
+	Enabled          bool        `json:"Enabled"`
+	IsMandatory      bool        `json:"IsMandatory"`
+	Parent           string      `json:"Parent"`
+	ParentDataSource string      `json:"ParentDataSource"`
+	Permission       string      `json:"Permission"`
+	Name             string      `json:"name"`
+	Options          []OptSchema `json:"options"`
+	Rules            string      `json:"rules"`
+	Status           string      `json:"status"`
+	Type             string      `json:"type"`
 }
-type Array struct {
+type OptSchema struct {
 	Value string `json:"value"`
 	Text  string `json:"text"`
 }
 
-var Url string
-
-type ResultResp struct {
+type StandardFields struct {
 	Data []Schema `json:"Data"`
 }
 
-func GetFields(tem string) (*ResultResp, error) {
-	conf := config.GetInstance()
-	if tem == "active" {
-		Url = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"
+func GetStandardFields(ftype string) (*StandardFields, error) {
+	var url string
+	if ftype == "active" {
+		url = conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?"
 	}
-	if tem == "all" {
-		Url = conf.AdminConsoleAPIDomain + "/platform-configuration/platform-registration-fields?"
+	if ftype == "all" {
+		url = conf.AdminConsoleAPIDomain + "/platform-configuration/platform-registration-fields?"
 	}
 
-	var resultResp ResultResp
-	resp, err := request.Rest(http.MethodGet, Url, nil, "")
-
+	var resultResp StandardFields
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
 	if err != nil {
 		return nil, err
 	}
@@ -109,14 +105,24 @@ func GetFields(tem string) (*ResultResp, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if ftype == "all" {
+		var basicFields StandardFields
+		for i := 0; i < len(resultResp.Data); i++ {
+			if resultResp.Data[i].Parent == "" {
+				basicFields.Data = append(basicFields.Data, resultResp.Data[i])
+			}
+		}
+		return &basicFields, nil
+	}
 	return &resultResp, nil
 }
+
 func GetActiveProviders() (*ProviderList, error) {
-	conf := config.GetInstance()
-	Url = conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options?"
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options?"
 
 	var R1 ProviderList
-	resp, err := request.Rest(http.MethodGet, Url, nil, "")
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
 
 	if err != nil {
 		return nil, err
