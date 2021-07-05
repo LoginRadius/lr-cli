@@ -22,8 +22,8 @@ func NewThemeCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 			$ lr get theme --all
 			Available Themes:
-			1. Tokyo
-			2. London
+			1. London
+			2. Tokyo
 			3. Helsinki
 
 			$ lr get theme --active 
@@ -43,8 +43,8 @@ func NewThemeCmd() *cobra.Command {
 func themes() error {
 	if *all && !*active {
 		fmt.Println("Available Themes:")
-		fmt.Println("1. Tokyo")
-		fmt.Println("2. London")
+		fmt.Println("1. London")
+		fmt.Println("2. Tokyo")
 		fmt.Println("3. Helsinki")
 	} else if *active && !*all {
 		resp, err := api.GetPage()
@@ -52,7 +52,6 @@ func themes() error {
 			return err
 		}
 		index := resp.Pages[0].Status
-
 		fmt.Println("Current Theme:", cmdutil.ThemeMap[index])
 	} else {
 		fmt.Println("Use exactly one of the following flags: ")
