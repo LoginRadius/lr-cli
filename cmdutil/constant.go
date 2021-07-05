@@ -1,6 +1,7 @@
 package cmdutil
 
 var ThemeMap = map[string]string{
+	"0": "London", // Handled fallback logic to London.
 	"1": "London",
 	"2": "Tokyo",
 	"3": "Helsinki",

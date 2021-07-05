@@ -96,6 +96,8 @@ func GetPage() (*HostedPageResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	// This Logic is needed to support the theme customization done using Dashboard.
+	resultResp.Pages[0].Status = strings.ReplaceAll(resultResp.Pages[0].Status, "9", "")
 	return &resultResp, nil
 }
 
