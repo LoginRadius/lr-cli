@@ -10,7 +10,6 @@ import (
 	"github.com/loginradius/lr-cli/cmd/get/site"
 
 	"github.com/loginradius/lr-cli/cmd/get/domain"
-	"github.com/loginradius/lr-cli/cmd/get/email"
 	"github.com/loginradius/lr-cli/cmd/get/servertime"
 	"github.com/loginradius/lr-cli/cmd/get/social"
 	"github.com/loginradius/lr-cli/cmd/get/theme"
@@ -37,9 +36,6 @@ func NewGetCmd() *cobra.Command {
 
 	domainCmd := domain.NewdomainCmd()
 	cmd.AddCommand(domainCmd)
-
-	emailCmd := email.NewemailCmd()
-	cmd.AddCommand(emailCmd)
 
 	configCmd := config.NewConfigCmd()
 	cmd.AddCommand(configCmd)
