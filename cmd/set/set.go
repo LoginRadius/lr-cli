@@ -3,7 +3,7 @@ package set
 import (
 	"github.com/loginradius/lr-cli/cmd/set/accountPassword"
 	"github.com/loginradius/lr-cli/cmd/set/domain"
-	"github.com/loginradius/lr-cli/cmd/set/email"
+	"github.com/loginradius/lr-cli/cmd/set/schema"
 	"github.com/loginradius/lr-cli/cmd/set/site"
 	"github.com/loginradius/lr-cli/cmd/set/theme"
 
@@ -27,8 +27,8 @@ func NewsetCmd() *cobra.Command {
 	domainCmd := domain.NewdomainCmd()
 	cmd.AddCommand((domainCmd))
 
-	emailCmd := email.NewemailCmd()
-	cmd.AddCommand(emailCmd)
+	schemaCmd := schema.NewSetSchemaCmd()
+	cmd.AddCommand(schemaCmd)
 
 	accountPasswordCmd := accountPassword.NewaccountPasswordCmd()
 	cmd.AddCommand(accountPasswordCmd)

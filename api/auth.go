@@ -35,6 +35,13 @@ type LoginOpts struct {
 	LookingFor  string `schema:"lookingFor" json:"lookingFor"`
 }
 
+type FeatureSchema struct {
+	Data []struct {
+		Feature string `json:"feature"`
+		Status  bool   `json:"status"`
+	} `json:"Data"`
+}
+
 func AuthLogin(params LoginOpts) (*LoginResponse, error) {
 
 	var resObj LoginResponse
@@ -162,6 +169,41 @@ func CurrentID() (int64, error) {
 		return 0, err
 	}
 	return loginInfo.AppID, nil
+}
+
+func GetSiteFeatures() (*FeatureSchema, error) {
+
+	featureUrl := conf.AdminConsoleAPIDomain + "/auth/features"
+	var resultResp FeatureSchema
+	resp, err := request.Rest(http.MethodGet, featureUrl, nil, "")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, nil
+
+}
+
+func IsPhoneLoginEnabled(features FeatureSchema) bool {
+	for _, val := range features.Data {
+		if val.Feature == "phone_id_and_email_login_enabled" && val.Status {
+			return true
+		}
+	}
+	return false
+}
+
+func IsPasswordLessEnabled(features FeatureSchema) bool {
+	for _, val := range features.Data {
+		if val.Feature == "instant_login_enabled" && val.Status {
+			return true
+		}
+	}
+	return false
 }
 
 func storeSiteInfo(data CoreAppData) map[int64]SitesReponse {
