@@ -104,10 +104,15 @@ func add1(opts1 *socialProvider) error {
 	opts2 := &Result{}
 	var key string
 	var secret string
-	fmt.Println("Please enter the provider key:")
-	fmt.Scanln(&key)
-	fmt.Println("Please enter the provider secret:")
-	fmt.Scanln(&secret)
+
+	prompt.SurveyAskOne(&survey.Input{
+		Message: "Please enter the provider key:",
+	}, &key, survey.WithValidator(survey.Required))
+
+	prompt.SurveyAskOne(&survey.Password{
+		Message: "Please enter the provider secret:",
+	}, &secret, survey.WithValidator(survey.Required))
+
 	opts2.Status = true
 	opts1.ProviderKey = key
 	opts1.ProviderSecret = secret

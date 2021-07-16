@@ -84,18 +84,14 @@ func addSite() error {
 }
 
 func input() bool {
-	fmt.Printf("Enter the App Name: ")
-	fmt.Scanf("%s\n", &AppName)
-	if AppName == "" {
-		fmt.Println("App Name is a required entry")
-		return false
-	}
-	fmt.Printf("Enter the Domain: ")
-	fmt.Scanf("%s\n", &Domain)
-	if Domain == "" {
-		fmt.Println("Domain is a required entry")
-		return false
-	}
+
+	prompt.SurveyAskOne(&survey.Input{
+		Message: "Enter the App Name: ",
+	}, &AppName, survey.WithValidator(survey.Required))
+
+	prompt.SurveyAskOne(&survey.Input{
+		Message: "Enter the Domain: ",
+	}, &Domain, survey.WithValidator(survey.Required))
 
 	plan := map[int]string{
 		0: "free",
@@ -152,8 +148,9 @@ func cardDetails() (bool, error) {
 		fmt.Println("Adding more than one app requires valid payment information. Please update card details in dashboard via browser.")
 		fmt.Println("(Note: User must re-login after updating details in the browser)")
 		fmt.Printf("Press Y to open Browser window:")
-		fmt.Scanf("%s", &option)
-		if option != "Y" {
+		var option bool
+		prompt.Confirm("Do you want to open the browser?", &option)
+		if !option {
 			return false, errors.New("Action not possible without updating card details.")
 		}
 		cmdutil.Openbrowser(conf.DashboardDomain + "/apps")
