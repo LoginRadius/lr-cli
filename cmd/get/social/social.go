@@ -16,8 +16,9 @@ func NewsocialCmd() *cobra.Command {
 		Use:   "social",
 		Short: "get social providers",
 		Long:  `This commmand lists social providers`,
-		Example: `$ lr get social
-		+-----------+--------------------+---------+
+		Example: `
+$ lr get social
++-----------+--------------------+---------+
 | PROVIDER  |       SCOPE        | ENABLED |
 +-----------+--------------------+---------+
 | Linkedin  | r_emailaddress     | true    |

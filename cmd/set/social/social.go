@@ -42,13 +42,17 @@ func NewsocialCmd() *cobra.Command {
 		Use:   "social",
 		Short: "Updated the exsiting social provider",
 		Long:  `This Command helps to upadte the exsiting social provider`,
-		Example: `$ lr set social
-		? Select the provider from the list: Facebook
-		Please enter the provider key:
-		*******
-		Please enter the provider secret:
-		*******
-		Social Provider added successfully
+		Example: `
+$ lr set social -p Google
+? API Key: <key>
+? API Secret: <secret>
+Google updated successfully.
+
+$ lr set social -p Google --disable
+Google Disabled Successfully
+
+$ lr set social -p Google --enable
+Google Enabled Successfully
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return update(provider, on, off)
@@ -82,7 +86,7 @@ func update(provider string, on bool, off bool) error {
 			if err != nil {
 				return err
 			}
-			fmt.Println(provider + " enabled successfully")
+			fmt.Println(provider + " Enabled Successfully")
 			return nil
 		}
 	} else if off {
@@ -93,7 +97,7 @@ func update(provider string, on bool, off bool) error {
 			if err != nil {
 				return err
 			}
-			fmt.Println(provider + " disabled successfully")
+			fmt.Println(provider + " Disabled Successfully")
 			return nil
 		}
 	}

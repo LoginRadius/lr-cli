@@ -18,16 +18,14 @@ func NewschemaCmd() *cobra.Command {
 		Short: "get schema",
 		Long:  `This commmand lists schema config`,
 		Example: heredoc.Doc(`$ lr get schema
-		+-----------+---------------+----------+---------+
++-----------+---------------+----------+---------+
 |   NAME    |    DISPLAY    |   TYPE   | ENABLED |
 +-----------+---------------+----------+---------+
-| cf_MyCF   | MyCF          | option   | true    |
 | password  | Password      | password | true    |
 | emailid   | Email Id      | email    | true    |
 | lastname  | Last Name     | string   | false   |
 | birthdate | Date of Birth | string   | false   |
 | country   | Country       | string   | false   |
-| phoneid   | Phone ID      | string   | false   |
 | firstname | First Name    | string   | false   |
 +-----------+---------------+----------+---------+
 +---------------+
