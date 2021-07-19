@@ -27,9 +27,11 @@ func NewSetSchemaCmd() *cobra.Command {
 		? Enter Field Name: My Field
 		? Optional? Yes
 		? Select field Type CheckBox
+
 		# To Enable the field with default configuration
 		lr set schema -f my-field --enable
         "my-field" enabled successfully
+		
 		# To Disable the field
 		lr set schema -f my-field --disable
         "my-field" disabled successfully

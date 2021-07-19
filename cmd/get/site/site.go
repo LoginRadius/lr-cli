@@ -27,19 +27,19 @@ func NewSiteCmd() *cobra.Command {
 			$ lr get site --all
 			All sites: 
 			+--------+-----------------+-------------------------+-----------+
-|   ID   |      NAME       |         DOMAIN          |   PLAN    |
-+--------+-----------------+-------------------------+-----------+
-| 111111 | new-test1       | https://mail7.io        | free      |
-| 122222 | my-app-final    | loginradius.com         | business  |
-| 142670 | trail-pro       | https://loginradius.com | business  |
-			
+			|   ID   |      NAME       |         DOMAIN          |   PLAN    |
+			+--------+-----------------+-------------------------+-----------+
+			| 111111 | new-test1       | https://mail7.io        | free      |
+			| 122222 | my-app-final    | loginradius.com         | business  |
+			| 142670 | trail-pro       | https://loginradius.com | business  |
+
 			$ lr get site --active
 			Current site: 
 			....
 
 			$ lr get site --appid <appid>
 			....
-			
+
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return getSite()

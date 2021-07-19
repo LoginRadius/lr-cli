@@ -31,8 +31,10 @@ func NewsocialCmd() *cobra.Command {
 		Use:   "social",
 		Short: "delete social provider",
 		Long:  `This commmand deletes social provider`,
-		Example: `$ lr delete social --provider <provider>
-		successfully deleted
+		Example: `
+		$ lr delete social -p Google
+		? Are you Sure you want to delete the provider? Yes
+		Google Successfully Deleted
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.ProviderName == "" {
@@ -70,7 +72,7 @@ func delete(opts *provider) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println(opts.ProviderName + " successfully deleted")
+		fmt.Println(opts.ProviderName + " Successfully Deleted")
 	}
 	return nil
 }
