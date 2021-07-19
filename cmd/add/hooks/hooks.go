@@ -17,6 +17,18 @@ var Event string
 var eventOption string
 var TargetUrl string
 
+var defaultEvents = []string{
+	"Login",
+	"Register",
+	"ResetPassword",
+	"UpdateProfile",
+}
+
+var proEvents = []string{
+	"BlockAccount",
+	"DeleteAccount",
+}
+
 func NewHooksCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "hooks",
@@ -43,17 +55,13 @@ func NewHooksCmd() *cobra.Command {
 }
 
 func addHooks() error {
-	err := api.CheckPlan()
-	if err != nil {
-		return err
-	}
 	checkInput := input()
 	if !checkInput {
 		fmt.Println("Please enter the input paramaters properly.")
 		return nil
 	}
 
-	err = add()
+	err := add()
 	if err != nil {
 		return err
 	}
@@ -63,42 +71,35 @@ func addHooks() error {
 }
 
 func input() bool {
-	fmt.Printf("Enter Name: ")
-	fmt.Scanf("%s\n", &Name)
-	if Name == "" {
-		fmt.Println("Name is a required entry")
-		return false
-	}
-	event := map[int]string{
-		0: "Login",
-		1: "Register",
-		2: "ResetPassword",
-		3: "UpdateProfile",
-	}
+	prompt.SurveyAskOne(&survey.Input{
+		Message: "Enter Name:",
+	}, &Name, survey.WithValidator(survey.Required))
 
-	//Currently supports only Developer plan event options.
-	var eventChoice int
-	err := prompt.SurveyAskOne(&survey.Select{
-		Message: "Select a plan",
-		Options: []string{
-			"Login",
-			"Register",
-			"ResetPassword",
-			"UpdateProfile",
-		},
-	}, &eventChoice)
+	res, err := api.GetSites()
 	if err != nil {
 		return false
 	}
 
-	Event = event[eventChoice]
+	var options = defaultEvents
+	if res.Productplan.Name == "business" {
+		options = append(proEvents, options...)
+	}
 
-	fmt.Printf("Enter TargetUrl: ")
-	fmt.Scanf("%s\n", &TargetUrl)
-	if TargetUrl == "" {
-		fmt.Println("TargetUrl is a required entry")
+	//Currently supports only Developer plan event options.
+	var eventChoice int
+	err = prompt.SurveyAskOne(&survey.Select{
+		Message: "Select a plan",
+		Options: options,
+	}, &eventChoice)
+	if err != nil {
 		return false
 	}
+	Event = options[eventChoice]
+
+	prompt.SurveyAskOne(&survey.Input{
+		Message: "Enter TargetUrl: ",
+	}, &TargetUrl, survey.WithValidator(survey.Required))
+
 	return true
 
 }

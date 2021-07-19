@@ -3,9 +3,12 @@ package site
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
 
@@ -23,11 +26,12 @@ func NewSiteCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 			$ lr get site --all
 			All sites: 
-			1
-				App Name:
-				App ID: 
-				Domain:
-			2....
+			+--------+-----------------+-------------------------+-----------+
+|   ID   |      NAME       |         DOMAIN          |   PLAN    |
++--------+-----------------+-------------------------+-----------+
+| 111111 | new-test1       | https://mail7.io        | free      |
+| 122222 | my-app-final    | loginradius.com         | business  |
+| 142670 | trail-pro       | https://loginradius.com | business  |
 			
 			$ lr get site --active
 			Current site: 
@@ -63,10 +67,15 @@ func getSite() error {
 		val, _ := AppInfo[currentID]
 		Output(val)
 	} else if *all && (!*active && *appid == -1) {
+		var data [][]string
 		fmt.Println("All sites: ")
 		for _, site := range AppInfo {
-			Output(site)
+			data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, site.Productplan.Name})
 		}
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"ID", "Name", "Domain", "Plan"})
+		table.AppendBulk(data)
+		table.Render()
 	} else if *appid != -1 && (!*active && !*all) {
 		site, ok := AppInfo[*appid]
 		if !ok {

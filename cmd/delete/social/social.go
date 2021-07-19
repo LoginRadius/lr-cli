@@ -8,6 +8,7 @@ import (
 
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 
 	"github.com/spf13/cobra"
@@ -49,19 +50,27 @@ func NewsocialCmd() *cobra.Command {
 }
 
 func delete(opts *provider) error {
-	conf := config.GetInstance()
 
-	url = conf.AdminConsoleAPIDomain + "/platform-configuration/social-provider-config-remove?"
-	body, _ := json.Marshal(opts)
-	var resultResp Result
-	resp, err := request.Rest(http.MethodDelete, url, nil, string(body))
-	if err != nil {
+	var shouldDelete bool
+	if err := prompt.Confirm("Are you Sure you want to delete the provider?", &shouldDelete); err != nil {
 		return err
 	}
-	err = json.Unmarshal(resp, &resultResp)
-	if err != nil {
-		return err
+
+	if shouldDelete {
+		conf := config.GetInstance()
+
+		url = conf.AdminConsoleAPIDomain + "/platform-configuration/social-provider-config-remove?"
+		body, _ := json.Marshal(opts)
+		var resultResp Result
+		resp, err := request.Rest(http.MethodDelete, url, nil, string(body))
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal(resp, &resultResp)
+		if err != nil {
+			return err
+		}
+		fmt.Println(opts.ProviderName + " successfully deleted")
 	}
-	fmt.Println("successfully deleted")
 	return nil
 }
