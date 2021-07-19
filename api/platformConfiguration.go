@@ -128,6 +128,10 @@ type UpdateRegFieldSchema struct {
 	Fields []Schema `json:"fields"`
 }
 
+type PasswordlessLogin struct {
+	Enabled bool `json:"isEnabled"`
+}
+
 func GetRegistrationFields() (*RegistrationSchema, error) {
 	url := conf.AdminConsoleAPIDomain + "/platform-configuration/registration-schema"
 
@@ -307,4 +311,18 @@ func UpdateProviderStatus(provider string, status bool) error {
 	}
 
 	return nil
+}
+
+func UpdatePasswordlessLogin(body []byte) (*PasswordlessLogin, error) {
+	featureUrl := conf.AdminConsoleAPIDomain + "/platform-configuration/passwordless-login/feature?"
+	var resultResp PasswordlessLogin
+	resp, err := request.Rest(http.MethodPost, featureUrl, nil, string(body))
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, err
 }
