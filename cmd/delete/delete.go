@@ -5,6 +5,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/delete/customField"
 	"github.com/loginradius/lr-cli/cmd/delete/domain"
 	"github.com/loginradius/lr-cli/cmd/delete/hooks"
+	"github.com/loginradius/lr-cli/cmd/delete/loginMethod"
 
 	"github.com/loginradius/lr-cli/cmd/delete/site"
 	"github.com/loginradius/lr-cli/cmd/delete/social"
@@ -22,6 +23,9 @@ func NewdeleteCmd() *cobra.Command {
 
 	hooksCmd := hooks.NewHooksCmd()
 	cmd.AddCommand((hooksCmd))
+
+	loginMethodCmd := loginMethod.NewloginMethodCmd()
+	cmd.AddCommand((loginMethodCmd))
 
 	siteCmd := site.NewSiteCmd()
 	cmd.AddCommand((siteCmd))
