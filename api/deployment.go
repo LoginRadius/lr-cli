@@ -101,6 +101,17 @@ func GetPage() (*HostedPageResponse, error) {
 	return &resultResp, nil
 }
 
+func CheckLoginMethod() error {
+	res, err := GetSites()
+	if err != nil {
+		return err
+	}
+	if res.Productplan.Name != "business" {
+		return errors.New("This command applies to Phone login and Passwordless login which are available only with the Developer Pro plan. Kindly upgrade your plan to use this feature.")
+	}
+	return nil
+}
+
 func UpdateDomain(domains []string) error {
 	var url string
 

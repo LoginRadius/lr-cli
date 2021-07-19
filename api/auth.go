@@ -36,10 +36,12 @@ type LoginOpts struct {
 }
 
 type FeatureSchema struct {
-	Data []struct {
-		Feature string `json:"feature"`
-		Status  bool   `json:"status"`
-	} `json:"Data"`
+	Data []Feature `json:"Data"`
+}
+
+type Feature struct {
+	Feature string `json:"feature"`
+	Status  bool   `json:"status"`
 }
 
 func AuthLogin(params LoginOpts) (*LoginResponse, error) {
@@ -222,4 +224,28 @@ func storeSiteInfo(data CoreAppData) map[int64]SitesReponse {
 		}
 	}
 	return siteInfo
+}
+
+func UpdatePhoneLogin(feature string, status bool) (*FeatureSchema, error) {
+	featureObj := Feature{
+		Feature: feature,
+		Status:  status,
+	}
+	data := []Feature{
+		featureObj,
+	}
+	body, err := json.Marshal(map[string][]Feature{
+		"data": data,
+	})
+	updateUrl := conf.AdminConsoleAPIDomain + "/auth/feature/update?"
+	var resultResp FeatureSchema
+	resp, err := request.Rest(http.MethodPost, updateUrl, nil, string(body))
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, err
 }
