@@ -2,16 +2,13 @@ package social
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/prompt"
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 )
-
-var temp string
-
-var Url string
 
 func NewsocialCmd() *cobra.Command {
 
@@ -20,11 +17,15 @@ func NewsocialCmd() *cobra.Command {
 		Short: "get social providers",
 		Long:  `This commmand lists social providers`,
 		Example: `$ lr get social
-		1.Facebook
-		...
-		Please select a number from 1 to <number of social providers>: <number>
-		HtmlFileName: 
-		...
+		+-----------+--------------------+---------+
+| PROVIDER  |       SCOPE        | ENABLED |
++-----------+--------------------+---------+
+| Linkedin  | r_emailaddress     | true    |
+|           |  r_fullprofile     |         |
+|           | r_contactinfo      |         |
++-----------+--------------------+---------+
+| Yahoo     | N/A                | true    |
++-----------+--------------------+---------+
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return get()
@@ -36,36 +37,34 @@ func NewsocialCmd() *cobra.Command {
 
 func get() error {
 
-	resultResp, err := api.GetActiveProviders()
+	activeProv, err := api.GetActiveProviders()
 	if err != nil {
 		return err
 	}
-	if len(resultResp.Data) == 0 {
+	if len(activeProv) == 0 {
 		fmt.Println("There is no social configuration")
 		return nil
 	}
-	var options []string
-	for i := 0; i < len(resultResp.Data); i++ {
-		options = append(options, resultResp.Data[i].Provider)
-	}
 
-	// Taking input from user
-	var ind int
-	err = prompt.SurveyAskOne(&survey.Select{
-		Message: "Please find Active Providers below, Select to show more details:",
-		Options: options,
-	}, &ind)
-	if err != nil {
-		return nil
+	table := tablewriter.NewWriter(os.Stdout)
+	for k, val := range activeProv {
+		var scope string
+		var status string
+		if len(val.Scope) > 0 {
+			scope = strings.Join(val.Scope, "\n")
+		} else {
+			scope = "N/A"
+		}
+		if val.Status {
+			status = "true"
+		} else {
+			status = "false"
+		}
+		table.Append([]string{k, scope, status})
 	}
-	sProvider := resultResp.Data[ind]
-	fmt.Println("########## Configuration ##########")
-	fmt.Println("Provider: ", sProvider.Provider)
-	fmt.Println("ProviderId: ", sProvider.ProviderId)
-	fmt.Println("ProviderKey: ", sProvider.ProviderKey)
-	fmt.Println("ProviderSecret: ", sProvider.ProviderSecret)
-	fmt.Println("Scope: ", sProvider.Scope)
-	fmt.Println("Status: ", sProvider.Status)
+	table.SetRowLine(true)
+	table.SetHeader([]string{"Provider", "Scope", "Enabled"})
+	table.Render()
 
 	return nil
 }

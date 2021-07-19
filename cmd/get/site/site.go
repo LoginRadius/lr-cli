@@ -26,11 +26,12 @@ func NewSiteCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 			$ lr get site --all
 			All sites: 
-			1
-				App Name:
-				App ID: 
-				Domain:
-			2....
+			+--------+-----------------+-------------------------+-----------+
+|   ID   |      NAME       |         DOMAIN          |   PLAN    |
++--------+-----------------+-------------------------+-----------+
+| 111111 | new-test1       | https://mail7.io        | free      |
+| 122222 | my-app-final    | loginradius.com         | business  |
+| 142670 | trail-pro       | https://loginradius.com | business  |
 			
 			$ lr get site --active
 			Current site: 

@@ -7,7 +7,8 @@ import (
 	"github.com/loginradius/lr-cli/request"
 )
 
-type Provider struct {
+// Social Provider Schemas
+type ActiveProvider struct {
 	HtmlFileName   string   `json:"HtmlFileName"`
 	Provider       string   `json:"Provider"`
 	ProviderId     int      `json:"ProviderId"`
@@ -17,9 +18,36 @@ type Provider struct {
 	Status         bool     `json:"Status"`
 }
 
-type ProviderList struct {
-	Data []Provider `json:"Data"`
+type ProviderOptSchema struct {
+	Display  string `json:"display"`
+	Name     string `json:"name"`
+	Value    string `json:"value"`
+	Required bool   `json:"required"`
 }
+
+type ProviderSchema struct {
+	Name       string              `json:"name"`
+	Display    string              `json:"display"`
+	Selected   bool                `json:"selected"`
+	Order      int                 `json:"order"`
+	Configured bool                `json:"configured"`
+	Options    []ProviderOptSchema `json:"options"`
+	Mdfile     string              `json:"mdfile"`
+	Scopes     []string            `json:"scopes"`
+}
+
+type AddProviderObj struct {
+	Provider       string   `json:"Provider"`
+	ProviderKey    string   `json:"ProviderKey"`
+	ProviderSecret string   `json:"ProviderSecret"`
+	Scope          []string `json:"Scope"`
+	Status         bool     `json:"status"`
+}
+
+type AddProviderSchema struct {
+	Data []AddProviderObj `json:"Data"`
+}
+
 type FieldTypeConfig struct {
 	Name                             string
 	Display                          string
@@ -175,19 +203,108 @@ func UpdateRegField(data UpdateRegFieldSchema) (*RegistrationSchema, error) {
 	return &resultResp, nil
 }
 
-func GetActiveProviders() (*ProviderList, error) {
-	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options?"
+func GetAllProviders() (map[string]ProviderSchema, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-provider/list"
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
 
-	var R1 ProviderList
+	type Providers struct {
+		Name       string        `json:"name"`
+		Display    string        `json:"display"`
+		Selected   bool          `json:"selected"`
+		Order      int           `json:"order"`
+		Configured bool          `json:"configured"`
+		Options    []interface{} `json:"options"`
+		Mdfile     string        `json:"mdfile"`
+		Scopes     []string      `json:"scopes"`
+	}
+
+	type AllProviders struct {
+		Data []Providers `json:"data"`
+	}
+
+	var resultResp AllProviders
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+
+	provMap := make(map[string]ProviderSchema, len(resultResp.Data))
+	for _, val := range resultResp.Data {
+		if val.Name != "apple" {
+			body, _ := json.Marshal(val)
+			var provConfig ProviderSchema
+			err = json.Unmarshal(body, &provConfig)
+			provMap[val.Name] = provConfig
+		}
+	}
+	return provMap, nil
+}
+
+func GetActiveProviders() (map[string]ActiveProvider, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options"
+
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
 
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(resp, &R1)
+	type ActiveProviderList struct {
+		Data []ActiveProvider `json:"Data"`
+	}
+	var resultResp ActiveProviderList
+
+	err = json.Unmarshal(resp, &resultResp)
 	if err != nil {
 		return nil, err
 	}
-	return &R1, nil
+	provMap := make(map[string]ActiveProvider, len(resultResp.Data))
+	for _, val := range resultResp.Data {
+		provMap[val.Provider] = val
+	}
+
+	return provMap, nil
+}
+
+func AddSocialProvider(data AddProviderSchema) error {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-provider/options"
+	body, _ := json.Marshal(data)
+	_, err := request.Rest(http.MethodPost, url, nil, string(body))
+	if err != nil {
+		return err
+	}
+
+	if err = UpdateProviderStatus(data.Data[0].Provider, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateProviderStatus(provider string, status bool) error {
+	type Data struct {
+		ProviderName string `json:"ProviderName"`
+		Status       bool   `json:"status"`
+	}
+	type UpdateStatusSchema struct {
+		Data []Data `json:"Data"`
+	}
+
+	statusObj := Data{
+		ProviderName: provider,
+		Status:       status,
+	}
+	statusBody := UpdateStatusSchema{
+		Data: []Data{statusObj},
+	}
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/status"
+	body, _ := json.Marshal(statusBody)
+	_, err := request.Rest(http.MethodPost, url, nil, string(body))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
