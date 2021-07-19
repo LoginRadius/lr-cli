@@ -5,6 +5,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/set/domain"
 	"github.com/loginradius/lr-cli/cmd/set/schema"
 	"github.com/loginradius/lr-cli/cmd/set/site"
+	"github.com/loginradius/lr-cli/cmd/set/social"
 	"github.com/loginradius/lr-cli/cmd/set/theme"
 
 	"github.com/spf13/cobra"
@@ -32,6 +33,9 @@ func NewsetCmd() *cobra.Command {
 
 	accountPasswordCmd := accountPassword.NewaccountPasswordCmd()
 	cmd.AddCommand(accountPasswordCmd)
+
+	socialCmd := social.NewsocialCmd()
+	cmd.AddCommand(socialCmd)
 
 	return cmd
 }

@@ -1,0 +1,133 @@
+package social
+
+import (
+	"errors"
+	"fmt"
+	"strings"
+
+	"github.com/AlecAivazis/survey/v2"
+	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/prompt"
+
+	"github.com/spf13/cobra"
+)
+
+type socialProvider struct {
+	Provider       string    `json:"Provider"`
+	ProviderKey    string    `json:"ProviderKey"`
+	ProviderSecret string    `json:"ProviderSecret"`
+	Scope          [1]string `json:"Scope"`
+	Status         bool      `json:"status"`
+}
+
+type socialProviderList struct {
+	Data []socialProvider `json:"Data"`
+}
+
+type Result struct {
+	ProviderName string `json:"ProviderName"`
+	Status       bool   `json:"status"`
+}
+
+type socialProviderList2 struct {
+	Data []Result `json:"Data"`
+}
+
+func NewsocialCmd() *cobra.Command {
+	var provider string
+	var on bool
+	var off bool
+
+	cmd := &cobra.Command{
+		Use:   "social",
+		Short: "Updated the exsiting social provider",
+		Long:  `This Command helps to upadte the exsiting social provider`,
+		Example: `$ lr set social
+		? Select the provider from the list: Facebook
+		Please enter the provider key:
+		*******
+		Please enter the provider secret:
+		*******
+		Social Provider added successfully
+		`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return update(provider, on, off)
+		},
+	}
+
+	cmd.Flags().StringVarP(&provider, "provider", "p", "", "The provider name which you want to update.")
+	cmd.Flags().BoolVarP(&on, "enable", "e", false, "This Flag is used to enable to field with the default configuration")
+	cmd.Flags().BoolVarP(&off, "disable", "d", false, "This Flag is used to enable to field with the default configuration")
+
+	return cmd
+}
+
+func update(provider string, on bool, off bool) error {
+
+	activeProv, err := api.GetActiveProviders()
+	if err != nil {
+		return err
+	}
+
+	provConfig, ok := activeProv[provider]
+	if !ok {
+		return errors.New("Configuration for the selected provider not found.")
+	}
+
+	if on {
+		if provConfig.Status {
+			return errors.New(provider + " is already enabled")
+		} else {
+			err := api.UpdateProviderStatus(provider, true)
+			if err != nil {
+				return err
+			}
+			fmt.Println(provider + " enabled successfully")
+			return nil
+		}
+	} else if off {
+		if !provConfig.Status {
+			return errors.New(provider + " is already disabled")
+		} else {
+			err := api.UpdateProviderStatus(provider, false)
+			if err != nil {
+				return err
+			}
+			fmt.Println(provider + " disabled successfully")
+			return nil
+		}
+	}
+
+	allProv, err := api.GetAllProviders()
+	if err != nil {
+		fmt.Println("Cannot add social login at the momment due to some issue at our end, kindly try after sometime.")
+		return nil
+	}
+
+	provObj, ok := allProv[strings.ToLower(provider)]
+	var updateProvObj api.AddProviderSchema
+	updateProvObj.Data = make([]api.AddProviderObj, 1)
+
+	prompt.SurveyAskOne(&survey.Input{
+		Message: provObj.Options[0].Display + ":",
+		Default: provConfig.ProviderKey,
+	}, &updateProvObj.Data[0].ProviderKey, survey.WithValidator(survey.Required))
+
+	prompt.SurveyAskOne(&survey.Input{
+		Message: provObj.Options[1].Display + ":",
+		Default: provConfig.ProviderSecret,
+	}, &updateProvObj.Data[0].ProviderSecret, survey.WithValidator(survey.Required))
+
+	updateProvObj.Data[0].Provider = provConfig.Provider
+	updateProvObj.Data[0].Scope = provConfig.Scope
+	updateProvObj.Data[0].Status = provConfig.Status
+
+	err = api.AddSocialProvider(updateProvObj)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(provider + " updated successfully.")
+	return nil
+
+}
