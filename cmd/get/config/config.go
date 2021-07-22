@@ -33,6 +33,7 @@ func configure() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("App Name:", resp.Appname)
 	fmt.Println("API Key:", resp.Key)
 	fmt.Println("API Secret:", resp.Secret)
 	return nil
