@@ -41,7 +41,8 @@ func NewdomainCmd() *cobra.Command {
 				return err
 			}
 			urls := strings.Split(p.Callbackurl, ";")
-			if !strings.Contains(p.Callbackurl, opts.Domain) {
+			_, found := cmdutil.Find(urls, opts.Domain)
+			if !found {
 				return &cmdutil.FlagError{Err: errors.New("Entered Domain not found")}
 			}
 			if len(urls) == 1 {
