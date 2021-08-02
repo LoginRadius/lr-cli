@@ -26,12 +26,12 @@ func NewSiteCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 			$ lr get site --all
 			All sites: 
-			+--------+-----------------+-------------------------+-----------+
-			|   ID   |      NAME       |         DOMAIN          |   PLAN    |
-			+--------+-----------------+-------------------------+-----------+
-			| 111111 | new-test1       | https://mail7.io        | free      |
-			| 122222 | my-app-final    | loginradius.com         | business  |
-			| 142670 | trail-pro       | https://loginradius.com | business  |
+			+--------+-----------------+-------------------------+----------------+
+			|   ID   |      NAME       |         DOMAIN          |   PLAN         |
+			+--------+-----------------+-------------------------+----------------+
+			| 111111 | new-test1       | https://mail7.io        | free           |
+			| 122222 | my-app-final    | loginradius.com         | developer pro  |
+			| 142670 | trail-pro       | https://loginradius.com | developer pro  |
 
 			$ lr get site --active
 			Current site: 
@@ -70,7 +70,11 @@ func getSite() error {
 		var data [][]string
 		fmt.Println("All sites: ")
 		for _, site := range AppInfo {
-			data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, site.Productplan.Name})
+			ProductPlan := site.Productplan.Name
+			if ProductPlan == "business" {
+				ProductPlan = "developer pro"
+			}
+			data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, ProductPlan})
 		}
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Name", "Domain", "Plan"})
