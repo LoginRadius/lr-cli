@@ -62,7 +62,11 @@ func get() error {
 		if v.Enabled {
 			enabled = "true"
 		}
-		data = append(data, []string{k, v.Display, v.Type, enabled})
+		Type := v.Type
+		if Type == "multi" {
+			Type = "checkbox"
+		}
+		data = append(data, []string{k, v.Display, Type, enabled})
 	}
 	sort.SliceStable(data, func(i, j int) bool {
 		return data[i][3] == "true"

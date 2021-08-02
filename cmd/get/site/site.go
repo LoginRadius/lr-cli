@@ -70,7 +70,11 @@ func getSite() error {
 		var data [][]string
 		fmt.Println("All sites: ")
 		for _, site := range AppInfo {
-			data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, site.Productplan.Name})
+			ProductPlan := site.Productplan.Name
+			if ProductPlan == "business" {
+				ProductPlan = "developer pro"
+			}
+			data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, ProductPlan})
 		}
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"ID", "Name", "Domain", "Plan"})
