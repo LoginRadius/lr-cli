@@ -17,7 +17,7 @@ func NewConfigCmd() *cobra.Command {
 		`),
 		Example: heredoc.Doc(`
 			$ lr get config
-			API Name: <Your App Name>
+			APP Name: <Your App Name>
 			API Key: <Your API Key>
 			API Secret: <Your API secret >
 	
