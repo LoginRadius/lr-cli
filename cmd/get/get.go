@@ -9,6 +9,7 @@ import (
 	profiles "github.com/loginradius/lr-cli/cmd/get/profile"
 	"github.com/loginradius/lr-cli/cmd/get/schema"
 	"github.com/loginradius/lr-cli/cmd/get/site"
+	"github.com/loginradius/lr-cli/cmd/get/sott"
 
 	"github.com/loginradius/lr-cli/cmd/get/domain"
 	"github.com/loginradius/lr-cli/cmd/get/servertime"
@@ -28,6 +29,9 @@ func NewGetCmd() *cobra.Command {
 
 	hooksCmd := hooks.NewHooksCmd()
 	cmd.AddCommand(hooksCmd)
+
+	sottCmd := sott.NewSottCmd()
+	cmd.AddCommand(sottCmd)
 
 	loginMethodCmd := loginMethod.NewloginMethodCmd()
 	cmd.AddCommand(loginMethodCmd)

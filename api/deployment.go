@@ -64,6 +64,17 @@ type HostedPageResponse struct {
 	} `json:"Pages"`
 }
 
+type SottResponse struct {
+	Data []struct {
+		AuthenticityToken string `json:"AuthenticityToken"`
+		Comment           string `json:"Comment"`
+		CreatedDate       string `json:"CreatedDate"`
+		DateRange         string `json:"DateRange"`
+		IsEncoded         bool   `json:"IsEncoded"`
+		Technology        string `json:"Technology"`
+	} `json:"Data"`
+}
+
 type CoreAppData struct {
 	Apps struct {
 		Data []SitesReponse `json:"Data"`
@@ -99,6 +110,34 @@ func GetPage() (*HostedPageResponse, error) {
 	// This Logic is needed to support the theme customization done using Dashboard.
 	resultResp.Pages[0].Status = strings.ReplaceAll(resultResp.Pages[0].Status, "9", "")
 	return &resultResp, nil
+}
+
+func GetSott() (*SottResponse, error) {
+	sottUrl := conf.AdminConsoleAPIDomain + "/deployment/sott?"
+	resp, err := request.Rest(http.MethodGet, sottUrl, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	var resultResp SottResponse
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, nil
+}
+
+//This function uses Authenticity token to check if SOTT exists.
+func CheckToken(token string) (bool, error) {
+	Sott, err := GetSott()
+	if err != nil {
+		return false, err
+	}
+	for i := 0; i < len(Sott.Data); i++ {
+		if token == Sott.Data[i].AuthenticityToken {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func CheckLoginMethod() error {
