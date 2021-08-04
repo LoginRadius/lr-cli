@@ -5,6 +5,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/add/customField"
 	"github.com/loginradius/lr-cli/cmd/add/domain"
 	"github.com/loginradius/lr-cli/cmd/add/loginMethod"
+	"github.com/loginradius/lr-cli/cmd/add/sott"
 
 	"github.com/loginradius/lr-cli/cmd/add/hooks"
 	"github.com/loginradius/lr-cli/cmd/add/site"
@@ -23,6 +24,9 @@ func NewaddCmd() *cobra.Command {
 
 	hooksCmd := hooks.NewHooksCmd()
 	cmd.AddCommand(hooksCmd)
+
+	sottCmd := sott.NewSottCmd()
+	cmd.AddCommand(sottCmd)
 
 	loginMethodCmd := loginMethod.NewloginMethodCmd()
 	cmd.AddCommand(loginMethodCmd)
