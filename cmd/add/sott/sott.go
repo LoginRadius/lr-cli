@@ -1,4 +1,4 @@
-package generateSott
+package sott
 
 import (
 	"encoding/json"
@@ -13,8 +13,6 @@ import (
 
 	"github.com/spf13/cobra"
 )
-
-var fileName string
 
 type sott struct {
 	Encoded    bool   `json:"Encoded"`
@@ -31,15 +29,14 @@ type Resp struct {
 	Technology        string `json:"Technology"`
 }
 
-var url string
-
-func NewgenerateSottCmd() *cobra.Command {
+func NewSottCmd() *cobra.Command {
 	opts := &sott{}
 	cmd := &cobra.Command{
-		Use:   "generate-sott",
-		Short: "generates sott",
-		Long:  `This commmand generates sott`,
-		Example: heredoc.Doc(`$ lr generate-sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> 
+		Use:   "sott",
+		Short: "Adds a sott",
+		Long:  `Use this command to add a sott configured for your app.`,
+		Example: heredoc.Doc(`$ lr add sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> 
+		Comment(optional): <value>
 		Select a technology
 		.....
 		.....
@@ -75,13 +72,14 @@ func NewgenerateSottCmd() *cobra.Command {
 
 func generate(opts *sott) error {
 	conf := config.GetInstance()
-	opts.Comment = ""
+	fmt.Printf("Comment(optional): ")
+	fmt.Scanf("%s\n", &opts.Comment)
 	opts.Encoded = false
 	opts.Technology = getTech()
 	if opts.Technology == "" {
 		return nil
 	}
-	url = conf.AdminConsoleAPIDomain + "/deployment/sott?"
+	url := conf.AdminConsoleAPIDomain + "/deployment/sott?"
 	body, _ := json.Marshal(opts)
 	var resultResp Resp
 	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
