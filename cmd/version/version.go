@@ -5,12 +5,17 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
 )
 
 func NewCmdVersion(version, buildDate string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    "version",
+		Use:   "version",
+		Short: "Gets the version of LR CLI",
+		Long: heredoc.Doc(`
+		Use this command to get the version of LoginRadius CLI that you are using.
+		`),
 		Hidden: true,
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println(Format(version, buildDate))

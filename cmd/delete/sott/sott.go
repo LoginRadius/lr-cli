@@ -43,7 +43,7 @@ func NewSottCmd() *cobra.Command {
 	}
 	fl := cmd.Flags()
 	all = fl.Bool("all", false, "Deletes all SOTT")
-	fl.StringVarP(&token, "token", "t", "", "Authenticity Token")
+	fl.StringVarP(&token, "token", "t", "", "Enter Authenticity Token of SOTT that you want to delete")
 	return cmd
 }
 

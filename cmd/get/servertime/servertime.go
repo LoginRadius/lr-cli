@@ -24,7 +24,7 @@ func NewServerTimeCmd() *cobra.Command {
 		Use:   "servertime",
 		Short: "Shows basic server details",
 		Long: heredoc.Doc(`
-		This command gives basic server details which is useful when generating an SOTT token.
+		Use this command to get the basic server information to use when creating the SOTT.
 		`),
 		Example: heredoc.Doc(`
 			$ lr get servertime

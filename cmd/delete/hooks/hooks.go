@@ -25,9 +25,9 @@ var option bool
 func NewHooksCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "hooks",
-		Short: "deletes hooks",
+		Short: "Deletes hooks",
 		Long: heredoc.Doc(`
-		This command deletes webhooks configured with an App.
+		Use this command to delete a configured webhook.
 		`),
 		Example: heredoc.Doc(`
 			$ lr delete hooks --hookid <hookid>
@@ -45,7 +45,7 @@ func NewHooksCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	fl.StringVarP(&hookid, "hookid", "i", "", "Hook Unique ID")
+	fl.StringVarP(&hookid, "hookid", "i", "", "Enter hook unique id of the hook you want to delete")
 	return cmd
 }
 

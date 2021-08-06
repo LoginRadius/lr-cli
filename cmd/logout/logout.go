@@ -19,7 +19,7 @@ func NewLogoutCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "logout",
 		Short: "Logout of LR account",
-		Long:  `This commmand logs user out of the LR account`,
+		Long:  `Use this command to log out from your LoginRadius account.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return logout()
 		},

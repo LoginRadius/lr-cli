@@ -15,8 +15,8 @@ func NewschemaCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "schema",
-		Short: "get schema",
-		Long:  `This commmand lists schema config`,
+		Short: "Gets schema",
+		Long:  `Use this command to get the list of configured registration schema fields.`,
 		Example: heredoc.Doc(`$ lr get schema
 +-----------+---------------+----------+---------+
 |   NAME    |    DISPLAY    |   TYPE   | ENABLED |

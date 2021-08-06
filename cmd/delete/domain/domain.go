@@ -27,8 +27,8 @@ func NewdomainCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "domain",
-		Short: "delete domain",
-		Long:  `This commmand deletes domain`,
+		Short: "Deletes a domain",
+		Long:  `Use this command to remove the whitelisted domain from your app.`,
 		Example: heredoc.Doc(`$ lr delete domain --domain <domain>
 		<doamin> is now removed from whitelisted domain."
 		`),
@@ -60,7 +60,7 @@ func NewdomainCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&opts.Domain, "domain", "d", "", "Enter Domain Value")
+	fl.StringVarP(&opts.Domain, "domain", "d", "", "Enter Domain Value of the domain you want to delete")
 
 	return cmd
 }

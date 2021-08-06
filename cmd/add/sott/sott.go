@@ -34,7 +34,7 @@ func NewSottCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sott",
 		Short: "Adds a sott",
-		Long:  `Use this command to add a sott configured for your app.`,
+		Long:  `Use this command to generate a time-bound SOTT.`,
 		Example: heredoc.Doc(`$ lr add sott -f <FromDate(mm/dd/yyyy)> -t <ToDate(mm/dd/yyyy)> 
 		Comment(optional): <value>
 		Select a technology
@@ -63,9 +63,9 @@ func NewSottCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&opts.FromDate, "FromDate", "f", "", "From Date")
+	fl.StringVarP(&opts.FromDate, "FromDate", "f", "", "From Date of the the SOTT")
 
-	fl.StringVarP(&opts.ToDate, "ToDate", "t", "", "To Date")
+	fl.StringVarP(&opts.ToDate, "ToDate", "t", "", "To Date of the SOTT")
 
 	return cmd
 }

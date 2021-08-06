@@ -27,8 +27,8 @@ func NewaccountPasswordCmd() *cobra.Command {
 	opts := &Password{}
 	cmd := &cobra.Command{
 		Use:   "account-password",
-		Short: "set account-password",
-		Long:  `This commmand sets account-password`,
+		Short: "Updates account-password",
+		Long:  `Use this command to set/update the user account password for a UID.`,
 		Example: heredoc.Doc(`$ lr set account-password --uid <uid> --password <password>
 		New password hash is: <hash>
 		`),
@@ -46,8 +46,8 @@ func NewaccountPasswordCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&inpUID, "uid", "u", "", "UID")
-	fl.StringVarP(&opts.InpPassword, "password", "p", "", "new password")
+	fl.StringVarP(&inpUID, "uid", "u", "", "Enter UID of the user")
+	fl.StringVarP(&opts.InpPassword, "password", "p", "", "Enter the new password")
 
 	return cmd
 }

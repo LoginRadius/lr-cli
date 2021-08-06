@@ -29,8 +29,8 @@ func NewsocialCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "social",
-		Short: "delete social provider",
-		Long:  `This commmand deletes social provider`,
+		Short: "Deletes a social provider",
+		Long:  `Use this command to delete a configured social login provider from your application.`,
 		Example: `
 		$ lr delete social -p Google
 		? Are you Sure you want to delete the provider? Yes
@@ -46,7 +46,7 @@ func NewsocialCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&opts.ProviderName, "provider", "p", "", "provider name")
+	fl.StringVarP(&opts.ProviderName, "provider", "p", "", "Enter name of the provider you want to delete")
 
 	return cmd
 }
