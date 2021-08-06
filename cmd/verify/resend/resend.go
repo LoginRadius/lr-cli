@@ -25,7 +25,7 @@ func NewResendCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "resend",
 		Short: "Resends verification mail to email ID",
-		Long:  `This command resends verification email to the entered email ID`,
+		Long:  `Use this command to resend the verification email to the email id entered.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts1.Email == "" {
 				return &cmdutil.FlagError{Err: errors.New("`--email` is require argument")}
@@ -35,7 +35,7 @@ func NewResendCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	fl.StringVarP(&opts1.Email, "email", "e", "", "Email Value")
+	fl.StringVarP(&opts1.Email, "email", "e", "", "Enter email id")
 	return cmd
 }
 

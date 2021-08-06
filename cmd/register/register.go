@@ -26,7 +26,7 @@ func NewRegisterCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register",
 		Short: "Register a LR account",
-		Long:  `This commmand registers a user to a LR account`,
+		Long:  `Use this command to create your LoginRadius account. The authentication process uses a web-based browser flow.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cmdutil.Openbrowser(conf.HubPageDomain + "/auth.aspx?action=register&return_url=http://localhost:8089/postLogin")
 			tempServer = cmdutil.CreateTempServer(cmdutil.TempServer{

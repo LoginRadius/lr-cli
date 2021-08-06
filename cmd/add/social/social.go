@@ -17,8 +17,8 @@ func NewsocialCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "social",
-		Short: "add social provider",
-		Long:  `This commmand adds social provider`,
+		Short: "Adds a social provider",
+		Long:  `Use this command to select and configure a social login provider for your application.`,
 		Example: `$ lr add social
 		? Select the provider from the list: Facebook
 		Please enter the provider key:

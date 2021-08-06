@@ -32,8 +32,8 @@ func NewprofilesCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "profile",
-		Short: "get profile",
-		Long:  `This commmand gets profiles`,
+		Short: "Gets profiles",
+		Long:  `Use this command to get basic user profile information by using an email or UID.`,
 		Example: heredoc.Doc(`$ lr get profile --email <email> (or) --uid <uid>
 		First name: <firstname>
 		Email: <email>
@@ -53,8 +53,8 @@ func NewprofilesCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&inpEmail, "email", "e", "", "emailID")
-	fl.StringVarP(&inputUID, "uid", "u", "", "UID")
+	fl.StringVarP(&inpEmail, "email", "e", "", "Enter email id of the user")
+	fl.StringVarP(&inputUID, "uid", "u", "", "Enter UID of the user")
 
 	return cmd
 }

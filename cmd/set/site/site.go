@@ -15,7 +15,7 @@ func NewSiteCmd() *cobra.Command {
 		Use:   "site",
 		Short: "Enables switching between sites",
 		Long: heredoc.Doc(`
-		This command changes switches sites based on the App ID entered by the user.
+		Use this command to switch between apps/sites using the appid.
 		`),
 		Example: heredoc.Doc(`
 			$ lr set site --appid <appid>  # To fetch app id use  lr get site --all

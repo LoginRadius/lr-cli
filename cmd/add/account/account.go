@@ -41,8 +41,8 @@ func NewaccountCmd() *cobra.Command {
 	opts.Email = append(opts.Email, *EmailObj)
 	cmd := &cobra.Command{
 		Use:   "account",
-		Short: "add account",
-		Long:  `This commmand adds account`,
+		Short: "Adds an account",
+		Long:  `Use this command to add a user to your application.`,
 		Example: heredoc.Doc(`$ lr add account --name <name> --email <email>
 		User Account  successfully created
 		First name:  <first name>
@@ -60,8 +60,8 @@ func NewaccountCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&opts.Email[0].Value, "email", "e", "", "emailID")
-	fl.StringVarP(&opts.FirstName, "name", "n", "", "first name")
+	fl.StringVarP(&opts.Email[0].Value, "email", "e", "", "Email id of the user you want to add")
+	fl.StringVarP(&opts.FirstName, "name", "n", "", "First name of the user")
 	fl.Lookup("name").NoOptDefVal = ""
 	return cmd
 }

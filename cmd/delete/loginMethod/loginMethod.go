@@ -16,7 +16,7 @@ func NewloginMethodCmd() *cobra.Command {
 		Use:   "login-method",
 		Short: "Deletes a Login Mathod",
 		Long: heredoc.Doc(`
-		This command deletes login methods linked to your app.
+		Use this command to disable a configured login method for your application.
 		`),
 		Example: heredoc.Doc(`
 		$ lr delete login-method

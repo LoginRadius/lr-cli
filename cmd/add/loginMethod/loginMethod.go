@@ -16,7 +16,7 @@ func NewloginMethodCmd() *cobra.Command {
 		Use:   "login-method",
 		Short: "Adds a Login Mathod",
 		Long: heredoc.Doc(`
-		This command adds login methods for your app.
+		Use this command to add the desired login methods for your application.
 		`),
 		Example: heredoc.Doc(`
 			$ lr add login-method

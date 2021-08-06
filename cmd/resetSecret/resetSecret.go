@@ -22,7 +22,7 @@ func NewResetCmd() *cobra.Command {
 		Use:   "reset-secret",
 		Short: "Resets the User App's API secret",
 		Long: heredoc.Doc(`
-			This commmand resets the User App's API secret
+		Use this command to reset your API Secret.
 		`),
 		Example: heredoc.Doc(`
 			$ lr reset-secret

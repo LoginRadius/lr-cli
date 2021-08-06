@@ -41,7 +41,7 @@ func NewsocialCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "social",
 		Short: "Updated the exsiting social provider",
-		Long:  `This Command helps to upadte the exsiting social provider`,
+		Long:  `Use this command to update the configured social login provider.`,
 		Example: `
 $ lr set social -p Google
 ? API Key: <key>

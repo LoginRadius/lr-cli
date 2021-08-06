@@ -30,8 +30,8 @@ func NewaccountCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "account",
-		Short: "delete account",
-		Long:  `This commmand deletes account`,
+		Short: "Delete an account",
+		Long:  `Use this command to delete a user from your app.`,
 		Example: heredoc.Doc(`$ lr delete account --email <email> (or) --uid <uid>
 		User account sucessfully deleted
 		`),
@@ -48,8 +48,8 @@ func NewaccountCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&inpEmail, "email", "e", "", "emailID")
-	fl.StringVarP(&inpUID, "uid", "u", "", "UID")
+	fl.StringVarP(&inpEmail, "email", "e", "", "Email id of the user you want to delete")
+	fl.StringVarP(&inpUID, "uid", "u", "", "UID of the user you want to delete")
 
 	return cmd
 }
