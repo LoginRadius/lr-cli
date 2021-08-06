@@ -12,7 +12,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/get/sott"
 
 	"github.com/loginradius/lr-cli/cmd/get/domain"
-	"github.com/loginradius/lr-cli/cmd/get/servertime"
+	"github.com/loginradius/lr-cli/cmd/get/serverInfo"
 	"github.com/loginradius/lr-cli/cmd/get/social"
 	"github.com/loginradius/lr-cli/cmd/get/theme"
 
@@ -48,8 +48,8 @@ func NewGetCmd() *cobra.Command {
 	configCmd := config.NewConfigCmd()
 	cmd.AddCommand(configCmd)
 
-	serverTimeCmd := servertime.NewServerTimeCmd()
-	cmd.AddCommand(serverTimeCmd)
+	serverInfoCmd := serverInfo.NewServerInfoCmd()
+	cmd.AddCommand(serverInfoCmd)
 
 	socialCmd := social.NewsocialCmd()
 	cmd.AddCommand(socialCmd)

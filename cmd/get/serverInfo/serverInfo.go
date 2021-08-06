@@ -1,4 +1,4 @@
-package servertime
+package serverInfo
 
 import (
 	"encoding/json"
@@ -19,19 +19,19 @@ type Server struct {
 
 var timediff *string
 
-func NewServerTimeCmd() *cobra.Command {
+func NewServerInfoCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "servertime",
+		Use:   "server-info",
 		Short: "Shows basic server details",
 		Long: heredoc.Doc(`
 		Use this command to get the basic server information to use when creating the SOTT.
 		`),
 		Example: heredoc.Doc(`
-			$ lr get servertime
+			$ lr get server-info
 			Server Information:
 			...
 
-			$ lr get servertime --sott=<optional value> (Default=10)
+			$ lr get server-info --sott=<optional value> (Default=10)
 			Server Information:
 			...
 			Sott:
@@ -39,7 +39,7 @@ func NewServerTimeCmd() *cobra.Command {
 	
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return servertime()
+			return serverInfo()
 		},
 	}
 
@@ -48,7 +48,7 @@ func NewServerTimeCmd() *cobra.Command {
 	fl.Lookup("sott").NoOptDefVal = "10"
 	return cmd
 }
-func servertime() error {
+func serverInfo() error {
 	var resObj Server
 	resp, err := request.RestLRAPI(http.MethodGet, "/identity/v2/serverinfo?timedifference="+*timediff, nil, "")
 	if err != nil {
