@@ -72,8 +72,9 @@ func NewSottCmd() *cobra.Command {
 
 func generate(opts *sott) error {
 	conf := config.GetInstance()
-	fmt.Printf("Comment(optional): ")
-	fmt.Scanf("%s\n", &opts.Comment)
+	prompt.SurveyAskOne(&survey.Input{
+		Message: "Comment(optional): ",
+	}, &opts.Comment)
 	opts.Encoded = false
 	opts.Technology = getTech()
 	if opts.Technology == "" {
@@ -90,7 +91,7 @@ func generate(opts *sott) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("sott generated successfully")
+	fmt.Println("SOTT generated successfully")
 	fmt.Println("AunthenticityToken: " + resultResp.AuthenticityToken)
 	fmt.Println("Comment: " + resultResp.Comment)
 	fmt.Println("Sott: " + resultResp.Sott)
