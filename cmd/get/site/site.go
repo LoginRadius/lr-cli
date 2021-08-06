@@ -21,7 +21,10 @@ func NewSiteCmd() *cobra.Command {
 		Use:   "site",
 		Short: "Shows Current/All sites",
 		Long: heredoc.Doc(`
-		This command displays all the sites as well as the current active site
+		Use this command to get the information about the:
+			- Current site/app (--active)
+			- All sites/app (--all) 
+			- Specific site based on the appid (--appid)
 		`),
 		Example: heredoc.Doc(`
 			$ lr get site --all

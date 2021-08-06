@@ -20,7 +20,7 @@ func NewAddCFCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "custom-field",
 		Short: "Add the custom field which can be used in a registeration schema",
-		Long:  `This command allows you to add upto 5 custom fields to your IDX Page.`,
+		Long:  `Use this command to add up to 5 custom fields to your Auth Page(IDX).`,
 		Example: heredoc.Doc(`$ lr add custom-field -f MyCustomField
 		MyCustomField is successfully add as your customfields
 		You can now add the custom field in your registration schema using "lr set schema" command

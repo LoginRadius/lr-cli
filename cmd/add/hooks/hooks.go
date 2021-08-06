@@ -34,7 +34,7 @@ func NewHooksCmd() *cobra.Command {
 		Use:   "hooks",
 		Short: "Adds hooks",
 		Long: heredoc.Doc(`
-		This command adds webhooks which are configured to an App.
+		Use this command to select a webhook event and then configure a URL to receive the payload.
 		`),
 		Example: heredoc.Doc(`
 			$ lr add hooks

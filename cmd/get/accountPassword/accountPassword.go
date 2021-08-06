@@ -24,8 +24,8 @@ func NewaccountPasswordCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "account-password",
-		Short: "get account-password",
-		Long:  `This commmand gets account-password`,
+		Short: "Gets account-password",
+		Long:  `Use this command to get the hashed password of an account using the UID.`,
 		Example: heredoc.Doc(`$ lr get account-password --uid <uid>
 		password hash for UID:<UID> is <hash> 
 		`),
@@ -40,7 +40,7 @@ func NewaccountPasswordCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&inpUID, "uid", "u", "", "UID")
+	fl.StringVarP(&inpUID, "uid", "u", "", "Enter UID of the user")
 
 	return cmd
 }

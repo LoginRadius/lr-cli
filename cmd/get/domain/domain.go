@@ -13,8 +13,8 @@ func NewdomainCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "domain",
-		Short: "get domains added",
-		Long:  `This commmand lists domains added`,
+		Short: "Gets whitelisted domains",
+		Long:  `Use this command to get the list of the whitelisted domains.`,
 		Example: heredoc.Doc(`$ lr get domain
 		1. http://localhost
 		...

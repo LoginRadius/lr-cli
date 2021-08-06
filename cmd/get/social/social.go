@@ -14,8 +14,8 @@ func NewsocialCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "social",
-		Short: "get social providers",
-		Long:  `This commmand lists social providers`,
+		Short: "Gets social providers",
+		Long:  `Use this command to get the list of configured social login providers for your application.`,
 		Example: `
 $ lr get social
 +-----------+--------------------+---------+

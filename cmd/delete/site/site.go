@@ -27,7 +27,7 @@ func NewSiteCmd() *cobra.Command {
 		Use:   "site",
 		Short: "Deletes a site",
 		Long: heredoc.Doc(`
-		This command deletes a site. 
+		Use this command to delete an app/site from your LoginRadius account.
 		`),
 		Example: heredoc.Doc(`
 			$ lr delete site --appid <appid>
@@ -41,7 +41,7 @@ func NewSiteCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	fl.Int64VarP(&appid, "appid", "i", -1, "AppId of the site")
+	fl.Int64VarP(&appid, "appid", "i", -1, "Enter appId of the site you want to delete")
 	return cmd
 }
 

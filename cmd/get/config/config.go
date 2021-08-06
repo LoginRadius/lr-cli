@@ -13,7 +13,7 @@ func NewConfigCmd() *cobra.Command {
 		Use:   "config",
 		Short: "Shows/Stores App's API Key/Secret",
 		Long: heredoc.Doc(`
-			This command displays and stores the User App's API Key/Secret
+		Use this command to get the API key and secret of your current application.
 		`),
 		Example: heredoc.Doc(`
 			$ lr get config

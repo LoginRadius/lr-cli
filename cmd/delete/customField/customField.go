@@ -15,8 +15,8 @@ func NewDeleteCFCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "custom-field",
-		Short: "",
-		Long:  `This commmand deletes the Custom Field`,
+		Short: "Deletes a custom field",
+		Long:  `Use this command to delete a custom field from your Auth Page(IDX). `,
 		Example: heredoc.Doc(`$ lr delete custom-field
 		? Select the field you Want to delete from the list: MyCF
 		? Are you Sure you want to delete this custom field? Yes

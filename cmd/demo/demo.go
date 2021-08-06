@@ -15,8 +15,7 @@ func NewDemoCmd() *cobra.Command {
 		Use:   "demo",
 		Short: "Opens LoginRadius Auth Page (IDX) of your application",
 		Long: heredoc.Doc(`
-		This commmand opens the LoginRadius Auth Page (IDX) for
-		your application in the browser.
+		Use this command to open the LoginRadius Auth Page (IDX) for your app in the browser.
 		`),
 		Example: heredoc.Doc(`
 		# Opens LoginRadius Auth page (IDX) in browser

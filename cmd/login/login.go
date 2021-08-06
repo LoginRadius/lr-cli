@@ -33,7 +33,7 @@ func NewLoginCmd() *cobra.Command {
 		Use:   "login",
 		Short: "Login to LR account",
 		Long: heredoc.Doc(`
-		This commmand logs user into the LR account.
+		Use this command to log in to your LoginRadius account. The authentication process uses a web-based browser flow.
 		`),
 		Example: heredoc.Doc(`
 		# Opens Interactive Mode

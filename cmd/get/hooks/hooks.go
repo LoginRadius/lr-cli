@@ -15,7 +15,7 @@ func NewHooksCmd() *cobra.Command {
 		Use:   "hooks",
 		Short: "Gets hooks",
 		Long: heredoc.Doc(`
-		This command fetches the list of webhooks configured with an App.
+		Use this command to get the details of webhooks configured for your app.
 		`),
 		Example: heredoc.Doc(`
 			$ lr get hooks

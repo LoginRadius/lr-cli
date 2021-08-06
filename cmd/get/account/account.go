@@ -35,8 +35,8 @@ func NewaccountCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "account",
-		Short: "get account",
-		Long:  `This commmand gets account`,
+		Short: "Gets basic account information",
+		Long:  `Use this command to get basic account information for a user account using email.`,
 		Example: heredoc.Doc(`$ lr get account --email <email>
 		First name: <firstname>
 		Email: <email>
@@ -54,7 +54,7 @@ func NewaccountCmd() *cobra.Command {
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&inpEmail, "email", "e", "", "emailID")
+	fl.StringVarP(&inpEmail, "email", "e", "", "Enter email id of the user")
 
 	return cmd
 }

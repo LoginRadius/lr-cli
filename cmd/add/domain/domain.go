@@ -32,8 +32,8 @@ func NewdomainCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "domain",
-		Short: "add doamin",
-		Long:  `This commmand adds domain`,
+		Short: "Adds doamin",
+		Long:  `Use this command to whitelist a domain.`,
 		Example: heredoc.Doc(`$ lr add domain --domain <domain>
 		Your Domain  <newDomain>  is now whitelisted
 		`),
@@ -65,7 +65,7 @@ func NewdomainCmd() *cobra.Command {
 		},
 	}
 	fl := cmd.Flags()
-	fl.StringVarP(&opts.Domain, "domain", "d", "", "Enter Domain Value")
+	fl.StringVarP(&opts.Domain, "domain", "d", "", "Enter Domain Value that you want to add")
 
 	return cmd
 }

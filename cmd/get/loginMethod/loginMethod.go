@@ -15,7 +15,7 @@ func NewloginMethodCmd() *cobra.Command {
 		Use:   "login-method",
 		Short: "Gets Login Methods",
 		Long: heredoc.Doc(`
-		This command fetches the list of login methods along with their status.
+		Use this command to get the list of login methods (excluding social login providers) with their status.
 		`),
 		Example: heredoc.Doc(`
 			$ lr get login-method

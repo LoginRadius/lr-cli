@@ -33,7 +33,7 @@ func NewThemeCmd() *cobra.Command {
 		Use:   "theme",
 		Short: "Changes the theme of the site",
 		Long: heredoc.Doc(`
-		This command changes the theme of the site depending on the user's choice.
+		Use this command to change the theme of your Auth Page (IDX).
 		`),
 		Example: heredoc.Doc(`
 			$ lr set theme --theme <theme>
