@@ -38,17 +38,6 @@ func NewAddCFCmd() *cobra.Command {
 }
 
 func add(fieldName string) error {
-	//checking if it is devoloper plan
-	res, err := api.GetSites()
-	if err != nil {
-		return err
-	}
-
-	if res.Productplan.Name != "business" {
-		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
-		return nil
-	}
-
 	regField, err := api.GetRegistrationFields()
 	if err != nil {
 		fmt.Println("Cannot add custom field at the momment due to some issue at our end, kindly try after sometime.")

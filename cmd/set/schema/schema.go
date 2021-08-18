@@ -45,7 +45,7 @@ func NewSetSchemaCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&fieldName, "fieldname", "f", "", "The Field Name which you wanted to enable or update.")
+	cmd.Flags().StringVarP(&fieldName, "fieldName", "f", "", "The Field Name which you wanted to enable or update.")
 	cmd.Flags().BoolVarP(&on, "enable", "e", false, "This Flag is used to enable to field with the default configuration")
 	cmd.Flags().BoolVarP(&off, "disable", "d", false, "This Flag is used to enable to field with the default configuration")
 	return cmd

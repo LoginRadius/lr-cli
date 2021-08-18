@@ -29,12 +29,12 @@ func NewSiteCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 			$ lr get site --all
 			All sites: 
-			+--------+-----------------+-------------------------+----------------+
-			|   ID   |      NAME       |         DOMAIN          |   PLAN         |
-			+--------+-----------------+-------------------------+----------------+
-			| 111111 | new-test1       | https://mail7.io        | free           |
-			| 122222 | my-app-final    | loginradius.com         | developer pro  |
-			| 142670 | trail-pro       | https://loginradius.com | developer pro  |
+			+--------+-----------------+-------------------------+
+			|   ID   |      NAME       |         DOMAIN          |
+			+--------+-----------------+-------------------------+
+			| 111111 | new-test1       | https://mail7.io        |
+			| 122222 | my-app-final    | loginradius.com         | 
+			| 142670 | trail-pro       | https://loginradius.com | 
 
 			$ lr get site --active
 			Current site: 
@@ -73,14 +73,10 @@ func getSite() error {
 		var data [][]string
 		fmt.Println("All sites: ")
 		for _, site := range AppInfo {
-			ProductPlan := site.Productplan.Name
-			if ProductPlan == "business" {
-				ProductPlan = "developer pro"
-			}
-			data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, ProductPlan})
+			data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain})
 		}
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Name", "Domain", "Plan"})
+		table.SetHeader([]string{"ID", "Name", "Domain"})
 		table.AppendBulk(data)
 		table.Render()
 	} else if *appid != -1 && (!*active && !*all) {
@@ -106,5 +102,4 @@ func Output(AppInfo api.SitesReponse) {
 	fmt.Println("App Name: ", AppInfo.Appname)
 	fmt.Println("App ID: ", AppInfo.Appid)
 	fmt.Println("Domain: ", AppInfo.Domain)
-	fmt.Println("Plan: ", AppInfo.Productplan.Name)
 }
