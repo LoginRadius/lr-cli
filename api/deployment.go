@@ -192,17 +192,6 @@ func UpdateDomain(domains []string) error {
 	return nil
 }
 
-func CheckPlan() error {
-	sitesResp, err := GetSites()
-	if err != nil {
-		return err
-	}
-	if sitesResp.Productplan.Name == "free" {
-		return errors.New("Please switch to developer/developer pro app or upgrade your plan to enable this feature.")
-	}
-	return nil
-}
-
 func CheckTrial() (bool, error) { // returns false if trial period has expired.
 	sitesResp, err := GetSites()
 	if err != nil {
