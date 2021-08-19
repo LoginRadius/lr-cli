@@ -99,7 +99,7 @@ func add() error {
 		"domain":          Domain,
 		"ownedAppCount":   strconv.Itoa(appCount),
 		"paymentMethodId": paymentInfo.Data.Order[0].Paymentdetail.Stripepaymentmethodid,
-		"planName":        "developer", //seems to be a requirement at this point. Have to get rid of this.
+		"planName":        "business", //seems to be a requirement at this point. Have to get rid of this.
 	})
 	resp, err := request.Rest(http.MethodPost, newApp, nil, string(body))
 	if err != nil {
