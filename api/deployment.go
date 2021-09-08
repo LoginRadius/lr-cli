@@ -3,12 +3,14 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 
 	"net/http"
 	"time"
 
 	"github.com/loginradius/lr-cli/cmdutil"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 )
 
@@ -190,13 +192,36 @@ func UpdateDomain(domains []string) error {
 	return nil
 }
 
-func CheckPlan() error {
+func CheckTrial() (bool, error) { // returns false if trial period has expired.
 	sitesResp, err := GetSites()
 	if err != nil {
-		return err
+		return false, err
 	}
-	if sitesResp.Productplan.Name == "free" {
-		return errors.New("Please switch to developer/developer pro app or upgrade your plan to enable this feature.")
+	today := time.Now()
+	check := today.After(sitesResp.Productplan.Expirytime)
+	if check {
+		return false, nil
 	}
-	return nil
+	return true, nil
+}
+
+func CardPay() (bool, error) {
+	paymentInfo, err := PaymentInfo()
+	if err != nil {
+		return false, err
+	}
+	paymentMethodId := paymentInfo.Data.Order[0].Paymentdetail.Stripepaymentmethodid
+	if paymentMethodId == "" {
+		fmt.Println("Please upgrade services by adding card details in dashboard via browser. ") //trial expired.
+		fmt.Printf("Press Y to open Browser window:")
+		var option bool
+		prompt.Confirm("Do you want to open the browser?", &option)
+		if !option {
+			return false, errors.New("Action not possible without updating card details.")
+		}
+		cmdutil.Openbrowser(conf.DashboardDomain + "/apps")
+		fmt.Println("Please Re-Login via CLI.")
+		return false, nil
+	}
+	return true, nil
 }

@@ -17,14 +17,11 @@ var Event string
 var eventOption string
 var TargetUrl string
 
-var defaultEvents = []string{
+var Events = []string{
 	"Login",
 	"Register",
 	"ResetPassword",
 	"UpdateProfile",
-}
-
-var proEvents = []string{
 	"BlockAccount",
 	"DeleteAccount",
 }
@@ -55,13 +52,27 @@ func NewHooksCmd() *cobra.Command {
 }
 
 func addHooks() error {
+	checkTrial, err := api.CheckTrial()
+	if err != nil {
+		return err
+	}
+	if !checkTrial {
+		cardPay, err := api.CardPay()
+		if err != nil {
+			return err
+		}
+		if !cardPay {
+			return nil
+		}
+	}
+
 	checkInput := input()
 	if !checkInput {
 		fmt.Println("Please enter the input paramaters properly.")
 		return nil
 	}
 
-	err := add()
+	err = add()
 	if err != nil {
 		return err
 	}
@@ -75,19 +86,10 @@ func input() bool {
 		Message: "Enter Name:",
 	}, &Name, survey.WithValidator(survey.Required))
 
-	res, err := api.GetSites()
-	if err != nil {
-		return false
-	}
+	var options = Events
 
-	var options = defaultEvents
-	if res.Productplan.Name == "business" {
-		options = append(proEvents, options...)
-	}
-
-	//Currently supports only Developer plan event options.
 	var eventChoice int
-	err = prompt.SurveyAskOne(&survey.Select{
+	err := prompt.SurveyAskOne(&survey.Select{
 		Message: "Select a plan",
 		Options: options,
 	}, &eventChoice)

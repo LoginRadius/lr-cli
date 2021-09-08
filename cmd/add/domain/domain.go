@@ -49,18 +49,13 @@ func NewdomainCmd() *cobra.Command {
 				return &cmdutil.FlagError{Err: errors.New("Entered Domain is already added")}
 			}
 			urls := strings.Split(p.Callbackurl, ";")
-			plan := p.Productplan.Name
-			if (plan == "free" && len(urls) < 3) || (plan == "developer" && len(urls) < 5) {
-				urls = append(urls, opts.Domain)
-				err := api.UpdateDomain(urls)
-				if err != nil {
-					return err
-				}
-				fmt.Println(opts.Domain, "is now whitelisted.")
-				return nil
-			} else {
-				return &cmdutil.FlagError{Err: errors.New("To add more domains, plan upgradation is required")}
+			urls = append(urls, opts.Domain)
+			err = api.UpdateDomain(urls)
+			if err != nil {
+				return err
 			}
+			fmt.Println(opts.Domain, "is now whitelisted.")
+			return nil
 
 		},
 	}

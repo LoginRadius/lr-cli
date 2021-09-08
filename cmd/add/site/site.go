@@ -2,7 +2,6 @@ package site
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
-	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
@@ -39,10 +37,7 @@ func NewSiteCmd() *cobra.Command {
 			$ lr add site 
 			Enter the App Name: <app_name>
 			Enter the Domain: <domain>
-			? Select a plan  [Use arrows to move, type to filter]
-			  Free
-			> Developer
-			  Business
+		
 			Your site has been added 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -52,16 +47,7 @@ func NewSiteCmd() *cobra.Command {
 	return cmd
 }
 func addSite() error {
-	checkPlan, err := plans()
-	if err != nil {
-		return err
-	}
-	if !checkPlan {
-		fmt.Println("Please upgrade your plan to add more sites. ")
-		return nil
-	}
-
-	checkCard, err := cardDetails()
+	checkCard, err := api.CardPay()
 	if err != nil {
 		return err
 	}
@@ -92,72 +78,7 @@ func input() bool {
 	prompt.SurveyAskOne(&survey.Input{
 		Message: "Enter the Domain: ",
 	}, &Domain, survey.WithValidator(survey.Required))
-
-	plan := map[int]string{
-		0: "free",
-		1: "developer",
-		2: "business",
-	}
-
-	var planChoice int
-	err := prompt.SurveyAskOne(&survey.Select{
-		Message: "Select a plan",
-		Options: []string{
-			"Free",
-			"Developer",
-			"Business",
-		},
-	}, &planChoice)
-	if err != nil {
-		return false
-	}
-
-	PlanName = plan[planChoice]
-	if PlanName == "" {
-		fmt.Println("Invalid Choice of Plan")
-		return false
-	}
 	return true
-
-}
-
-func plans() (bool, error) {
-	AppsInfo, err := api.GetAppsInfo()
-	if err != nil {
-		return false, err
-	}
-	if len(AppsInfo) > 1 {
-		return true, nil
-	}
-	for _, app := range AppsInfo {
-		if app.Productplan.Name != "free" { //case for 1 App
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
-func cardDetails() (bool, error) {
-	conf := config.GetInstance()
-	paymentInfo, err := api.PaymentInfo()
-	if err != nil {
-		return false, err
-	}
-	paymentMethodId := paymentInfo.Data.Order[0].Paymentdetail.Stripepaymentmethodid
-	if paymentMethodId == "" {
-		fmt.Println("Adding more than one app requires valid payment information. Please update card details in dashboard via browser.")
-		fmt.Println("(Note: User must re-login after updating details in the browser)")
-		fmt.Printf("Press Y to open Browser window:")
-		var option bool
-		prompt.Confirm("Do you want to open the browser?", &option)
-		if !option {
-			return false, errors.New("Action not possible without updating card details.")
-		}
-		cmdutil.Openbrowser(conf.DashboardDomain + "/apps")
-		fmt.Println("Please Re-Login via CLI.")
-		return false, nil
-	}
-	return true, nil
 
 }
 
@@ -178,7 +99,7 @@ func add() error {
 		"domain":          Domain,
 		"ownedAppCount":   strconv.Itoa(appCount),
 		"paymentMethodId": paymentInfo.Data.Order[0].Paymentdetail.Stripepaymentmethodid,
-		"planName":        PlanName,
+		"planName":        "business", //seems to be a requirement at this point. Have to get rid of this.
 	})
 	resp, err := request.Rest(http.MethodPost, newApp, nil, string(body))
 	if err != nil {

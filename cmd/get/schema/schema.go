@@ -76,23 +76,17 @@ func get() error {
 	table.AppendBulk(data)
 	table.Render()
 
-	res, err := api.GetSites()
-	if err != nil {
-		return err
-	}
-	if res.Productplan.Name == "business" {
-		cfTable := tablewriter.NewWriter(os.Stdout)
-		if len(schema.Data.CustomFields) > 0 {
-			for _, v := range schema.Data.CustomFields {
-				cfTable.Append([]string{v.Display})
-			}
-		} else {
-			cfTable.Append([]string{"No Custom Fields"})
-			cfTable.SetCaption(true, "Use command `lr add custom-field` to add the Custom Field")
+	cfTable := tablewriter.NewWriter(os.Stdout)
+	if len(schema.Data.CustomFields) > 0 {
+		for _, v := range schema.Data.CustomFields {
+			cfTable.Append([]string{v.Display})
 		}
-		cfTable.SetHeader([]string{"Custom Fields"})
-		cfTable.Render()
+	} else {
+		cfTable.Append([]string{"No Custom Fields"})
+		cfTable.SetCaption(true, "Use command `lr add custom-field` to add the Custom Field")
 	}
+	cfTable.SetHeader([]string{"Custom Fields"})
+	cfTable.Render()
 
 	return nil
 }

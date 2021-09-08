@@ -32,15 +32,6 @@ func NewDeleteCFCmd() *cobra.Command {
 }
 
 func delete() error {
-	res, err := api.GetSites()
-	if err != nil {
-		return err
-	}
-	if res.Productplan.Name != "business" {
-		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
-		return nil
-	}
-
 	regfields, err := api.GetRegistrationFields()
 	var options []string
 	for i := 0; i < len(regfields.Data.CustomFields); i++ {
