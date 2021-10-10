@@ -3,6 +3,7 @@ package site
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
@@ -56,7 +57,7 @@ func TestSetSite(t *testing.T) {
 
 			createSiteInfo(tt, baseFileName)
 
-			output := captureOutput(setSite)
+			output := captureOutput(NewSiteCmd)
 			assert.Equal(t, tt.want, output)
 
 			removeFile(baseFileName)
@@ -65,12 +66,13 @@ func TestSetSite(t *testing.T) {
 	}
 }
 
-func captureOutput(f func() error) string {
+func captureOutput(f func() *cobra.Command) string {
 	rescueStdout := os.Stdout
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	f()
+	a := f()
+	a.Execute()
 
 	w.Close()
 	out, _ := ioutil.ReadAll(r)
@@ -111,7 +113,6 @@ func createSiteInfo(tt struct {
 	wantErr bool
 }, baseFileName string) error {
 
-
 	err := os.Mkdir(baseFileName, 0755)
 	if err != nil {
 		fmt.Println("os.Create:", err)
@@ -121,10 +122,14 @@ func createSiteInfo(tt struct {
 
 	_, err = os.Create(fileName)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func removeFile (baseFileName string){
+func removeFile(baseFileName string) {
 	err := os.RemoveAll(baseFileName)
 	if err != nil {
 		fmt.Println("os.Create:", err)
