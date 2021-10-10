@@ -3,6 +3,7 @@ package site
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -42,8 +43,20 @@ func TestSetSite(t *testing.T) {
 				"appId":          int64(123456),
 				"pathToSiteInfo": "siteInfo.json",
 				"pathToToken":    "token.json",
+				"function":       NewSiteCmd,
 			},
 			"There is no site with this AppID.\n",
+			false,
+		},
+		{
+			"invalid app id",
+			map[string]interface{}{
+				"appId":          int64(0),
+				"pathToSiteInfo": "siteInfo.json",
+				"pathToToken":    "token.json",
+				"function":       setSite,
+			},
+			"You are already using this site\n",
 			false,
 		},
 	}
@@ -53,11 +66,11 @@ func TestSetSite(t *testing.T) {
 
 			appid = tt.args["appId"].(int64)
 
-			createToken(tt, baseFileName)
-
 			createSiteInfo(tt, baseFileName)
 
-			output := captureOutput(NewSiteCmd)
+			createToken(tt, baseFileName)
+
+			output := captureOutput(tt.args["function"])
 			assert.Equal(t, tt.want, output)
 
 			removeFile(baseFileName)
@@ -66,13 +79,17 @@ func TestSetSite(t *testing.T) {
 	}
 }
 
-func captureOutput(f func() *cobra.Command) string {
+func captureOutput(fun interface{}) string {
 	rescueStdout := os.Stdout
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	a := f()
-	a.Execute()
+	switch f := fun.(type) {
+	case func() *cobra.Command:
+		f().Execute()
+	case func() error:
+		f()
+	}
 
 	w.Close()
 	out, _ := ioutil.ReadAll(r)
@@ -120,11 +137,21 @@ func createSiteInfo(tt struct {
 
 	fileName := filepath.Join(baseFileName, tt.args["pathToSiteInfo"].(string))
 
-	_, err = os.Create(fileName)
+	dest, err := os.Create(fileName)
 
 	if err != nil {
 		return err
 	}
+
+	siteInfo := map[int64]api.SitesReponse{
+		tt.args["appId"].(int64): {
+			Appname: "app_name",
+		},
+	}
+
+	bytes, _ := json.Marshal(siteInfo)
+
+	fmt.Fprintf(dest, string(bytes))
 
 	return nil
 }
