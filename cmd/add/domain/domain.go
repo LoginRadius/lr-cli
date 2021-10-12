@@ -13,12 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var fileName string
-
-type domainManagement struct {
-	CallbackUrl string `json:"CallbackUrl"`
-}
-
 type domain struct {
 	Domain string `json:"domain"`
 }
