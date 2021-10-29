@@ -15,6 +15,7 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/shirou/gopsutil v3.21.4+incompatible
 	github.com/spf13/cobra v1.1.3
+	github.com/stretchr/testify v1.3.0
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 )
 
