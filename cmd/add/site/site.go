@@ -18,8 +18,6 @@ import (
 var AppName string
 var Domain string
 var PlanName string
-var planOption string
-var option string
 var AppsInfo *api.CoreAppData
 
 type AddAppResponse struct {
@@ -34,11 +32,11 @@ func NewSiteCmd() *cobra.Command {
 		Use this command to create a new app by specifying the app name and domain and selecting a plan for it.
 		`),
 		Example: heredoc.Doc(`
-			$ lr add site 
+			$ lr add site
 			Enter the App Name: <app_name>
 			Enter the Domain: <domain>
-		
-			Your site has been added 
+
+			Your site has been added
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return addSite()
@@ -46,6 +44,7 @@ func NewSiteCmd() *cobra.Command {
 	}
 	return cmd
 }
+
 func addSite() error {
 	checkCard, err := api.CardPay()
 	if err != nil {
