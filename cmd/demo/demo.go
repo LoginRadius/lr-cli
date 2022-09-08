@@ -13,12 +13,12 @@ import (
 func NewDemoCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "demo",
-		Short: "Opens LoginRadius Auth Page (IDX) of your application",
+		Short: "Opens LoginRadius Identity Experience Framework (IDX) of your application",
 		Long: heredoc.Doc(`
-		Use this command to open the LoginRadius Auth Page (IDX) for your app in the browser.
+		Use this command to open the LoginRadius Identity Experience Framework (IDX) for your app in the browser.
 		`),
 		Example: heredoc.Doc(`
-		# Opens LoginRadius Auth page (IDX) in browser
+		# Opens LoginRadius Identity Experience Framework (IDX) in browser
 		$ lr demo
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {

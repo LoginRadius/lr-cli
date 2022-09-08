@@ -21,7 +21,7 @@ func NewSetSchemaCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "schema",
 		Short: "Update Registeration Schema",
-		Long:  `Use this command to enable or disable the registration fields for the Auth Page(IDX). You can also manage field configurations such as optional, required, type, and name.`,
+		Long:  `Use this command to enable or disable the registration fields for the Identity Experience Framework (IDX). You can also manage field configurations such as optional, required, type, and name.`,
 		Example: heredoc.Doc(`# To update the field configuration
 		$ lr set schema -f my-field
 		? Enter Field Name: My Field

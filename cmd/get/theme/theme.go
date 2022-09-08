@@ -17,7 +17,7 @@ func NewThemeCmd() *cobra.Command {
 		Use:   "theme",
 		Short: "Shows Current/All available themes of the site",
 		Long: heredoc.Doc(`
-		Use this command to get the active theme (--active) of the Auth Page (IDX) or to get the list of all available themes (--all).
+		Use this command to get the active theme (--active) of the Identity Experience Framework (IDX) or to get the list of all available themes (--all).
 		`),
 		Example: heredoc.Doc(`
 			$ lr get theme --all

@@ -20,7 +20,7 @@ func NewAddCFCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "custom-field",
 		Short: "Add the custom field which can be used in a registeration schema",
-		Long:  `Use this command to add up to 5 custom fields to your Auth Page(IDX).`,
+		Long:  `Use this command to add up to 15 custom fields to your Identity Experience Framework (IDX).`,
 		Example: heredoc.Doc(`$ lr add custom-field -f MyCustomField
 		MyCustomField is successfully add as your customfields
 		You can now add the custom field in your registration schema using "lr set schema" command
@@ -44,8 +44,8 @@ func add(fieldName string) error {
 		return nil
 	}
 
-	if len(regField.Data.CustomFields) >= 5 {
-		return &cmdutil.FlagError{Err: errors.New("Cannot add more then 5 custom fields.")}
+	if len(regField.Data.CustomFields) >= 15 {
+		return &cmdutil.FlagError{Err: errors.New("cannot add more then 15 custom fields")}
 	}
 
 	_, err = api.AddCustomField(fieldName)

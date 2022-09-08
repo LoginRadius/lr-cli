@@ -1,6 +1,6 @@
 # LoginRadius CLI
 
-`lr` is LoginRadius on the command line. You can perform basic actions of your [LoginRadius Dashboard](https://dashboard.loginradius.com/dashboard) through command line. The actions includes **login, register, logout, email configuration, domain whitelisting etc**.
+`lr` is LoginRadius on the command line. You can perform basic actions of your [LoginRadius Admin Console](https://adminconsole.loginradius.com/dashboard) through command line. The actions includes **login, logout, email configuration, domain whitelisting etc**.
 
 ![](./cli_home.png)
 
