@@ -35,6 +35,9 @@ func NewdomainCmd() *cobra.Command {
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
 			}
+			if !cmdutil.DomainValidation.MatchString(opts.Domain)  {
+				return &cmdutil.FlagError{Err: errors.New("Invalid Domain")}
+			}
 			p, err := api.GetSites()
 			if err != nil {
 				return err

@@ -145,6 +145,9 @@ func UpdateField(field *api.Schema, isAdvance bool) error {
 	}, &field.Display); err != nil {
 		return err
 	}
+	if strings.TrimSpace(field.Display) == "" {
+		return errors.New("Error:- Invalid Field Name")
+	}
 
 	var optional bool
 	if err := prompt.Confirm("Optional?", &optional); err != nil {

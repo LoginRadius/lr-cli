@@ -152,7 +152,7 @@ func GetRegistrationFields() (*RegistrationSchema, error) {
 func AddCustomField(customfield string) (*AddCFRespSchema, error) {
 	url := conf.AdminConsoleAPIDomain + "/platform-configuration/custom-field"
 	body, _ := json.Marshal(map[string]string{
-		"customField": customfield,
+		"customfield": customfield,
 	})
 	var resultResp AddCFRespSchema
 	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
