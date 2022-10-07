@@ -56,9 +56,6 @@ func NewdomainCmd() *cobra.Command {
 				return &cmdutil.FlagError{Err: errors.New("Invalid Domain")}
 			}
 			
-			if opts.Domain == "http://localhost" || opts.Domain == "http://127.0.0.1" {
-				return &cmdutil.FlagError{Err: errors.New("Cannot Update Default Domains")}
-			}
 			if strings.Contains(p.Callbackurl, opts.DomainMod) {
 				return &cmdutil.FlagError{Err: errors.New("Entered Domain is already added")}
 			}
