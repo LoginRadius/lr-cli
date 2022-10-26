@@ -20,7 +20,7 @@ This project and everyone participating in it are governed by the [LoginRadius C
 ### Reporting Bugs
 
 * **Do not open up a GitHub issue if the bug is a security vulnerability
-  in LoginRadius CLI**, and instead to refer to our [security policy](https://www.loginradius.com/security-policy).
+  in LoginRadius CLI**, and instead refer to our [security policy](https://www.loginradius.com/security-policy).
 
 * **Ensure the bug was not already reported** by searching on GitHub under [Issues](https://github.com/loginradius/lr-cli/issues).
 
