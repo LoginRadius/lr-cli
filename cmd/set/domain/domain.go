@@ -32,7 +32,7 @@ func NewdomainCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "domain",
 		Short: "Updates domain",
-		Long:  `Use this command to update the configured social login provider.`,
+		Long:  `Use this command to update the whitelisted domains.`,
 		Example: heredoc.Doc(`$ lr set domain --domain <domain> --new-domain <new domain>
 		Domain successfully updated
 		`),

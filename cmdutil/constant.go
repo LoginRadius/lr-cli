@@ -18,7 +18,7 @@ var conf = config.GetInstance()
 
 
 
-var DomainValidation = regexp.MustCompile(`^(?:^|[ \t])((https?:\/\/)?(?:localhost|[\w-]+(?:\.[\w-]+)+)(:\d+)?(\/\S*)?)$`)
+var DomainValidation = regexp.MustCompile(`^((([\S]+:\/\/?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]*|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-]*)?\??(?:[-\+=&;%@.\w]*)#?(?:[\w]*))?)`)
 
 type ThemeType struct {
 	PageType     string        `json:"PageType"`

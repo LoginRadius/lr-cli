@@ -42,6 +42,7 @@ type AddProviderObj struct {
 	ProviderSecret string   `json:"ProviderSecret"`
 	Scope          []string `json:"Scope"`
 	Status         bool     `json:"status"`
+	HtmlFileName   string   `json:"HtmlFileName"`
 }
 
 type AddProviderSchema struct {
@@ -122,6 +123,10 @@ type RegistrationSchema struct {
 type AddCFRespSchema struct {
 	ResponseAddCustomField struct {
 		Data []CustomFieldSchema `json:"Data"`
+		ErrorCode int  `json:"errorCode"`
+		Message string  `json:"message"`
+		Description string  `json:"description"`
+
 	} `json:"responseAddCustomField"`
 }
 type UpdateRegFieldSchema struct {
@@ -130,6 +135,10 @@ type UpdateRegFieldSchema struct {
 
 type PasswordlessLogin struct {
 	Enabled bool `json:"isEnabled"`
+}
+
+type CustomFieldLimit struct {
+	Limit int `json:"CustomFieldLimit"`
 }
 
 func GetRegistrationFields() (*RegistrationSchema, error) {
@@ -146,6 +155,22 @@ func GetRegistrationFields() (*RegistrationSchema, error) {
 		return nil, err
 	}
 
+	return &resultResp, nil
+}
+
+func GetCustomFieldLimit() (*CustomFieldLimit, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/custom-fields-limit"
+	
+	var resultResp CustomFieldLimit
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
 	return &resultResp, nil
 }
 

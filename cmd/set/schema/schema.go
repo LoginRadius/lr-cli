@@ -113,10 +113,10 @@ func update(fieldname string, enable bool, disable bool) error {
 			regSchema.Fields = append(regSchema.Fields, v)
 		}
 	} else {
-		isAdv := fieldname == "country" || strings.Contains(fieldname, "cf_")
+		// isAdv := fieldname == "country" || strings.Contains(fieldname, "cf_")
 		for k, v := range regField.Data.RegistrationFields {
 			if fieldname == k {
-				err := UpdateField(&v, isAdv)
+				err := UpdateField(&v, true)
 				if err != nil {
 					return err
 				}
@@ -213,9 +213,14 @@ func UpdateField(field *api.Schema, isAdvance bool) error {
 			return err
 		}
 	}
-
+	var rule string
 	if !optional {
-		field.Rules += "|required"
+		rule = "required"
+		if field.Rules != "" { 
+			rule = "|required" 
+		}
+		
+		field.Rules += rule
 	}
 	return nil
 

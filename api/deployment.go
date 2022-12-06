@@ -84,16 +84,19 @@ type CoreAppData struct {
 }
 
 func GetSites() (*SitesReponse, error) {
-
-	var siteInfo SitesReponse
-	data, err := cmdutil.ReadFile("currentSite.json")
-	if err != nil {
-		return nil, errors.New("Please Login to execute this command")
-	}
-	err = json.Unmarshal(data, &siteInfo)
+	var url string
+	url = conf.AdminConsoleAPIDomain + "/deployment/sites?ownerUid=&"
+	domainResp, err := request.Rest(http.MethodGet, url, nil, "" )
 	if err != nil {
 		return nil, err
 	}
+	var siteInfo SitesReponse
+	err = json.Unmarshal(domainResp, &siteInfo)
+	if err != nil {
+		return nil, err
+	}
+	sInfo, _ := json.Marshal(siteInfo)
+	_ = cmdutil.WriteFile("currentSite.json", sInfo)
 	return &siteInfo, nil
 }
 

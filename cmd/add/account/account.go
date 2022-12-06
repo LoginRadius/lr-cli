@@ -91,7 +91,8 @@ func add(Account account) error {
 	}
 	fmt.Println("User Account successfully created, Please Check email to set the password")
 	fmt.Println("Please find the user details below:")
-	if *resultResp.FirstName != "" {
+
+	if Account.FirstName != "" {
 		fmt.Println("First name: " + *resultResp.FirstName)
 	}
 	fmt.Println("Email: " + resultResp.Email[0].Value)

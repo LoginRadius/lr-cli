@@ -29,7 +29,7 @@ func NewVerifyCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "verify",
 		Short: "Verify Email/Password",
-		Long: heredoc.Doc(`Use this command to verify that an email/username exists in your application.
+		Long: heredoc.Doc(`Use this command to verify that an email exists in your application.
 		`),
 		Example: heredoc.Doc(`
 			$ lr verify -e <email> 
