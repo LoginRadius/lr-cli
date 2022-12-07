@@ -3,12 +3,17 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-
+	"strings"
 	"github.com/loginradius/lr-cli/request"
 )
 
 // Social Provider Schemas
 type ActiveProvider struct {
+	Provider       string   `json:"ProviderName"`
+	Status         bool     `json:"Status"`
+}
+
+type ProviderDetail struct {
 	HtmlFileName   string   `json:"HtmlFileName"`
 	Provider       string   `json:"Provider"`
 	ProviderId     int      `json:"ProviderId"`
@@ -17,6 +22,7 @@ type ActiveProvider struct {
 	Scope          []string `json:"Scope"`
 	Status         bool     `json:"Status"`
 }
+
 
 type ProviderOptSchema struct {
 	Display  string `json:"display"`
@@ -272,8 +278,36 @@ func GetAllProviders() (map[string]ProviderSchema, error) {
 	return provMap, nil
 }
 
-func GetActiveProviders() (map[string]ActiveProvider, error) {
+
+func GetProvidersDetail() (map[string]ProviderDetail, error) {
 	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options"
+
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+
+	if err != nil {
+		return nil, err
+	}
+
+	type ProviderDetailList struct {
+		Data []ProviderDetail `json:"Data"`
+	}
+	var resultResp ProviderDetailList
+
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+
+	provMap := make(map[string]ProviderDetail, len(resultResp.Data))
+	for _, val := range resultResp.Data {
+		provMap[val.Provider] = val
+	}
+
+	return provMap , nil
+}
+
+func GetActiveProviders() (map[string]ActiveProvider, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers?v="
 
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
 
@@ -292,7 +326,7 @@ func GetActiveProviders() (map[string]ActiveProvider, error) {
 	}
 	provMap := make(map[string]ActiveProvider, len(resultResp.Data))
 	for _, val := range resultResp.Data {
-		provMap[val.Provider] = val
+		provMap[strings.ToLower(val.Provider)] = val
 	}
 
 	return provMap, nil

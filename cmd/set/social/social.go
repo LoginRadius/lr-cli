@@ -68,7 +68,7 @@ Google Enabled Successfully
 
 func update(provider string, on bool, off bool) error {
 
-	activeProv, err := api.GetActiveProviders()
+	activeProv, err := api.GetProvidersDetail()
 	if err != nil {
 		return err
 	}

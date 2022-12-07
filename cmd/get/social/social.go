@@ -38,7 +38,7 @@ $ lr get social
 
 func get() error {
 
-	activeProv, err := api.GetActiveProviders()
+	activeProv, err := api.GetProvidersDetail()
 	if err != nil {
 		return err
 	}
