@@ -42,10 +42,12 @@ func NewdomainCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if strings.Contains(p.Callbackurl, opts.Domain) {
-				return &cmdutil.FlagError{Err: errors.New("Entered Domain is already added")}
-			}
 			urls := strings.Split(p.Callbackurl, ";")
+			for _, val := range urls {
+				if val == opts.Domain {
+					return &cmdutil.FlagError{Err: errors.New("Entered Domain is already added")}
+				}
+			}
 			urls = append(urls, opts.Domain)
 			err = api.UpdateDomain(urls)
 			if err != nil {

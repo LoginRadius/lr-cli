@@ -109,6 +109,9 @@ func update(provider string, on bool, off bool) error {
 	}
 
 	provObj, ok := allProv[strings.ToLower(provider)]
+	if !ok {
+		return errors.New(provider + " is a deprecated social provider, and you cannot update/configure it")
+	}
 	var updateProvObj api.AddProviderSchema
 	updateProvObj.Data = make([]api.AddProviderObj, 1)
 

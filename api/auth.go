@@ -142,10 +142,9 @@ func SitesBasic(tokens *SitesToken) error {
 
 func GetAppsInfo() (map[int64]SitesReponse, error) {
 	var Apps CoreAppData
-	data, err := cmdutil.ReadFile("siteInfo.json")
-	if err != nil {
+
 		coreAppData := conf.AdminConsoleAPIDomain + "/auth/core-app-data?"
-		data, err = request.Rest(http.MethodGet, coreAppData, nil, "")
+		data, err := request.Rest(http.MethodGet, coreAppData, nil, "")
 		if err != nil {
 			return nil, err
 		}
@@ -154,7 +153,7 @@ func GetAppsInfo() (map[int64]SitesReponse, error) {
 			return nil, err
 		}
 		return storeSiteInfo(Apps), nil
-	}
+	
 	var siteInfo map[int64]SitesReponse
 	err = json.Unmarshal(data, &siteInfo)
 	return siteInfo, nil

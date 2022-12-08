@@ -16,7 +16,7 @@ type ActiveProvider struct {
 type ProviderDetail struct {
 	HtmlFileName   string   `json:"HtmlFileName"`
 	Provider       string   `json:"Provider"`
-	ProviderId     int      `json:"ProviderId"`
+	ProviderId     string   `json:"ProviderId"`
 	ProviderKey    string   `json:"ProviderKey"`
 	ProviderSecret string   `json:"ProviderSecret"`
 	Scope          []string `json:"Scope"`
@@ -300,7 +300,7 @@ func GetProvidersDetail() (map[string]ProviderDetail, error) {
 
 	provMap := make(map[string]ProviderDetail, len(resultResp.Data))
 	for _, val := range resultResp.Data {
-		provMap[val.Provider] = val
+		provMap[strings.ToLower(val.Provider)] = val
 	}
 
 	return provMap , nil

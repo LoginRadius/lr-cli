@@ -48,7 +48,7 @@ func get() error {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	for k, val := range activeProv {
+	for _, val := range activeProv {
 		var scope string
 		var status string
 		if len(val.Scope) > 0 {
@@ -61,7 +61,7 @@ func get() error {
 		} else {
 			status = "false"
 		}
-		table.Append([]string{k, scope, status})
+		table.Append([]string{val.Provider, scope, status})
 	}
 	table.SetRowLine(true)
 	table.SetHeader([]string{"Provider", "Scope", "Enabled"})
