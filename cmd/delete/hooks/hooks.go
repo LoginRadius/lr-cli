@@ -50,10 +50,6 @@ func NewHooksCmd() *cobra.Command {
 }
 
 func deleteHooks() error {
-	err := api.CheckPlan()
-	if err != nil {
-		return err
-	}
 	checkHookID, err := api.CheckHookID(hookid)
 	if err != nil {
 		return err

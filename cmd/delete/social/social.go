@@ -1,15 +1,12 @@
 package social
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-
+	"strings"
 	"github.com/loginradius/lr-cli/cmdutil"
-	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/prompt"
-	"github.com/loginradius/lr-cli/request"
+	"github.com/loginradius/lr-cli/api"
 
 	"github.com/spf13/cobra"
 )
@@ -59,20 +56,26 @@ func delete(opts *provider) error {
 	}
 
 	if shouldDelete {
-		conf := config.GetInstance()
-
-		url = conf.AdminConsoleAPIDomain + "/platform-configuration/social-provider-config-remove?"
-		body, _ := json.Marshal(opts)
-		var resultResp Result
-		resp, err := request.Rest(http.MethodDelete, url, nil, string(body))
-		if err != nil {
-			return err
+		var validProvider bool
+		activeProv, err := api.GetActiveProviders()
+		for  prov, _ := range activeProv {
+			ok := prov == strings.ToLower(opts.ProviderName)
+			if ok {
+				validProvider = true
+			}
 		}
-		err = json.Unmarshal(resp, &resultResp)
-		if err != nil {
-			return err
-		}
-		fmt.Println(opts.ProviderName + " Successfully Deleted")
+		if validProvider {
+		 err = api.UpdateProviderStatus(opts.ProviderName, false)
+			if err != nil {
+				return err
+			}
+		
+		
+			fmt.Println(opts.ProviderName + " Successfully Deleted")
+		} else {
+			return &cmdutil.FlagError{Err: errors.New(opts.ProviderName + " not added as a social provider")}
+		} 
+		
 	}
 	return nil
 }

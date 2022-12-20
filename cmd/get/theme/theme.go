@@ -17,17 +17,19 @@ func NewThemeCmd() *cobra.Command {
 		Use:   "theme",
 		Short: "Shows Current/All available themes of the site",
 		Long: heredoc.Doc(`
-		Use this command to get the active theme (--active) of the Auth Page (IDX) or to get the list of all available themes (--all).
+		Use this command to get the active theme (--active) of the Identity Experience Framework (IDX) or to get the list of all available themes (--all).
 		`),
 		Example: heredoc.Doc(`
 			$ lr get theme --all
 			Available Themes:
-			1. London
-			2. Tokyo
-			3. Helsinki
+			1. Template_1
+			2. Template_2
+			3. Template_3
+			4. Template_4
+			5. Template_5
 
 			$ lr get theme --active 
-			Current Theme: London
+			Current Theme: Template_1
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return themes()
@@ -43,9 +45,11 @@ func NewThemeCmd() *cobra.Command {
 func themes() error {
 	if *all && !*active {
 		fmt.Println("Available Themes:")
-		fmt.Println("1. London")
-		fmt.Println("2. Tokyo")
-		fmt.Println("3. Helsinki")
+		fmt.Println("1. Template_1")
+		fmt.Println("2. Template_2")
+		fmt.Println("3. Template_3")
+		fmt.Println("4. Template_4")
+		fmt.Println("5. Template_5")
 	} else if *active && !*all {
 		resp, err := api.GetPage()
 		if err != nil {

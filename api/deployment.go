@@ -3,12 +3,14 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 
 	"net/http"
 	"time"
 
 	"github.com/loginradius/lr-cli/cmdutil"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
 )
 
@@ -82,16 +84,19 @@ type CoreAppData struct {
 }
 
 func GetSites() (*SitesReponse, error) {
-
-	var siteInfo SitesReponse
-	data, err := cmdutil.ReadFile("currentSite.json")
-	if err != nil {
-		return nil, errors.New("Please Login to execute this command")
-	}
-	err = json.Unmarshal(data, &siteInfo)
+	var url string
+	url = conf.AdminConsoleAPIDomain + "/deployment/sites?ownerUid=&"
+	domainResp, err := request.Rest(http.MethodGet, url, nil, "" )
 	if err != nil {
 		return nil, err
 	}
+	var siteInfo SitesReponse
+	err = json.Unmarshal(domainResp, &siteInfo)
+	if err != nil {
+		return nil, err
+	}
+	sInfo, _ := json.Marshal(siteInfo)
+	_ = cmdutil.WriteFile("currentSite.json", sInfo)
 	return &siteInfo, nil
 }
 
@@ -145,8 +150,8 @@ func CheckLoginMethod() error {
 	if err != nil {
 		return err
 	}
-	if res.Productplan.Name != "business" {
-		return errors.New("This command applies to Phone login and Passwordless login which are available only with the Developer Pro plan. Kindly upgrade your plan to use this feature.")
+	if res.Productplan != nil && res.Productplan.Name != "business" {
+		return errors.New("this command applies to Phone login and Passwordless login which are available only with the Developer Pro plan. Kindly upgrade your plan to use this feature")
 	}
 	return nil
 }
@@ -190,13 +195,36 @@ func UpdateDomain(domains []string) error {
 	return nil
 }
 
-func CheckPlan() error {
+func CheckTrial() (bool, error) { // returns false if trial period has expired.
 	sitesResp, err := GetSites()
 	if err != nil {
-		return err
+		return false, err
 	}
-	if sitesResp.Productplan.Name == "free" {
-		return errors.New("Please switch to developer/developer pro app or upgrade your plan to enable this feature.")
+	today := time.Now()
+	check := today.After(sitesResp.Productplan.Expirytime)
+	if check {
+		return false, nil
 	}
-	return nil
+	return true, nil
+}
+
+func CardPay() (bool, error) {
+	paymentInfo, err := PaymentInfo()
+	if err != nil {
+		return false, err
+	}
+	paymentMethodId := paymentInfo.Data.Order[0].Paymentdetail.Stripepaymentmethodid
+	if paymentMethodId == "" {
+		fmt.Println("Please upgrade services by adding card details in dashboard via browser. ") //trial expired.
+		fmt.Printf("Press Y to open Browser window:")
+		var option bool
+		prompt.Confirm("Do you want to open the browser?", &option)
+		if !option {
+			return false, errors.New("Action not possible without updating card details.")
+		}
+		cmdutil.Openbrowser(conf.DashboardDomain + "/apps")
+		fmt.Println("Please Re-Login via CLI.")
+		return false, nil
+	}
+	return true, nil
 }

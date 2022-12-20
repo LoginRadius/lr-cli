@@ -50,7 +50,7 @@ func add1() error {
 
 	var providers []string
 	for _, prov := range allProv {
-		_, ok := activeProv[prov.Display]
+		_, ok := activeProv[strings.ToLower(prov.Display)]
 		if !ok {
 			providers = append(providers, prov.Display)
 		}

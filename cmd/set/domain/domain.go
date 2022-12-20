@@ -32,7 +32,7 @@ func NewdomainCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "domain",
 		Short: "Updates domain",
-		Long:  `Use this command to update the configured social login provider.`,
+		Long:  `Use this command to update the whitelisted domains.`,
 		Example: heredoc.Doc(`$ lr set domain --domain <domain> --new-domain <new domain>
 		Domain successfully updated
 		`),
@@ -52,8 +52,12 @@ func NewdomainCmd() *cobra.Command {
 			if !strings.Contains(p.Callbackurl, opts.Domain) {
 				return &cmdutil.FlagError{Err: errors.New("Entered Domain Not Found")}
 			}
-			if opts.Domain == "http://localhost" || opts.Domain == "http://127.0.0.1" {
-				return &cmdutil.FlagError{Err: errors.New("Cannot Update Default Domains")}
+			if !cmdutil.DomainValidation.MatchString(opts.DomainMod)  {
+				return &cmdutil.FlagError{Err: errors.New("Invalid Domain")}
+			}
+			
+			if strings.Contains(p.Callbackurl, opts.DomainMod) {
+				return &cmdutil.FlagError{Err: errors.New("Entered Domain is already added")}
 			}
 			domain := strings.ReplaceAll(p.Callbackurl, opts.Domain, opts.DomainMod)
 			return set(domain)

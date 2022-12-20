@@ -67,15 +67,19 @@ func GeneratePassword() string {
 
 func ThemeConstants(theme string) (ThemeType, ThemeType) {
 	auths := map[string]ThemeType{
-		"London":   Theme1Auth,
-		"Tokyo":    Theme2Auth,
-		"Helsinki": Theme3Auth,
+		"Template_1":   Theme1Auth,
+		"Template_2":   Theme2Auth,
+		"Template_3": 	Theme3Auth,
+		"Template_4": 	Theme4Auth,
+		"Template_5": 	Theme5Auth,
 	}
 
 	profiles := map[string]ThemeType{
-		"London":   Theme1Profile,
-		"Tokyo":    Theme2Profile,
-		"Helsinki": Theme3Profile,
+		"Template_1":   Theme1Profile,
+		"Template_2":   Theme2Profile,
+		"Template_3": 	Theme3Profile,
+		"Template_4": 	Theme4Profile,
+		"Template_5": 	Theme5Profile,
 	}
 	return auths[theme], profiles[theme]
 }

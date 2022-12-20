@@ -21,7 +21,7 @@ func NewSetSchemaCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "schema",
 		Short: "Update Registeration Schema",
-		Long:  `Use this command to enable or disable the registration fields for the Auth Page(IDX). You can also manage field configurations such as optional, required, type, and name.`,
+		Long:  `Use this command to enable or disable the registration fields for the Identity Experience Framework (IDX). You can also manage field configurations such as optional, required, type, and name.`,
 		Example: heredoc.Doc(`# To update the field configuration
 		$ lr set schema -f my-field
 		? Enter Field Name: My Field
@@ -45,7 +45,7 @@ func NewSetSchemaCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&fieldName, "fieldname", "f", "", "The Field Name which you wanted to enable or update.")
+	cmd.Flags().StringVarP(&fieldName, "fieldName", "f", "", "The Field Name which you wanted to enable or update.")
 	cmd.Flags().BoolVarP(&on, "enable", "e", false, "This Flag is used to enable to field with the default configuration")
 	cmd.Flags().BoolVarP(&off, "disable", "d", false, "This Flag is used to enable to field with the default configuration")
 	return cmd
@@ -53,7 +53,9 @@ func NewSetSchemaCmd() *cobra.Command {
 
 func update(fieldname string, enable bool, disable bool) error {
 
-	regField, err := api.GetRegistrationFields()
+	regField, err := api.GetAllRegistrationFields()
+	
+	activeRegField, err:= api.GetRegistrationFields()
 	if err != nil {
 		fmt.Println("Cannot update registeration field at the momment due to some issue at our end, kindly try after sometime.")
 		return nil
@@ -62,14 +64,20 @@ func update(fieldname string, enable bool, disable bool) error {
 	if fieldname == "emailid" || fieldname == "password" {
 		return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` is default field, can't be updated.")}
 	}
-
-	_, ok := regField.Data.RegistrationFields[fieldname]
+	_, ok := regField[strings.ToLower(fieldname)]
 	var regSchema api.UpdateRegFieldSchema
+	customFields, err := api.GetAllCustomFields()
+	
 	if !ok {
 		if disable {
 			return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` not found")}
 		}
-		for _, v := range regField.Data.CustomFields {
+		if err != nil {
+			if err.Error() == "Custom field does not exist" {
+				return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` not found")}
+			}
+		}
+		for _, v := range customFields.Data {
 			if fieldname == v.Display {
 				// This is the flow where user want to add the custom
 				// field with default configuration
@@ -81,10 +89,12 @@ func update(fieldname string, enable bool, disable bool) error {
 					}
 				}
 				var schema api.UpdateRegFieldSchema
-				for _, v := range regField.Data.RegistrationFields {
-					schema.Fields = append(schema.Fields, v)
+				for _, v := range activeRegField {
+					if fieldname != v.Display {
+					schema.Data = append(schema.Data, v)
+					}
 				}
-				schema.Fields = append(schema.Fields, field)
+				schema.Data = append(schema.Data, field)
 				_, err := api.UpdateRegField(schema)
 				if err != nil {
 					return err
@@ -96,8 +106,8 @@ func update(fieldname string, enable bool, disable bool) error {
 		return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` not found")}
 	}
 	if enable || disable {
-		for k, v := range regField.Data.RegistrationFields {
-			if fieldname == k {
+		for _, v := range activeRegField {
+			if fieldname == v.Name {
 				if enable {
 					if v.Enabled {
 						return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` is already enabled for registration schema")}
@@ -110,19 +120,38 @@ func update(fieldname string, enable bool, disable bool) error {
 					v.Enabled = false
 				}
 			}
-			regSchema.Fields = append(regSchema.Fields, v)
+			regSchema.Data = append(regSchema.Data, v)
 		}
 	} else {
-		isAdv := fieldname == "country" || strings.Contains(fieldname, "cf_")
-		for k, v := range regField.Data.RegistrationFields {
-			if fieldname == k {
-				err := UpdateField(&v, isAdv)
-				if err != nil {
-					return err
+		// isAdv := fieldname == "country" || strings.Contains(fieldname, "cf_")
+		for _, v := range activeRegField {
+			if strings.ToLower(fieldname) != strings.ToLower(v.Name) {
+				regSchema.Data = append(regSchema.Data, v)
+			}	
+		}
+		_, ok := activeRegField[strings.ToLower(fieldname)]
+		if ok && !strings.Contains(fieldname, "cf") {
+			for _, v := range activeRegField {
+			
+				if strings.ToLower(fieldname) == strings.ToLower(v.Name) {
+					err := UpdateField(&v, true )
+					if err != nil {
+						return err
+					}
+					regSchema.Data = append(regSchema.Data, v)
 				}
 			}
-			regSchema.Fields = append(regSchema.Fields, v)
-		}
+			} else {
+				for _, v := range regField {
+					if strings.ToLower(fieldname) == strings.ToLower(v.Name) {
+						err := UpdateField(&v, true )
+						if err != nil {
+							return err
+						}
+					regSchema.Data = append(regSchema.Data, v)
+				}
+			}
+		}	
 	}
 	_, err = api.UpdateRegField(regSchema)
 	if err != nil {
@@ -144,6 +173,9 @@ func UpdateField(field *api.Schema, isAdvance bool) error {
 		Default: field.Display,
 	}, &field.Display); err != nil {
 		return err
+	}
+	if strings.TrimSpace(field.Display) == "" {
+		return errors.New("Error:- Invalid Field Name")
 	}
 
 	var optional bool
@@ -172,7 +204,9 @@ func UpdateField(field *api.Schema, isAdvance bool) error {
 			return err
 		}
 		field.Type = api.TypeMap[ind].Name
-
+		if(field.Type == ""){
+			field.Type = "string"
+		}
 		if api.TypeMap[ind].ShouldDisplayValidaitonRuleInput {
 			if err := prompt.SurveyAskOne(&survey.Input{
 				Message: "Enter the validation string \nCheckout how to use validation rules - https://www.loginradius.com/docs/libraries/js-libraries/javascript-hooks/#customvalidationhook16",
@@ -210,9 +244,21 @@ func UpdateField(field *api.Schema, isAdvance bool) error {
 			return err
 		}
 	}
-
-	if !optional {
-		field.Rules += "|required"
+	var rule string
+	if !optional && !strings.Contains(field.Rules, "required") {
+		rule = "required"
+		if field.Rules != "" { 
+			rule = "|required" 
+		}
+		
+		field.Rules += rule
+	} else {
+		 if field.Rules == "required" {
+			rule = ""
+		} else if field.Rules != "" {
+			rule = strings.Replace(field.Rules, "|required", "",1)
+		}
+		field.Rules = rule
 	}
 	return nil
 
@@ -226,5 +272,6 @@ func generateCFDefault(fieldName string) api.Schema {
 	field.Options = nil
 	field.Rules = ""
 	field.Type = "string"
+	field.Permission = "w"
 	return field
 }

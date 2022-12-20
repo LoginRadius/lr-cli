@@ -4,7 +4,6 @@ import (
 	"github.com/loginradius/lr-cli/cmd/set/accountPassword"
 	"github.com/loginradius/lr-cli/cmd/set/domain"
 	"github.com/loginradius/lr-cli/cmd/set/schema"
-	"github.com/loginradius/lr-cli/cmd/set/site"
 	"github.com/loginradius/lr-cli/cmd/set/social"
 	"github.com/loginradius/lr-cli/cmd/set/theme"
 
@@ -19,8 +18,8 @@ func NewsetCmd() *cobra.Command {
 		Long:  `This commmand acts as a base command for set subcommands`,
 	}
 
-	siteCmd := site.NewSiteCmd()
-	cmd.AddCommand(siteCmd)
+	// siteCmd := site.NewSiteCmd()
+	// cmd.AddCommand(siteCmd)
 
 	themeCmd := theme.NewThemeCmd()
 	cmd.AddCommand(themeCmd)

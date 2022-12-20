@@ -11,6 +11,7 @@ type Config struct {
 	AdminConsoleAPIDomain string
 	HubPageDomain         string
 	DashboardDomain       string
+	ThemeDomain	          string
 }
 
 // Singleton instance of config
@@ -24,7 +25,8 @@ func read() *Config {
 		LoginRadiusAPIDomain:  "https://api.loginradius.com",
 		HubPageDomain:         "https://accounts.loginradius.com",
 		AdminConsoleAPIDomain: "https://adminconsole-api.loginradius.com",
-		DashboardDomain:       "https://dashboard.loginradius.com",
+		DashboardDomain:       "https://adminconsole.loginradius.com",
+		ThemeDomain: 		   "https://cdn.loginradius.com/hub/prod/v1",
 	}
 	return &config
 }

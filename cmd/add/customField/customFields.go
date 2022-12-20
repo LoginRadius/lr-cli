@@ -3,6 +3,7 @@ package customField
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
@@ -20,7 +21,7 @@ func NewAddCFCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "custom-field",
 		Short: "Add the custom field which can be used in a registeration schema",
-		Long:  `Use this command to add up to 5 custom fields to your Auth Page(IDX).`,
+		Long:  `Use this command to add custom fields to your Identity Experience Framework (IDX).`,
 		Example: heredoc.Doc(`$ lr add custom-field -f MyCustomField
 		MyCustomField is successfully add as your customfields
 		You can now add the custom field in your registration schema using "lr set schema" command
@@ -38,33 +39,31 @@ func NewAddCFCmd() *cobra.Command {
 }
 
 func add(fieldName string) error {
-	//checking if it is devoloper plan
-	res, err := api.GetSites()
+	regField, err := api.GetAllCustomFields()
+	
+	if err != nil {
+		if err.Error() != "Custom field does not exist" {
+			fmt.Println("Cannot add custom field at the momment due to some issue at our end, kindly try after sometime.")
+			return nil
+		}
+	}
+	customfieldLimit, err := api.GetCustomFieldLimit()
 	if err != nil {
 		return err
 	}
-
-	if res.Productplan.Name != "business" {
-		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
-		return nil
+	if regField != nil {
+		if len(regField.Data) >= customfieldLimit.Limit {
+			return &cmdutil.FlagError{Err: errors.New("cannot add more than " + strconv.Itoa(customfieldLimit.Limit) + " custom fields")}
+		}
 	}
-
-	regField, err := api.GetRegistrationFields()
-	if err != nil {
-		fmt.Println("Cannot add custom field at the momment due to some issue at our end, kindly try after sometime.")
-		return nil
-	}
-
-	if len(regField.Data.CustomFields) >= 5 {
-		return &cmdutil.FlagError{Err: errors.New("Cannot add more then 5 custom fields.")}
-	}
-
-	_, err = api.AddCustomField(fieldName)
+	respData, err := api.AddCustomField(fieldName)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(fieldName + " is successfully add as your customfields")
+	if respData.ResponseAddCustomField.Message != "" {
+		return errors.New(respData.ResponseAddCustomField.Message)
+	}
+	fmt.Println(fieldName + " is successfully added")
 	fmt.Println("You can now add the custom field in your registration schema using `lr set schema` command")
 	return nil
 }

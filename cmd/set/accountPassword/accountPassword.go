@@ -10,14 +10,15 @@ import (
 
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/request"
-
+	"github.com/loginradius/lr-cli/config"
 	"github.com/spf13/cobra"
 )
 
-var inpUID string
 
 type Password struct {
-	InpPassword string `json:"password"`
+	
+	accountid string `json:"accountid"`
+	password string `json:"password"`
 }
 type Result struct {
 	PasswordHash string `json:"PasswordHash"`
@@ -33,29 +34,35 @@ func NewaccountPasswordCmd() *cobra.Command {
 		New password hash is: <hash>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if inpUID == "" {
+			if opts.accountid == "" {
 				return &cmdutil.FlagError{Err: errors.New("`uid` is required argument")}
 			}
-			if opts.InpPassword == "" {
+			if opts.password == "" {
 				return &cmdutil.FlagError{Err: errors.New("`password` is required argument")}
 			}
 
-			return set(inpUID, *opts)
+			return set(opts.accountid,opts.password)
 
 		},
 	}
 
 	fl := cmd.Flags()
-	fl.StringVarP(&inpUID, "uid", "u", "", "Enter UID of the user")
-	fl.StringVarP(&opts.InpPassword, "password", "p", "", "Enter the new password")
+	fl.StringVarP(&opts.accountid, "uid", "u", "", "Enter UID of the user")
+	fl.StringVarP(&opts.password, "password", "p", "", "Enter the new password")
 
 	return cmd
 }
 
-func set(UID string, password Password) error {
+func set( uid string,  password string) error {
 	var resultResp Result
-	body, _ := json.Marshal(password)
-	resp, err := request.RestLRAPI(http.MethodGet, "/identity/v2/manage/account/"+UID+"/password", nil, string(body))
+	conf := config.GetInstance()
+	body, _ := json.Marshal(map[string]string{
+		"password": password,
+		"accountid": uid,
+	})
+
+	url := conf.AdminConsoleAPIDomain + "/customer-management/resetpassword?"
+	resp, err := request.Rest(http.MethodPut, url, nil, string(body))
 
 	if err != nil {
 		return err

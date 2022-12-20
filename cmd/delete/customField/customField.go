@@ -16,7 +16,7 @@ func NewDeleteCFCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "custom-field",
 		Short: "Deletes a custom field",
-		Long:  `Use this command to delete a custom field from your Auth Page(IDX). `,
+		Long:  `Use this command to delete a custom field from your Identity Experience Framework (IDX). `,
 		Example: heredoc.Doc(`$ lr delete custom-field
 		? Select the field you Want to delete from the list: MyCF
 		? Are you Sure you want to delete this custom field? Yes
@@ -32,19 +32,13 @@ func NewDeleteCFCmd() *cobra.Command {
 }
 
 func delete() error {
-	res, err := api.GetSites()
+	regfields, err := api.GetAllCustomFields()
 	if err != nil {
 		return err
 	}
-	if res.Productplan.Name != "business" {
-		fmt.Println("Kindly Upgrade the plan to enable this command for your app")
-		return nil
-	}
-
-	regfields, err := api.GetRegistrationFields()
 	var options []string
-	for i := 0; i < len(regfields.Data.CustomFields); i++ {
-		options = append(options, regfields.Data.CustomFields[i].Display)
+	for i := 0; i < len(regfields.Data); i++ {
+		options = append(options, regfields.Data[i].Display)
 	}
 
 	var ind int
@@ -62,7 +56,7 @@ func delete() error {
 	}
 
 	if shouldDelete {
-		isDeleted, err := api.DeleteCustomField(regfields.Data.CustomFields[ind].Key)
+		isDeleted, err := api.DeleteCustomField(regfields.Data[ind].Key)
 		if err != nil {
 			return err
 		}

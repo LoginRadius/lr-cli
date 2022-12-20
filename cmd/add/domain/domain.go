@@ -13,12 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var fileName string
-
-type domainManagement struct {
-	CallbackUrl string `json:"CallbackUrl"`
-}
-
 type domain struct {
 	Domain string `json:"domain"`
 }
@@ -32,7 +26,7 @@ func NewdomainCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "domain",
-		Short: "Adds doamin",
+		Short: "Whitelists a domain",
 		Long:  `Use this command to whitelist a domain.`,
 		Example: heredoc.Doc(`$ lr add domain --domain <domain>
 		Your Domain  <newDomain>  is now whitelisted
@@ -41,26 +35,26 @@ func NewdomainCmd() *cobra.Command {
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
 			}
+			if !cmdutil.DomainValidation.MatchString(opts.Domain)  {
+				return &cmdutil.FlagError{Err: errors.New("Invalid Domain")}
+			}
 			p, err := api.GetSites()
 			if err != nil {
 				return err
 			}
-			if strings.Contains(p.Callbackurl, opts.Domain) {
-				return &cmdutil.FlagError{Err: errors.New("Entered Domain is already added")}
-			}
 			urls := strings.Split(p.Callbackurl, ";")
-			plan := p.Productplan.Name
-			if (plan == "free" && len(urls) < 3) || (plan == "developer" && len(urls) < 5) {
-				urls = append(urls, opts.Domain)
-				err := api.UpdateDomain(urls)
-				if err != nil {
-					return err
+			for _, val := range urls {
+				if val == opts.Domain {
+					return &cmdutil.FlagError{Err: errors.New("Entered Domain is already added")}
 				}
-				fmt.Println(opts.Domain, "is now whitelisted.")
-				return nil
-			} else {
-				return &cmdutil.FlagError{Err: errors.New("To add more domains, plan upgradation is required")}
 			}
+			urls = append(urls, opts.Domain)
+			err = api.UpdateDomain(urls)
+			if err != nil {
+				return err
+			}
+			fmt.Println(opts.Domain, "is now whitelisted.")
+			return nil
 
 		},
 	}

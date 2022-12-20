@@ -11,7 +11,6 @@ import (
 	"github.com/loginradius/lr-cli/cmd/get"
 	"github.com/loginradius/lr-cli/cmd/login"
 	"github.com/loginradius/lr-cli/cmd/logout"
-	"github.com/loginradius/lr-cli/cmd/register"
 	"github.com/loginradius/lr-cli/cmd/verify"
 
 	"github.com/loginradius/lr-cli/internal/build"
@@ -53,8 +52,8 @@ func NewRootCmd() *cobra.Command {
 	demoCmd := demo.NewDemoCmd()
 	rootCmd.AddCommand(demoCmd)
 
-	registerCmd := register.NewRegisterCmd()
-	rootCmd.AddCommand((registerCmd))
+	// registerCmd := register.NewRegisterCmd()
+	// rootCmd.AddCommand((registerCmd))
 
 	verifyCmd := verify.NewVerifyCmd()
 	rootCmd.AddCommand((verifyCmd))
