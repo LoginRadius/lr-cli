@@ -3,6 +3,7 @@ package schema
 import (
 	"os"
 	"sort"
+	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
@@ -28,11 +29,11 @@ func NewschemaCmd() *cobra.Command {
 | country   | Country       | string   | false   |
 | firstname | First Name    | string   | false   |
 +-----------+---------------+----------+---------+
-+---------------+
-| CUSTOM FIELDS |
-+---------------+
-| MyCF          |
-+---------------+
++---------------+----------+---------+
+| CUSTOM FIELDS |   TYPE   | ENABLED |
++---------------+----------+---------+
+| MyCF          | string   | false   |
++---------------+----------+---------+
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return get()
@@ -49,17 +50,17 @@ func get() error {
 		return err
 	}
 
-	schema, err := api.GetRegistrationFields()
-	if err != nil {
-		return err
-	}
+	regFields, err := api.GetAllRegistrationFields()
+	activeRegField, err := api.GetRegistrationFields()
+	
 	var data [][]string
-	for k, v := range schema.Data.RegistrationFields {
+	for k, v := range regFields {
 		if k == "phoneid" && !api.IsPhoneLoginEnabled(*features) {
 			continue
 		}
 		enabled := "false"
-		if v.Enabled {
+		_, ok := activeRegField[k]
+		if ok {
 			enabled = "true"
 		}
 		Type := v.Type
@@ -76,16 +77,27 @@ func get() error {
 	table.AppendBulk(data)
 	table.Render()
 
+	customFields, err := api.GetAllCustomFields()
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
 	cfTable := tablewriter.NewWriter(os.Stdout)
-	if len(schema.Data.CustomFields) > 0 {
-		for _, v := range schema.Data.CustomFields {
-			cfTable.Append([]string{v.Display})
+	if len(customFields.Data) > 0 {
+		for _, v := range customFields.Data {
+			enabled := "false"
+		_, ok := activeRegField["cf_" + v.Display]
+		if ok {
+			enabled = "true"
+		}
+		Type := activeRegField["cf_" + v.Display].Type
+			cfTable.Append([]string{v.Display, Type,enabled})
 		}
 	} else {
 		cfTable.Append([]string{"No Custom Fields"})
 		cfTable.SetCaption(true, "Use command `lr add custom-field` to add the Custom Field")
 	}
-	cfTable.SetHeader([]string{"Custom Fields"})
+	cfTable.SetHeader([]string{"Custom Fields", "Type", "Enabled"})
 	cfTable.Render()
 
 	return nil

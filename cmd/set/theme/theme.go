@@ -17,7 +17,7 @@ import (
 
 var theme string
 var option bool
-var ListTheme = []string{"London", "Tokyo", "Helsinki"}
+var ListTheme = []string{"Template_1", "Template_2", "Template_3", "Template_4", "Template_5"}
 
 type body struct {
 	PageType string     `json:"PageType"`
@@ -184,7 +184,7 @@ func otherCalls() error {
 	conf := config.GetInstance()
 	profile := conf.AdminConsoleAPIDomain + "/deployment/hostedPage/script/Profile"
 	bodyProfile, _ := json.Marshal(map[string]string{
-		"url": "https://hosted-pages.lrinternal.com/Themes/profile/html/profile.html",
+		"url": conf.ThemeDomain + "/Themes/profile/html/profile.html",
 	})
 	_, err := request.Rest(http.MethodPost, profile, nil, string(bodyProfile))
 	if err != nil {
@@ -233,9 +233,11 @@ func themeurl() error {
 	conf := config.GetInstance()
 	auth := conf.LoginRadiusAPIDomain + "/deployment/hostedPage/script/Auth"
 	themeurl := map[string]string{
-		"London":   "https://hosted-pages.lrinternal.com/Themes/Theme-1/auth/auth.html",
-		"Tokyo":    "https://hosted-pages.lrinternal.com/Themes/Theme-2/auth/auth.html",
-		"Helsinki": "https://hosted-pages.lrinternal.com/Themes/Theme-3/auth/auth.html",
+		"Template_1":    conf.ThemeDomain + "/Themes/Theme-1/auth/auth.html",
+		"Template_2":    conf.ThemeDomain + "/Themes/Theme-2/auth/auth.html",
+		"Template_3": 	 conf.ThemeDomain + "/Themes/Theme-3/auth/auth.html",
+		"Template_4": 	 conf.ThemeDomain + "/Themes/Theme-4/auth/auth.html",
+		"Template_5": 	 conf.ThemeDomain + "/Themes/Theme-5/auth/auth.html",
 	}
 	body, _ := json.Marshal(map[string]string{
 		"url": themeurl[theme],

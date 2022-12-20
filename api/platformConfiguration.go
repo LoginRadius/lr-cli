@@ -3,20 +3,26 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-
+	"strings"
 	"github.com/loginradius/lr-cli/request"
 )
 
 // Social Provider Schemas
 type ActiveProvider struct {
+	Provider       string   `json:"ProviderName"`
+	Status         bool     `json:"Status"`
+}
+
+type ProviderDetail struct {
 	HtmlFileName   string   `json:"HtmlFileName"`
 	Provider       string   `json:"Provider"`
-	ProviderId     int      `json:"ProviderId"`
+	ProviderId     string   `json:"ProviderId"`
 	ProviderKey    string   `json:"ProviderKey"`
 	ProviderSecret string   `json:"ProviderSecret"`
 	Scope          []string `json:"Scope"`
 	Status         bool     `json:"Status"`
 }
+
 
 type ProviderOptSchema struct {
 	Display  string `json:"display"`
@@ -42,6 +48,7 @@ type AddProviderObj struct {
 	ProviderSecret string   `json:"ProviderSecret"`
 	Scope          []string `json:"Scope"`
 	Status         bool     `json:"status"`
+	HtmlFileName   string   `json:"HtmlFileName"`
 }
 
 type AddProviderSchema struct {
@@ -101,39 +108,67 @@ type Schema struct {
 	Options []OptSchema `json:"Options"`
 	Rules   string      `json:"Rules"`
 	Type    string      `json:"Type"`
+	Permission string `json:"Permission"`
+	Parent string `json:"Parent"`
 }
 type OptSchema struct {
 	Value string `json:"value"`
 	Text  string `json:"text"`
 }
 
-type CustomFieldSchema struct {
+type CustomSchema struct {
 	Key     string `json:"Key"`
 	Display string `json:"Display"`
 }
 
-type FieldSchema struct {
-	CustomFields       []CustomFieldSchema `json:"customFields"`
-	RegistrationFields map[string]Schema   `json:"registrationFields"`
-}
 type RegistrationSchema struct {
-	Data FieldSchema `json:"data"`
+	Data []Schema `json:"data"`
 }
+
+type CustomFieldSchema struct {
+	Data []CustomSchema `json:"data"`
+}
+
 type AddCFRespSchema struct {
 	ResponseAddCustomField struct {
 		Data []CustomFieldSchema `json:"Data"`
+		ErrorCode int  `json:"errorCode"`
+		Message string  `json:"message"`
+		Description string  `json:"description"`
+
 	} `json:"responseAddCustomField"`
 }
 type UpdateRegFieldSchema struct {
-	Fields []Schema `json:"fields"`
+	Data []Schema `json:"data"`
 }
 
 type PasswordlessLogin struct {
 	Enabled bool `json:"isEnabled"`
 }
 
-func GetRegistrationFields() (*RegistrationSchema, error) {
-	url := conf.AdminConsoleAPIDomain + "/platform-configuration/registration-schema"
+type CustomFieldLimit struct {
+	Limit int `json:"CustomFieldLimit"`
+}
+
+
+func GetAllCustomFields() (*CustomFieldSchema, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/custom-fields?d="
+
+	var resultResp CustomFieldSchema
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resultResp, nil
+}
+
+func GetAllRegistrationFields() (map[string]Schema, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/platform-registration-fields?d="
 
 	var resultResp RegistrationSchema
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
@@ -145,14 +180,59 @@ func GetRegistrationFields() (*RegistrationSchema, error) {
 	if err != nil {
 		return nil, err
 	}
+	provMap := make(map[string]Schema, len(resultResp.Data))
 
+	for _ ,value := range resultResp.Data {
+		if value.Parent == "" {
+			provMap[strings.ToLower(value.Name)] = value
+		}
+	}
+
+
+	return provMap, nil
+}
+
+
+func GetRegistrationFields() (map[string]Schema, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?d="
+
+	var resultResp RegistrationSchema
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	provMap := make(map[string]Schema, len(resultResp.Data))
+
+	for _ ,value := range resultResp.Data {
+		provMap[strings.ToLower(value.Name)] = value
+	}
+	return provMap, nil
+}
+
+func GetCustomFieldLimit() (*CustomFieldLimit, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/custom-fields-limit"
+	
+	var resultResp CustomFieldLimit
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
 	return &resultResp, nil
 }
 
 func AddCustomField(customfield string) (*AddCFRespSchema, error) {
 	url := conf.AdminConsoleAPIDomain + "/platform-configuration/custom-field"
 	body, _ := json.Marshal(map[string]string{
-		"customField": customfield,
+		"customfield": customfield,
 	})
 	var resultResp AddCFRespSchema
 	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
@@ -191,7 +271,7 @@ func DeleteCustomField(field string) (*bool, error) {
 }
 
 func UpdateRegField(data UpdateRegFieldSchema) (*RegistrationSchema, error) {
-	url := conf.AdminConsoleAPIDomain + "/platform-configuration/registration-schema"
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/default-fields?d="
 	body, _ := json.Marshal(data)
 	var resultResp RegistrationSchema
 	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
@@ -247,8 +327,36 @@ func GetAllProviders() (map[string]ProviderSchema, error) {
 	return provMap, nil
 }
 
-func GetActiveProviders() (map[string]ActiveProvider, error) {
+
+func GetProvidersDetail() (map[string]ProviderDetail, error) {
 	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers/options"
+
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+
+	if err != nil {
+		return nil, err
+	}
+
+	type ProviderDetailList struct {
+		Data []ProviderDetail `json:"Data"`
+	}
+	var resultResp ProviderDetailList
+
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+
+	provMap := make(map[string]ProviderDetail, len(resultResp.Data))
+	for _, val := range resultResp.Data {
+		provMap[strings.ToLower(val.Provider)] = val
+	}
+
+	return provMap , nil
+}
+
+func GetActiveProviders() (map[string]ActiveProvider, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/social-providers?v="
 
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
 
@@ -267,7 +375,7 @@ func GetActiveProviders() (map[string]ActiveProvider, error) {
 	}
 	provMap := make(map[string]ActiveProvider, len(resultResp.Data))
 	for _, val := range resultResp.Data {
-		provMap[val.Provider] = val
+		provMap[strings.ToLower(val.Provider)] = val
 	}
 
 	return provMap, nil

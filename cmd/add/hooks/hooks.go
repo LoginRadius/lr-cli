@@ -52,19 +52,19 @@ func NewHooksCmd() *cobra.Command {
 }
 
 func addHooks() error {
-	checkTrial, err := api.CheckTrial()
-	if err != nil {
-		return err
-	}
-	if !checkTrial {
-		cardPay, err := api.CardPay()
-		if err != nil {
-			return err
-		}
-		if !cardPay {
-			return nil
-		}
-	}
+	// checkTrial, err := api.CheckTrial()
+	// if err != nil {
+	// 	return err
+	// }
+	// if !checkTrial {
+	// 	cardPay, err := api.CardPay()
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	if !cardPay {
+	// 		return nil
+	// 	}
+	// }
 
 	checkInput := input()
 	if !checkInput {
@@ -72,7 +72,7 @@ func addHooks() error {
 		return nil
 	}
 
-	err = add()
+	err := add()
 	if err != nil {
 		return err
 	}
