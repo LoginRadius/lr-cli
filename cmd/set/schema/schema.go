@@ -53,7 +53,9 @@ func NewSetSchemaCmd() *cobra.Command {
 
 func update(fieldname string, enable bool, disable bool) error {
 
-	regField, err := api.GetRegistrationFields()
+	regField, err := api.GetAllRegistrationFields()
+	
+	activeRegField, err:= api.GetRegistrationFields()
 	if err != nil {
 		fmt.Println("Cannot update registeration field at the momment due to some issue at our end, kindly try after sometime.")
 		return nil
@@ -62,14 +64,20 @@ func update(fieldname string, enable bool, disable bool) error {
 	if fieldname == "emailid" || fieldname == "password" {
 		return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` is default field, can't be updated.")}
 	}
-
-	_, ok := regField.Data.RegistrationFields[fieldname]
+	_, ok := regField[strings.ToLower(fieldname)]
 	var regSchema api.UpdateRegFieldSchema
+	customFields, err := api.GetAllCustomFields()
+	
 	if !ok {
 		if disable {
 			return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` not found")}
 		}
-		for _, v := range regField.Data.CustomFields {
+		if err != nil {
+			if err.Error() == "Custom field does not exist" {
+				return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` not found")}
+			}
+		}
+		for _, v := range customFields.Data {
 			if fieldname == v.Display {
 				// This is the flow where user want to add the custom
 				// field with default configuration
@@ -81,10 +89,12 @@ func update(fieldname string, enable bool, disable bool) error {
 					}
 				}
 				var schema api.UpdateRegFieldSchema
-				for _, v := range regField.Data.RegistrationFields {
-					schema.Fields = append(schema.Fields, v)
+				for _, v := range activeRegField {
+					if fieldname != v.Display {
+					schema.Data = append(schema.Data, v)
+					}
 				}
-				schema.Fields = append(schema.Fields, field)
+				schema.Data = append(schema.Data, field)
 				_, err := api.UpdateRegField(schema)
 				if err != nil {
 					return err
@@ -96,8 +106,8 @@ func update(fieldname string, enable bool, disable bool) error {
 		return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` not found")}
 	}
 	if enable || disable {
-		for k, v := range regField.Data.RegistrationFields {
-			if fieldname == k {
+		for _, v := range activeRegField {
+			if fieldname == v.Name {
 				if enable {
 					if v.Enabled {
 						return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` is already enabled for registration schema")}
@@ -110,19 +120,38 @@ func update(fieldname string, enable bool, disable bool) error {
 					v.Enabled = false
 				}
 			}
-			regSchema.Fields = append(regSchema.Fields, v)
+			regSchema.Data = append(regSchema.Data, v)
 		}
 	} else {
 		// isAdv := fieldname == "country" || strings.Contains(fieldname, "cf_")
-		for k, v := range regField.Data.RegistrationFields {
-			if fieldname == k {
-				err := UpdateField(&v, true)
-				if err != nil {
-					return err
+		for _, v := range activeRegField {
+			if strings.ToLower(fieldname) != strings.ToLower(v.Name) {
+				regSchema.Data = append(regSchema.Data, v)
+			}	
+		}
+		_, ok := activeRegField[strings.ToLower(fieldname)]
+		if ok && !strings.Contains(fieldname, "cf") {
+			for _, v := range activeRegField {
+			
+				if strings.ToLower(fieldname) == strings.ToLower(v.Name) {
+					err := UpdateField(&v, true )
+					if err != nil {
+						return err
+					}
+					regSchema.Data = append(regSchema.Data, v)
 				}
 			}
-			regSchema.Fields = append(regSchema.Fields, v)
-		}
+			} else {
+				for _, v := range regField {
+					if strings.ToLower(fieldname) == strings.ToLower(v.Name) {
+						err := UpdateField(&v, true )
+						if err != nil {
+							return err
+						}
+					regSchema.Data = append(regSchema.Data, v)
+				}
+			}
+		}	
 	}
 	_, err = api.UpdateRegField(regSchema)
 	if err != nil {
@@ -175,7 +204,9 @@ func UpdateField(field *api.Schema, isAdvance bool) error {
 			return err
 		}
 		field.Type = api.TypeMap[ind].Name
-
+		if(field.Type == ""){
+			field.Type = "string"
+		}
 		if api.TypeMap[ind].ShouldDisplayValidaitonRuleInput {
 			if err := prompt.SurveyAskOne(&survey.Input{
 				Message: "Enter the validation string \nCheckout how to use validation rules - https://www.loginradius.com/docs/libraries/js-libraries/javascript-hooks/#customvalidationhook16",
@@ -214,13 +245,20 @@ func UpdateField(field *api.Schema, isAdvance bool) error {
 		}
 	}
 	var rule string
-	if !optional {
+	if !optional && !strings.Contains(field.Rules, "required") {
 		rule = "required"
 		if field.Rules != "" { 
 			rule = "|required" 
 		}
 		
 		field.Rules += rule
+	} else {
+		 if field.Rules == "required" {
+			rule = ""
+		} else if field.Rules != "" {
+			rule = strings.Replace(field.Rules, "|required", "",1)
+		}
+		field.Rules = rule
 	}
 	return nil
 
@@ -234,5 +272,6 @@ func generateCFDefault(fieldName string) api.Schema {
 	field.Options = nil
 	field.Rules = ""
 	field.Type = "string"
+	field.Permission = "w"
 	return field
 }

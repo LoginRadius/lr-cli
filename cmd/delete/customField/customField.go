@@ -32,10 +32,13 @@ func NewDeleteCFCmd() *cobra.Command {
 }
 
 func delete() error {
-	regfields, err := api.GetRegistrationFields()
+	regfields, err := api.GetAllCustomFields()
+	if err != nil {
+		return err
+	}
 	var options []string
-	for i := 0; i < len(regfields.Data.CustomFields); i++ {
-		options = append(options, regfields.Data.CustomFields[i].Display)
+	for i := 0; i < len(regfields.Data); i++ {
+		options = append(options, regfields.Data[i].Display)
 	}
 
 	var ind int
@@ -53,7 +56,7 @@ func delete() error {
 	}
 
 	if shouldDelete {
-		isDeleted, err := api.DeleteCustomField(regfields.Data.CustomFields[ind].Key)
+		isDeleted, err := api.DeleteCustomField(regfields.Data[ind].Key)
 		if err != nil {
 			return err
 		}

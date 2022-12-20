@@ -108,24 +108,27 @@ type Schema struct {
 	Options []OptSchema `json:"Options"`
 	Rules   string      `json:"Rules"`
 	Type    string      `json:"Type"`
+	Permission string `json:"Permission"`
+	Parent string `json:"Parent"`
 }
 type OptSchema struct {
 	Value string `json:"value"`
 	Text  string `json:"text"`
 }
 
-type CustomFieldSchema struct {
+type CustomSchema struct {
 	Key     string `json:"Key"`
 	Display string `json:"Display"`
 }
 
-type FieldSchema struct {
-	CustomFields       []CustomFieldSchema `json:"customFields"`
-	RegistrationFields map[string]Schema   `json:"registrationFields"`
-}
 type RegistrationSchema struct {
-	Data FieldSchema `json:"data"`
+	Data []Schema `json:"data"`
 }
+
+type CustomFieldSchema struct {
+	Data []CustomSchema `json:"data"`
+}
+
 type AddCFRespSchema struct {
 	ResponseAddCustomField struct {
 		Data []CustomFieldSchema `json:"Data"`
@@ -136,7 +139,7 @@ type AddCFRespSchema struct {
 	} `json:"responseAddCustomField"`
 }
 type UpdateRegFieldSchema struct {
-	Fields []Schema `json:"fields"`
+	Data []Schema `json:"data"`
 }
 
 type PasswordlessLogin struct {
@@ -147,8 +150,25 @@ type CustomFieldLimit struct {
 	Limit int `json:"CustomFieldLimit"`
 }
 
-func GetRegistrationFields() (*RegistrationSchema, error) {
-	url := conf.AdminConsoleAPIDomain + "/platform-configuration/registration-schema"
+
+func GetAllCustomFields() (*CustomFieldSchema, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/custom-fields?d="
+
+	var resultResp CustomFieldSchema
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resultResp, nil
+}
+
+func GetAllRegistrationFields() (map[string]Schema, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/platform-registration-fields?d="
 
 	var resultResp RegistrationSchema
 	resp, err := request.Rest(http.MethodGet, url, nil, "")
@@ -160,8 +180,37 @@ func GetRegistrationFields() (*RegistrationSchema, error) {
 	if err != nil {
 		return nil, err
 	}
+	provMap := make(map[string]Schema, len(resultResp.Data))
 
-	return &resultResp, nil
+	for _ ,value := range resultResp.Data {
+		if value.Parent == "" {
+			provMap[strings.ToLower(value.Name)] = value
+		}
+	}
+
+
+	return provMap, nil
+}
+
+
+func GetRegistrationFields() (map[string]Schema, error) {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/registration-form-settings?d="
+
+	var resultResp RegistrationSchema
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	provMap := make(map[string]Schema, len(resultResp.Data))
+
+	for _ ,value := range resultResp.Data {
+		provMap[strings.ToLower(value.Name)] = value
+	}
+	return provMap, nil
 }
 
 func GetCustomFieldLimit() (*CustomFieldLimit, error) {
@@ -222,7 +271,7 @@ func DeleteCustomField(field string) (*bool, error) {
 }
 
 func UpdateRegField(data UpdateRegFieldSchema) (*RegistrationSchema, error) {
-	url := conf.AdminConsoleAPIDomain + "/platform-configuration/registration-schema"
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/default-fields?d="
 	body, _ := json.Marshal(data)
 	var resultResp RegistrationSchema
 	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
