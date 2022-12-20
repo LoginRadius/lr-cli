@@ -153,10 +153,6 @@ func GetAppsInfo() (map[int64]SitesReponse, error) {
 			return nil, err
 		}
 		return storeSiteInfo(Apps), nil
-	
-	var siteInfo map[int64]SitesReponse
-	err = json.Unmarshal(data, &siteInfo)
-	return siteInfo, nil
 }
 
 func CurrentID() (int64, error) {
