@@ -133,6 +133,31 @@ type VerifySmtpConfigError struct {
 	Message 		string		`json:"message"`
 }
 
+type SmtpConfigSchema struct {
+	FromEmailId     string		`json:"FromEmailId"`
+	FromName    	string		`json:"FromName"`
+	IsSsl   		bool        `json:"IsSsl"`
+	Key      		string      `json:"Key"`
+	Password 		string      `json:"Password"`
+	Provider    	string		`json:"provider"`
+	Secret     		string      `json:"Secret"`
+	SmtpHost     	string      `json:"SmtpHost"`
+	SmtpPort     	int         `json:"SmtpPort"`
+	UserName     	string      `json:"UserName"`
+}
+
+type VerifySmtpConfigSchema struct {
+	SmtpConfigSchema
+	EmailId 		string		`json:"emailId"`
+	Message 		string		`json:"message"`
+	Subject 		string		`json:"subject"`
+}
+
+type VerifySmtpConfigError struct {
+	Description 		string		`json:"description"`
+	Message 		string		`json:"message"`
+}
+
 func GetSites() (*SitesReponse, error) {
 	var url string
 	url = conf.AdminConsoleAPIDomain + "/deployment/sites?ownerUid=&"
