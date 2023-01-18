@@ -20,6 +20,8 @@ var conf = config.GetInstance()
 
 var DomainValidation = regexp.MustCompile(`^((([\S]+:\/\/?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]*|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-]*)?\??(?:[-\+=&;%@.\w]*)#?(?:[\w]*))?)`)
 
+var AccessRestrictionDomain = regexp.MustCompile(`^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\")){0,}@{0,1}((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$`)
+
 type ThemeType struct {
 	PageType     string        `json:"PageType"`
 	CustomCss    []string      `json:"CustomCss"`

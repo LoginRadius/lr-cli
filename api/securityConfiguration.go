@@ -14,6 +14,20 @@ type ResetResponse struct {
 	XToken string `json:"xtoken"`
 }
 
+type EmailResponse struct {
+	Domains []string `json:"Domains"`
+	ListType  string `json:"ListType"`
+	RegistrationType string `json:"RegistrationType"`
+}
+
+type RegistrationRestrictionTypeSchema struct {
+	SelectedRestrictionType string `json:"selectedRestrictionType"`
+}
+
+type EmailWhiteBLackListSchema struct {
+	Domains []string `json:"Domains"`
+}
+
 func ResetSecret() error {
 
 	// Restting the Secret
@@ -58,4 +72,41 @@ func ResetSecret() error {
 	_ = cmdutil.WriteFile("token.json", lInfo)
 	return nil
 
+}
+
+func GetEmailWhiteListBlackList() (*EmailResponse, error) {
+	
+	url := conf.AdminConsoleAPIDomain + "/security-configuration/restriction/config?"
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	var resObj EmailResponse
+	err = json.Unmarshal(resp, &resObj)
+	if err != nil {
+		return nil, err
+	}
+	return &resObj, nil
+
+}
+
+func AddEmailWhitelistBlacklist(restrictionType RegistrationRestrictionTypeSchema, data EmailWhiteBLackListSchema) error {
+	typeUrl := conf.AdminConsoleAPIDomain + "/security-configuration/restriction/type?"
+	body, _ := json.Marshal(restrictionType)
+	_, err := request.Rest(http.MethodPut, typeUrl, nil, string(body))
+	
+	if err != nil {
+		return err
+	}
+
+	if restrictionType.SelectedRestrictionType != "none" {
+		domainUrl := conf.AdminConsoleAPIDomain + "/security-configuration/restriction/config?"
+		body, _ := json.Marshal(data)
+		_, err := request.Rest(http.MethodPost, domainUrl, nil, string(body))
+		
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
