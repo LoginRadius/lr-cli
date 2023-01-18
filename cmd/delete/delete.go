@@ -9,6 +9,7 @@ import (
 
 	"github.com/loginradius/lr-cli/cmd/delete/social"
 	"github.com/loginradius/lr-cli/cmd/delete/accessRestriction"
+	"github.com/loginradius/lr-cli/cmd/delete/smtpConfiguration"
 
 	"github.com/spf13/cobra"
 )
@@ -47,6 +48,9 @@ func NewdeleteCmd() *cobra.Command {
 
 	accessRestrictionCmd := accessRestriction.NewaccessRestrictionCmd()
 	cmd.AddCommand(accessRestrictionCmd)
+
+	smtpConfigurationCmd := smtpConfiguration.NewsmtpConfigurationCmd()
+	cmd.AddCommand(smtpConfigurationCmd)
 
 	return cmd
 }

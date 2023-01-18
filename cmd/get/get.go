@@ -16,6 +16,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/get/social"
 	"github.com/loginradius/lr-cli/cmd/get/theme"
 	"github.com/loginradius/lr-cli/cmd/get/accessRestriction"
+	"github.com/loginradius/lr-cli/cmd/get/smtpConfiguration"
 
 	"github.com/spf13/cobra"
 )
@@ -70,5 +71,7 @@ func NewGetCmd() *cobra.Command {
 	accessRestrictionCmd := accessRestriction.NewaccessRestrictionCmd()
 	cmd.AddCommand(accessRestrictionCmd)
 
+	smtpConfigurationCmd := smtpConfiguration.NewsmtpConfigurationCmd()
+	cmd.AddCommand(smtpConfigurationCmd)
 	return cmd
 }
