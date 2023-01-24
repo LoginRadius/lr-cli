@@ -24,14 +24,15 @@ func NewaccessRestrictionCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "access-restriction",
-		Short: "Deletes whitelisted/blacklisted domain/emails",
-		Long:  `Use this command to remove the whitelisted/blacklisted domain/emails.`,
-		Example: heredoc.Doc(`$ lr delete access-restriction --blacklist-domain <domain>
-		<Type> domains/emails have been updated"
+		Short: "Deletes Whitelisted/Blacklisted Domains/Emails",
+		Long:  `Use this command to remove the whitelisted/blacklisted Domains/Emails.`,
+		Example: heredoc.Doc(`
+		$ lr delete access-restriction --blacklist-domain <domain>
+		Blacklist Domains/Emails have been updated successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.BlacklistDomain == "" && opts.WhitelistDomain == "" {
-				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
+				return &cmdutil.FlagError{Err: errors.New("`domain` is a required argument")}
 			}
 
 			resp, err := api.GetEmailWhiteListBlackList()
@@ -39,7 +40,7 @@ func NewaccessRestrictionCmd() *cobra.Command {
 				return err
 			}
 			if (resp.ListType == "WhiteList" && opts.BlacklistDomain != "") || (resp.ListType == "BlackList" && opts.WhitelistDomain != "") {
-				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email Not Found. As " + resp.ListType + " Restriction Type is selected. You can change it via `lr add access-restriction`" )}
+				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email was not found. As the " + resp.ListType + " restriction type is selected, you can change it by using the command `lr add access-restriction`" )}
 
 			} 
 			var domain string
@@ -62,6 +63,9 @@ func NewaccessRestrictionCmd() *cobra.Command {
 					break
 				}
 			}
+			if len(newDomains) == 0 {
+				return &cmdutil.FlagError{Err: errors.New("You cannot delete all Domains/Emails. At least one must be retained on the whitelist/blacklist.")}
+			}
 			delete(resp.ListType, newDomains)
 			return nil
 
@@ -83,6 +87,6 @@ func delete(listType string, domain []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(listType + " domains/emails have been updated" )
+	fmt.Println(listType + " Domains/Emails have been updated successfully" )
 	return nil
 }

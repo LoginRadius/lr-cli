@@ -13,9 +13,10 @@ func NewaccessRestrictionCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "access-restriction",
-		Short: "Gets whitelisted/blacklisted domains/emails",
-		Long:  `Use this command to get the list of the whitelist/blacklist domains/emails.`,
-		Example: heredoc.Doc(`$ lr get access-restriction
+		Short: "Gets whitelisted/blacklisted Domains/Emails",
+		Long:  `Use this command to get the list of the whitelist/blacklist Domains/Emails`,
+		Example: heredoc.Doc(`
+		$ lr get access-restriction
 		WhiteList/Blacklist Domains/Emails
 		1. http://localhost
 		...

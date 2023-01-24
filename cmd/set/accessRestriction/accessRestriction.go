@@ -25,18 +25,19 @@ func NewaccessRestrictionCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "access-restriction",
-		Short: "Updates whitelisted/blacklisted domain/emails",
-		Long:  `Use this command to update the whitelisted/blacklisted domains/emails.`,
-		Example: heredoc.Doc(`$ lr set access-restriction --blacklist-domain <old-domain> --new-domain <new-domain>
-		<Type> domains/emails have been updated
+		Short: "Updates whitelisted/blacklisted Domains/Emails",
+		Long:  `Use this command to update the whitelisted/blacklisted Domains/Emails.`,
+		Example: heredoc.Doc(`
+		$ lr set access-restriction --blacklist-domain <old-domain> --new-domain <new-domain>
+		Blacklist Domains/Emails have been updated successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.BlacklistDomain == "" && opts.WhitelistDomain == "" {
-				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
+				return &cmdutil.FlagError{Err: errors.New("`domain` is a required argument ")}
 			}
 
 			if opts.DomainMod == "" {
-				return &cmdutil.FlagError{Err: errors.New("`new-domain` is required argument")}
+				return &cmdutil.FlagError{Err: errors.New("`new-domain` is a required argument")}
 			}
 
 			resp, err := api.GetEmailWhiteListBlackList()
@@ -44,7 +45,7 @@ func NewaccessRestrictionCmd() *cobra.Command {
 				return err
 			}
 			if (resp.ListType == "WhiteList" && opts.BlacklistDomain != "") || (resp.ListType == "BlackList" && opts.WhitelistDomain != "") {
-				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email Not Found. As " + resp.ListType + " Restriction Type is selected. You can change it via `lr add access-restriction`" )}
+				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email was not found. As the " + resp.ListType + " restriction type is selected, you can change it by using the command `lr add access-restriction`" )}
 			} 
 			var domain string
 			if opts.BlacklistDomain != "" {
@@ -58,12 +59,12 @@ func NewaccessRestrictionCmd() *cobra.Command {
 				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email not found")}
 			}
 			if !cmdutil.AccessRestrictionDomain.MatchString(opts.DomainMod)  {
-				return &cmdutil.FlagError{Err: errors.New("Domain/Email field is invalid")}
+				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email field is invalid")}
 			}
 			
 			_, found = cmdutil.Find(resp.Domains, opts.DomainMod)
 			if found {
-				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email is already added")}
+				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email has already been added")}
 			}
 			var newDomains []string
 			newDomains = resp.Domains
@@ -77,7 +78,7 @@ func NewaccessRestrictionCmd() *cobra.Command {
 	fl := cmd.Flags()
 	fl.StringVarP(&opts.BlacklistDomain, "blacklist-domain", "b", "", "Enter Old Blacklist Domain/Email Value")
 	fl.StringVarP(&opts.WhitelistDomain, "whitelist-domain", "w", "", "Enter Old Whitelist Domain/Email Value")
-	fl.StringVarP(&opts.DomainMod, "new-domain", "n", "", "Enter New Domain Value")
+	fl.StringVarP(&opts.DomainMod, "new-domain", "n", "", "Enter New Domain/Email Value")
 
 	return cmd
 }
@@ -91,6 +92,6 @@ func set(listType string, domain []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(listType + " domains/emails have been updated" )
+	fmt.Println(listType + " Domains/Emails have been updated successfully" )
 	return nil
 }
