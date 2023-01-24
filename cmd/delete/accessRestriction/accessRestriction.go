@@ -64,7 +64,7 @@ func NewaccessRestrictionCmd() *cobra.Command {
 				}
 			}
 			if len(newDomains) == 0 {
-				return &cmdutil.FlagError{Err: errors.New("You cannot delete all Domains/Emails. At least one must be retained on the whitelist/blacklist.")}
+				resp.ListType = "none"
 			}
 			delete(resp.ListType, newDomains)
 			return nil
@@ -87,6 +87,10 @@ func delete(listType string, domain []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(listType + " Domains/Emails have been updated successfully" )
+	if listType == "none" {
+		fmt.Println("Access restrictions have been disabled" )
+	} else {
+		fmt.Println(listType + " Domains/Emails have been updated successfully" )
+	}
 	return nil
 }
