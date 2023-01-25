@@ -49,6 +49,28 @@ type SitesReponse struct {
 	} `json:"ProductPlan"`
 }
 
+type SharedSitesReponse struct {
+	Appname               string      `json:"AppName"`
+	Domain                string      `json:"Domain"`
+	Appid                 int64       `json:"AppId"`
+	AppKey           	  string      `json:"ApiKey"`
+	AppSecret             string      `json:"ApiSecret"`
+	Role                  []string    `json:"Role"`
+	AdditionalPermissions []string 	  `json:"AdditionalPermissions"`
+	Recurlyaccountcode    *string     `json:"RecurlyAccountCode"`
+	Userlimit             int         `json:"UserLimit"`
+	Domainlimit           int         `json:"DomainLimit"`
+	Apiversion            string      `json:"ApiVersion"`
+	Israasenabled         bool        `json:"IsRaasEnabled"`
+	Ownerid               string      `json:"OwnerId"`
+	Productplan           *struct {
+		Name         string      `json:"Name"`
+		Expirytime   time.Time   `json:"ExpiryTime"`
+		Billingcycle interface{} `json:"BillingCycle"`
+		Fromdate     interface{} `json:"FromDate"`
+	} `json:"ProductPlan"`
+}
+
 type HostedPageResponse struct {
 	Pages []struct {
 		Pagetype     string        `json:"PageType"`
@@ -81,6 +103,9 @@ type CoreAppData struct {
 	Apps struct {
 		Data []SitesReponse `json:"Data"`
 	} `json:"apps"`
+	SharedApps struct {
+		Data []SharedSitesReponse `json:"Data"`
+	} `json:"sharedApps"`
 }
 
 type SmtpConfigSchema struct {

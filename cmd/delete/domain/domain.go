@@ -30,7 +30,7 @@ func NewdomainCmd() *cobra.Command {
 		Short: "Deletes a domain",
 		Long:  `Use this command to remove the whitelisted domain from your app.`,
 		Example: heredoc.Doc(`$ lr delete domain --domain <domain>
-		<doamin> is now removed from whitelisted domain."
+		<domain> is now removed from whitelisted domain."
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.Domain == "" {
