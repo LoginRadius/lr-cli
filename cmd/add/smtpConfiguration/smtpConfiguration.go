@@ -28,22 +28,20 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 		Use:   "smtp-configuration",
 		Short: "Add a SMTP configuration",
 		Long:  `Configure your SMTP email settings to allow LoginRadius to send email from your email server automatically.`,
-		Example: heredoc.Doc(`$ lr add smtp-configuration
-		SMTP Providers : <Provider>
-(If you dont have mailazy account. Please Create a mailazy account via https://app.mailazy.com/signup)(only for mailazy)
-? Key: dgfdfg? Key: <Key>(only for mailazy)
-? Secret: <Secret>(only for mailazy)
-? From Name: <Name>
-? From Email Id: <Email ID>
-
-? SMTP User Name: <User name>(not for mailazy)
-? SMTP Password: <Password>(not for mailazy)
-? Enable SSL(Y/N): Yes(not for mailazy)
-
-SMTP settings saved
-? Configure and send an email to verify your configuration settings are correct (Y/N): Yes
-? To Email : <Email ID for Verification>
-SMTP settings are verified
+		Example: heredoc.Doc(`
+		$ lr add smtp-configuration
+		SMTP Providers: Mailazy
+		If you don't have a mailazy account. Please Create a mailazy account via https://app.mailazy.com/signup
+		? Key: <Key>
+		? Secret: <Secret>
+		? From Name: <Name>
+		? From Email Id: <Email ID>
+		
+		SMTP settings are saved
+		
+		? Send an email to verify your configuration settings are correct (Y/N): Yes
+		? To Email: <Email ID for Verification>
+		SMTP settings are verified
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return addAccessRestriction()
@@ -61,9 +59,9 @@ func addAccessRestriction() error {
 	var num int
 	var isSsl bool
 	var isMailazy bool 
-	num = len(cmdutil.SMTP_PROVIDERS)
+	num = len(cmdutil.SmtpProviders)
 	for i := 0; i < num; i++ { 
-		smtpProviders = append(smtpProviders, cmdutil.SMTP_PROVIDERS[i].Name)
+		smtpProviders = append(smtpProviders, cmdutil.SmtpProviders[i].Name)
 	}
 	for _,val := range smtpLabels {
 		
@@ -76,8 +74,8 @@ func addAccessRestriction() error {
 					return err
 				}					
 		} else if val == "IsSsl" && num != 0 {
-			isSsl = cmdutil.SMTP_PROVIDERS[num].EnableSSL
-			if err := prompt.Confirm(cmdutil.SmtpOptionNames[val] + "(Y/N):", 
+			isSsl = cmdutil.SmtpProviders[num].EnableSSL
+			if err := prompt.Confirm(cmdutil.SmtpOptionNames[val] + ":", 
 						&isSsl); err != nil {
 							return err
 			}
@@ -95,7 +93,7 @@ func addAccessRestriction() error {
 				var promptRes string
 				
 				if  val == "Key" {
-					fmt.Println("(If you dont have mailazy account. Please Create a mailazy account via https://app.mailazy.com/signup)")
+					fmt.Println("(If you don't have a mailazy account. Please Create a mailazy account via https://app.mailazy.com/signup)")
 				}
 				prompt.SurveyAskOne(&survey.Input{
 					Message: cmdutil.SmtpOptionNames[val] + ":",
@@ -105,12 +103,12 @@ func addAccessRestriction() error {
 					return errors.New(cmdutil.SmtpOptionNames[val] + " is required")
 				}
 				if val == "FromEmailId" && !cmdutil.ValidateEmail.MatchString(promptRes)  {
-					return &cmdutil.FlagError{Err: errors.New("Email has invalid format.")}
+					return &cmdutil.FlagError{Err: errors.New("Invalid email format")}
 				}
 				if val == "SmtpPort" {
 					smtpPort, err := strconv.ParseInt(promptRes, 10, 64)
 					if err != nil  {
-						return &cmdutil.FlagError{Err: errors.New("Please enter valid SMTP Port")}
+						return &cmdutil.FlagError{Err: errors.New("Please enter the valid SMTP Port")}
 					}
 					field.SetInt(smtpPort)
 				} else {
@@ -134,12 +132,12 @@ func addAccessRestriction() error {
 	  }
 	  smtpSchema.UserName = smtpSchema.Key
 	  smtpSchema.Password = smtpSchema.Secret
-	  smtpSchema.IsSsl = cmdutil.SMTP_PROVIDERS[num].EnableSSL
+	  smtpSchema.IsSsl = cmdutil.SmtpProviders[num].EnableSSL
 
 	  } else if num != 9 {
 		var err error
-		smtpSchema.SmtpHost = cmdutil.SMTP_PROVIDERS[num].SmtpHost
-		smtpSchema.SmtpPort,err = strconv.Atoi(cmdutil.SMTP_PROVIDERS[num].SmtpPort) 
+		smtpSchema.SmtpHost = cmdutil.SmtpProviders[num].SmtpHost
+		smtpSchema.SmtpPort,err = strconv.Atoi(cmdutil.SmtpProviders[num].SmtpPort) 
 		if err != nil {
 			return err
 		}
@@ -149,10 +147,10 @@ func addAccessRestriction() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("SMTP settings saved")
+	fmt.Println("SMTP settings are saved")
 	var verify bool 
 	
-	if err := prompt.Confirm("Configure and send an email to verify your configuration settings are correct (Y/N):", 
+	if err := prompt.Confirm("Send an email to verify your configuration settings are correct?", 
 		&verify); err != nil {
 			return err
 	}
@@ -165,6 +163,10 @@ func addAccessRestriction() error {
 	prompt.SurveyAskOne(&survey.Input{
 		Message:  "To Email :",
 	}, &emailid, survey.WithValidator(survey.Required))
+
+	if !cmdutil.ValidateEmail.MatchString(emailid)  {
+		return &cmdutil.FlagError{Err: errors.New("Invalid email format")}
+	}
 	
 	var respMap map[string]string
 	data, _ := json.Marshal(smtpSchema)
@@ -182,9 +184,12 @@ func addAccessRestriction() error {
 	verifySchema.Message = "This is the test email to validate your SMTP credentials for LoginRadius' User Registration feature on your website. <br><br>The SMTP server credentials are verified.<br><br>Thank you,<br>LoginRadius Team"
 	verifySchema.Subject = "Test Email - LoginRadius"
 	verifySchema.SmtpPort = smtpSchema.SmtpPort
+	verifySchema.IsSsl = smtpSchema.IsSsl
+
 	err = api.VerifySMTPConfiguration(verifySchema) 
 	if err != nil {
-		return err
+		fmt.Println("Error: " + strings.Replace(err.Error(), "Learn more at", "", 1))
+		return nil
 	}
 	fmt.Println("SMTP settings are verified")
 

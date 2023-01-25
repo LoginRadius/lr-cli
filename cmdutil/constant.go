@@ -233,7 +233,7 @@ var Theme5Auth = ThemeType{
 	Status:       "4",
 }
 
-var SMTP_PROVIDERS = map[int]SmtpProviderSchema {
+var SmtpProviders = map[int]SmtpProviderSchema {
     0: {
       Name: "Mailazy",
       Display: "Mailazy",

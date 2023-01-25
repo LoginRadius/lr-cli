@@ -19,17 +19,13 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 		Use:   "smtp-configuration",
 		Short: "Gets SMTP Configuration",
 		Long:  `Use this command to get the your SMTP email setting Configuration`,
-		Example: heredoc.Doc(`$ lr get smtp-configuration
-		SMTP Providers: <Provider>
-SMTP Host: <Host>(Not for mailazy)
-SMTP Port: <Port>(Not for mailazy)
-
-Key: <Key>(only for mailazy)
-Secret: <Secret>(only for mailazy)
-From Name: <Name>
-From Email Id: <Email ID>
-SMTP User Name: <User Name>(Not for mailazy)
-Enable SSL: true(Not for mailazy)
+		Example: heredoc.Doc(`
+		$ lr get smtp-configuration
+		SMTP Providers: Mailazy
+		Key: <Key>
+		Secret: <Secret>
+		From Name: <Name>
+		From Email Id: <Email ID>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var smtpLabels = [] string {"Provider","Key","Secret", "SmtpHost", "SmtpPort",
@@ -45,12 +41,12 @@ Enable SSL: true(Not for mailazy)
 			var respMap map[string]string
 			data, _ := json.Marshal(resp)
 			json.Unmarshal(data, &respMap)
+
 			var providerlen int
-			for i, v := range cmdutil.SMTP_PROVIDERS {
-				if v.SmtpHost == respMap["SmtpHost"] {
+			providerlen = len(cmdutil.SmtpProviders) - 1 
+			for i, v := range cmdutil.SmtpProviders {
+				if v.SmtpHost == resp.SmtpHost {
 					providerlen = i
-				} else if respMap["Provider"] == "" {
-					providerlen = 9
 				}
 			}
 			var isDisplayed bool
@@ -67,7 +63,7 @@ Enable SSL: true(Not for mailazy)
 					newVal = strings.Split(strings.Split(respMap[val], "<")[1], ">")[0] 
 				} else if val == "Provider" {
 					if resp.Provider == "" {
-						newVal = cmdutil.SMTP_PROVIDERS[providerlen].Name
+						newVal = cmdutil.SmtpProviders[providerlen].Name
 					} else {
 						newVal = resp.Provider
 					}

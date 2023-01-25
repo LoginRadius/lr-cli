@@ -1,12 +1,11 @@
 package set
 
 import (
-	"github.com/loginradius/lr-cli/cmd/set/accountPassword"
+	// "github.com/loginradius/lr-cli/cmd/set/accountPassword"
 	"github.com/loginradius/lr-cli/cmd/set/domain"
 	"github.com/loginradius/lr-cli/cmd/set/schema"
 	"github.com/loginradius/lr-cli/cmd/set/social"
 	"github.com/loginradius/lr-cli/cmd/set/theme"
-	"github.com/loginradius/lr-cli/cmd/set/accessRestriction"
 	"github.com/loginradius/lr-cli/cmd/set/smtpConfiguration"
 
 	"github.com/spf13/cobra"
@@ -32,14 +31,11 @@ func NewsetCmd() *cobra.Command {
 	schemaCmd := schema.NewSetSchemaCmd()
 	cmd.AddCommand(schemaCmd)
 
-	accountPasswordCmd := accountPassword.NewaccountPasswordCmd()
-	cmd.AddCommand(accountPasswordCmd)
+	// accountPasswordCmd := accountPassword.NewaccountPasswordCmd()
+	// cmd.AddCommand(accountPasswordCmd)
 
 	socialCmd := social.NewsocialCmd()
 	cmd.AddCommand(socialCmd)
-
-	accessRestrictionCmd := accessRestriction.NewaccessRestrictionCmd()
-	cmd.AddCommand(accessRestrictionCmd)
 
 	smtpConfigurationCmd := smtpConfiguration.NewsmtpConfigurationCmd()
 	cmd.AddCommand(smtpConfigurationCmd)

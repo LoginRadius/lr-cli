@@ -18,7 +18,7 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 		Short: "Delete/Reset the SMTP Configuration",
 		Long:  `Use this command to remove/reset the configured SMTP email setting.`,
 		Example: heredoc.Doc(`$ lr delete smtp-configuration
-		Settings have been reset
+		Settings have been reset successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			
@@ -26,7 +26,7 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 			if err != nil {
 				return nil
 			}
-			fmt.Println("Settings have been reset")
+			fmt.Println("Settings have been reset successfully")
 			return nil
 
 		},

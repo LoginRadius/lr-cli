@@ -28,15 +28,16 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 		Long:  `Use this command to update the configured SMTP email setting`,
 		Example: heredoc.Doc(`
 		# SMTP Provider's Names we can use in set commands
-		# Mailazy, AmazonSES-USEast, AmazonSES-USWest, AmazonSES-EU, Gmail, Mandrill, Rackspace-mailgun, SendGrid, Yahoo, Other	 
+		# Mailazy, AmazonSES-USEast, AmazonSES-USWest, AmazonSES-EU, Gmail, 
+		Mandrill, Rackspace-mailgun, SendGrid, Yahoo, Other
 		$ lr set smtp-configuration -p Mailazy
 		? Key: <Key>
 		? Secret: <Secret>
 		? From Name: <Name>
-		? From Email Id: <Email ID>
-
+		? From Email Id: <Email ID>		
 		SMTP settings updated
-		? Configure and send an email to verify your configuration settings are correct (Y/N): Yes
+			   
+		? Send an email to verify your configuration settings are correct?(Y/N): Yes
 		? To Email : <Email ID for Verification>
 		SMTP settings are verified
 		`),
@@ -56,27 +57,34 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 func update(provider string) error {
 	var ok bool
 	var num int
-	for i, val := range cmdutil.SMTP_PROVIDERS {
-		if strings.ToLower(val.Display) == strings.ToLower(provider){
-			ok = true
+	
+	resp, err := api.GetSMTPConfiguration()
+	if err != nil {
+		return err
+	}
+	var isCustomProvider bool
+	for i, val := range cmdutil.SmtpProviders {
+		if strings.ToLower(val.Display) == strings.ToLower(provider) {
+			ok = true 
 			num = i
+		} 
+		if resp.SmtpHost ==  val.SmtpHost {
+			isCustomProvider = true
 		}
 	}
 	if !ok {
-		return errors.New("SMTP Provider not found.")
+		return errors.New("SMTP Provider is not found.")
 	} 
-	resp, err := api.GetSMTPConfiguration()
-			if err != nil {
-				return err
-			}
-	if strings.ToLower(resp.Provider) == strings.ToLower(cmdutil.SMTP_PROVIDERS[num].Name) || 
-	resp.SmtpHost ==  cmdutil.SMTP_PROVIDERS[num].SmtpHost || num == 9 {
+			
+	if resp.FromEmailId != "" && 
+		(strings.ToLower(resp.Provider) == strings.ToLower(cmdutil.SmtpProviders[num].Name) || 
+		resp.SmtpHost ==  cmdutil.SmtpProviders[num].SmtpHost || (num == 9 && !isCustomProvider))  {
 		ok = true
 	} else {
 		ok = false
 	}
 	if !ok {
-		return errors.New("Configuration for the selected provider not found.")
+		return errors.New("The configuration for the selected provider is not found.")
 	} 
 	var smtpSchema api.SmtpConfigSchema 
 	var smtpLabels = [] string {"Key","Secret","SmtpHost","SmtpPort",
@@ -87,8 +95,8 @@ func update(provider string) error {
 	for _,val := range smtpLabels {
 		
 		if val == "IsSsl" && strings.ToLower(provider) != "mailazy" {
-			isSsl = cmdutil.SMTP_PROVIDERS[num].EnableSSL
-			if err := prompt.Confirm(cmdutil.SmtpOptionNames[val] + "(Y/N):", 
+			isSsl = cmdutil.SmtpProviders[num].EnableSSL
+			if err := prompt.Confirm(cmdutil.SmtpOptionNames[val] + ":", 
 						&isSsl); err != nil {
 							return err
 			}
@@ -131,7 +139,7 @@ func update(provider string) error {
 				}
 				
 				if val == "FromEmailId" && !cmdutil.ValidateEmail.MatchString(promptRes)  {
-					return &cmdutil.FlagError{Err: errors.New("Email has invalid format.")}
+					return &cmdutil.FlagError{Err: errors.New("Invalid email format")}
 				}
 				if val == "SmtpPort" {
 					smtpPort, err := strconv.ParseInt(promptRes, 10, 64)
@@ -145,16 +153,16 @@ func update(provider string) error {
 			}
 		}
 	}
+	smtpSchema.IsSsl = isSsl
 	if num != 9 {
 		smtpSchema.Provider = provider
-		smtpSchema.IsSsl = isSsl
 		smtpSchema.SmtpHost = resp.SmtpHost
 		smtpSchema.SmtpPort = resp.SmtpPort
 	}
 	
 	if strings.ToLower(provider) == "mailazy"  {
-		smtpSchema.UserName = resp.Key
-		smtpSchema.Password = resp.Secret
+		smtpSchema.UserName = smtpSchema.Key
+		smtpSchema.Password = smtpSchema.Secret
 		smtpSchema.IsSsl = resp.IsSsl
 		
 	}
@@ -163,10 +171,10 @@ func update(provider string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("SMTP settings updated")
+	fmt.Println("SMTP settings are updated")
 	var verify bool 
 	
-	if err := prompt.Confirm("Configure and send an email to verify your configuration settings are correct (Y/N):", 
+	if err := prompt.Confirm(" Send an email to verify your configuration settings are correct?", 
 		&verify); err != nil {
 			return err
 	}
@@ -181,15 +189,13 @@ func update(provider string) error {
 	}, &emailid, survey.WithValidator(survey.Required))
 	
 	if !cmdutil.ValidateEmail.MatchString(emailid)  {
-		return &cmdutil.FlagError{Err: errors.New("Email has invalid format.")}
+		return &cmdutil.FlagError{Err: errors.New("Invalid email format")}
 	}
 
 	var respMap map[string]string
 	data, _ := json.Marshal(smtpSchema)
 	json.Unmarshal(data, &respMap)
 
-	smtpLabels = append(smtpLabels, "SmtpHost")
-	smtpLabels = append(smtpLabels, "SmtpPort")
 
 	for _, val := range smtpLabels {
 		if val != "IsSsl" && val != "SmtpPort" {
@@ -203,10 +209,14 @@ func update(provider string) error {
 	verifySchema.Message = "This is the test email to validate your SMTP credentials for LoginRadius' User Registration feature on your website. <br><br>The SMTP server credentials are verified.<br><br>Thank you,<br>LoginRadius Team"
 	verifySchema.Subject = "Test Email - LoginRadius"
 	verifySchema.SmtpPort = smtpSchema.SmtpPort
+	verifySchema.IsSsl = smtpSchema.IsSsl
+
 	err = api.VerifySMTPConfiguration(verifySchema) 
 	if err != nil {
-		return err
+		fmt.Println("Error: " + strings.Replace(err.Error(), "Learn more at", "", 1))
+		return nil
 	}
+	
 	fmt.Println("SMTP settings are verified")
 	
 
