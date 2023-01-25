@@ -6,6 +6,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/set/schema"
 	"github.com/loginradius/lr-cli/cmd/set/social"
 	"github.com/loginradius/lr-cli/cmd/set/theme"
+	"github.com/loginradius/lr-cli/cmd/set/accessRestriction"
 
 	"github.com/spf13/cobra"
 )
@@ -35,6 +36,9 @@ func NewsetCmd() *cobra.Command {
 
 	socialCmd := social.NewsocialCmd()
 	cmd.AddCommand(socialCmd)
+
+	accessRestrictionCmd := accessRestriction.NewaccessRestrictionCmd()
+	cmd.AddCommand(accessRestrictionCmd)
 
 	return cmd
 }
