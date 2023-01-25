@@ -208,7 +208,11 @@ func GetRegistrationFields() (map[string]Schema, error) {
 	provMap := make(map[string]Schema, len(resultResp.Data))
 
 	for _ ,value := range resultResp.Data {
-		provMap[strings.ToLower(value.Name)] = value
+		if !strings.Contains(value.Name, "cf") {
+			provMap[strings.ToLower(value.Name)] = value
+		} else {
+			provMap[value.Name] = value
+		}
 	}
 	return provMap, nil
 }

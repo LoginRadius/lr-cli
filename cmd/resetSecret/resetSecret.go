@@ -5,6 +5,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/api"
+	"github.com/loginradius/lr-cli/prompt"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +30,16 @@ func NewResetCmd() *cobra.Command {
 			API Secret reset successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return reset()
+			var shouldReset bool
+			if err := prompt.Confirm("If you change or reset the API secret, any API calls you have developed will stop working until you update them with your new key", 
+						&shouldReset); err != nil {
+							return err
+			}
+			if shouldReset {
+				return reset()
+			} else {
+				return nil
+			}
 		},
 	}
 	return cmd

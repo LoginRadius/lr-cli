@@ -56,7 +56,7 @@ func NewSiteCmd() *cobra.Command {
 }
 
 func getSite() error {
-	AppInfo, err := api.GetAppsInfo()
+	AppInfo,SharedAppInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
@@ -67,24 +67,50 @@ func getSite() error {
 			return err
 		}
 		fmt.Println("Active site: ")
-		val, _ := AppInfo[currentID]
-		Output(val)
+		if len(SharedAppInfo) != 0 {
+			val, _ := SharedAppInfo[currentID] 
+			Output(val.Appname, val.Appid,val.Domain)
+		} else {	
+			vals, _ := AppInfo[currentID] 
+			Output(vals.Appname, vals.Appid,vals.Domain)
+		}
 	} else if *all && (!*active && *appid == -1) {
 		var data [][]string
+		var sharedAppdata [][]string
 		fmt.Println("All sites: ")
-		for _, site := range AppInfo {
-			data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain})
+		if len(AppInfo) != 0 {
+			fmt.Println("Your sites: ")
+			for _, site := range AppInfo {
+				data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain})
+			}
+			table := tablewriter.NewWriter(os.Stdout)
+			table.SetHeader([]string{"ID", "Name", "Domain"})
+			table.AppendBulk(data)
+			table.Render()
+		} 
+		if len(SharedAppInfo) != 0 {
+			fmt.Println("Shared sites: ")
+			for _, site := range SharedAppInfo {
+				sharedAppdata = append(sharedAppdata, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain})
+			}
+			table := tablewriter.NewWriter(os.Stdout)
+			table.SetHeader([]string{"ID", "Name", "Domain"})
+			table.AppendBulk(sharedAppdata)
+			table.Render()
 		}
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Name", "Domain"})
-		table.AppendBulk(data)
-		table.Render()
 	} else if *appid != -1 && (!*active && !*all) {
 		site, ok := AppInfo[*appid]
-		if !ok {
+		sharedsite, sharedAppstatus := SharedAppInfo[*appid]
+
+		if !ok && !sharedAppstatus {
 			return errors.New("There is no site with this App ID")
 		}
-		Output(site)
+		if ok {
+			Output(site.Appname, site.Appid,site.Domain)
+		} else {
+			Output(sharedsite.Appname, sharedsite.Appid,sharedsite.Domain)
+			
+		}
 
 	} else {
 		fmt.Println("Use exactly one of the following flags: ")
@@ -97,9 +123,9 @@ func getSite() error {
 	return nil
 }
 
-func Output(AppInfo api.SitesReponse) {
+func Output(AppName string, Appid int64, Domain string) {
 	fmt.Println("------------------------------")
-	fmt.Println("App Name: ", AppInfo.Appname)
-	fmt.Println("App ID: ", AppInfo.Appid)
-	fmt.Println("Domain: ", AppInfo.Domain)
+	fmt.Println("App Name: ", AppName)
+	fmt.Println("App ID: ", Appid)
+	fmt.Println("Domain: ", Domain)
 }

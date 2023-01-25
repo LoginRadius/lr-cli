@@ -131,7 +131,7 @@ func SitesBasic(tokens *SitesToken) error {
 	if err != nil {
 		return err
 	}
-	_, err = GetAppsInfo()
+	_,_, err = GetAppsInfo()
 	if err != nil {
 		return err
 	}
@@ -140,19 +140,20 @@ func SitesBasic(tokens *SitesToken) error {
 
 }
 
-func GetAppsInfo() (map[int64]SitesReponse, error) {
+func GetAppsInfo() (map[int64]SitesReponse,map[int64]SharedSitesReponse, error) {
 	var Apps CoreAppData
 
 		coreAppData := conf.AdminConsoleAPIDomain + "/auth/core-app-data?"
 		data, err := request.Rest(http.MethodGet, coreAppData, nil, "")
 		if err != nil {
-			return nil, err
+			return nil,nil, err
 		}
 		err = json.Unmarshal(data, &Apps)
 		if err != nil {
-			return nil, err
+			return nil,nil, err
 		}
-		return storeSiteInfo(Apps), nil
+		apps, sharedApps := storeSiteInfo(Apps) 
+		return apps,sharedApps, nil
 }
 
 func CurrentID() (int64, error) {
@@ -203,12 +204,17 @@ func IsPasswordLessEnabled(features FeatureSchema) bool {
 	return false
 }
 
-func storeSiteInfo(data CoreAppData) map[int64]SitesReponse {
+func storeSiteInfo(data CoreAppData) (map[int64]SitesReponse, map[int64]SharedSitesReponse) {
 	siteInfo := make(map[int64]SitesReponse, len(data.Apps.Data))
+	sharedsiteInfo := make(map[int64]SharedSitesReponse, len(data.Apps.Data))
 	for _, app := range data.Apps.Data {
 		siteInfo[app.Appid] = app
 	}
 	obj, _ := json.Marshal(siteInfo)
+	for _, app := range data.SharedApps.Data {
+		sharedsiteInfo[app.Appid] = app
+	}
+	obj, _ = json.Marshal(sharedsiteInfo)
 	cmdutil.WriteFile("siteInfo.json", obj)
 	currentId, err := CurrentID()
 	if err == nil {
@@ -218,7 +224,7 @@ func storeSiteInfo(data CoreAppData) map[int64]SitesReponse {
 			cmdutil.WriteFile("currentSite.json", obj)
 		}
 	}
-	return siteInfo
+	return siteInfo,sharedsiteInfo
 }
 
 func UpdatePhoneLogin(feature string, status bool) (*FeatureSchema, error) {

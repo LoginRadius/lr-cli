@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"errors"
+	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/MakeNowJust/heredoc"
@@ -66,13 +68,12 @@ func addHooks() error {
 	// 	}
 	// }
 
-	checkInput := input()
+	checkInput,err := input()
 	if !checkInput {
-		fmt.Println("Please enter the input paramaters properly.")
-		return nil
+		return err
 	}
 
-	err := add()
+	err = add()
 	if err != nil {
 		return err
 	}
@@ -81,28 +82,42 @@ func addHooks() error {
 	return nil
 }
 
-func input() bool {
+func input() (bool, error) {
+	Hooks, err := api.Hooks(http.MethodGet, "")
+	if err != nil {
+		return false, err
+	}
 	prompt.SurveyAskOne(&survey.Input{
 		Message: "Enter Name:",
 	}, &Name, survey.WithValidator(survey.Required))
-
+	if strings.TrimSpace(Name) == "" {
+		return false, errors.New("Webhook Name is required")	
+	}
+	for _,v := range Hooks.Data {
+		if v.Name == Name {
+			return false, errors.New("Webhook name exists. Please use a different name.")	
+		}
+	}
 	var options = Events
 
 	var eventChoice int
-	err := prompt.SurveyAskOne(&survey.Select{
+	err = prompt.SurveyAskOne(&survey.Select{
 		Message: "Select a plan",
 		Options: options,
 	}, &eventChoice)
 	if err != nil {
-		return false
+		return false, err
 	}
 	Event = options[eventChoice]
 
 	prompt.SurveyAskOne(&survey.Input{
 		Message: "Enter TargetUrl: ",
 	}, &TargetUrl, survey.WithValidator(survey.Required))
+	if strings.TrimSpace(TargetUrl) == "" {
+		return false, errors.New("Webhook Target URL is required")	
+	}
 
-	return true
+	return true, nil
 
 }
 

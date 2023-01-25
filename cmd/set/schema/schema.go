@@ -78,10 +78,16 @@ func update(fieldname string, enable bool, disable bool) error {
 			}
 		}
 		for _, v := range customFields.Data {
-			if fieldname == v.Display {
+			if fieldname == "cf_" + v.Key {
 				// This is the flow where user want to add the custom
 				// field with default configuration
 				field := generateCFDefault(fieldname)
+				field.Display = v.Display
+				for _, v := range activeRegField {
+					if fieldname == v.Name {
+						field = v
+					}
+				}
 				if !enable {
 					err = UpdateField(&field, true)
 					if err != nil {
@@ -90,7 +96,7 @@ func update(fieldname string, enable bool, disable bool) error {
 				}
 				var schema api.UpdateRegFieldSchema
 				for _, v := range activeRegField {
-					if fieldname != v.Display {
+					if fieldname != v.Name {
 					schema.Data = append(schema.Data, v)
 					}
 				}
@@ -106,22 +112,40 @@ func update(fieldname string, enable bool, disable bool) error {
 		return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` not found")}
 	}
 	if enable || disable {
-		for _, v := range activeRegField {
-			if fieldname == v.Name {
-				if enable {
-					if v.Enabled {
-						return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` is already enabled for registration schema")}
+		_, ok := activeRegField[strings.ToLower(fieldname)]
+		if ok {
+			for _, v := range activeRegField {
+				if fieldname == v.Name {
+					if enable {
+						if v.Enabled {
+							return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` is already enabled for registration schema")}
+						}
+						v.Enabled = true
+					} else {
+						
+						v.Enabled = false
 					}
-					v.Enabled = true
-				} else {
-					if !v.Enabled {
+				}
+				
+				regSchema.Data = append(regSchema.Data, v)
+			}
+		} else {
+			for _, v := range activeRegField {
+				if strings.ToLower(fieldname) != strings.ToLower(v.Name) {
+					regSchema.Data = append(regSchema.Data, v)
+				}	
+			}
+			for _, v := range regField {
+				if strings.ToLower(fieldname) == strings.ToLower(v.Name) {
+					if !v.Enabled && disable {
 						return &cmdutil.FlagError{Err: errors.New("`" + fieldname + "` is already disabled for registration schema")}
 					}
-					v.Enabled = false
+					v.Enabled = enable
 				}
+				regSchema.Data = append(regSchema.Data, v)		
 			}
-			regSchema.Data = append(regSchema.Data, v)
 		}
+
 	} else {
 		// isAdv := fieldname == "country" || strings.Contains(fieldname, "cf_")
 		for _, v := range activeRegField {
@@ -268,7 +292,7 @@ func generateCFDefault(fieldName string) api.Schema {
 	var field api.Schema
 	field.Enabled = true
 	field.Display = fieldName
-	field.Name = "cf_" + fieldName
+	field.Name = fieldName
 	field.Options = nil
 	field.Rules = ""
 	field.Type = "string"

@@ -34,7 +34,7 @@ func NewSiteCmd() *cobra.Command {
 }
 
 func setSite() error {
-	siteInfo, err := api.GetAppsInfo()
+	siteInfo,_, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}

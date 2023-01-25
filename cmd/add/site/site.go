@@ -87,7 +87,7 @@ func add() error {
 	if err != nil {
 		return err
 	}
-	appInfo, err := api.GetAppsInfo()
+	appInfo,_, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}

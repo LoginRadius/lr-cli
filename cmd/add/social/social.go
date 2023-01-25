@@ -67,7 +67,13 @@ func add1() error {
 	if err != nil {
 		return err
 	}
-	provConfig, ok := allProv[strings.ToLower(providers[num])]
+	var providerName string
+	if strings.Contains(providers[num], " ") {
+		providerName = strings.Join(strings.Split(providers[num], " "), "")
+	} else {
+		providerName = providers[num]
+	}
+	provConfig, ok := allProv[strings.ToLower(providerName)]
 	if !ok {
 		return errors.New("Configuration for the selected provider not found.")
 	}
@@ -82,7 +88,9 @@ func add1() error {
 		prompt.SurveyAskOne(&survey.Input{
 			Message: val.Display + ":",
 		}, &promptRes, survey.WithValidator(survey.Required))
-
+		if strings.TrimSpace(promptRes) == "" {
+			return errors.New(val.Display + " is required")
+		}
 		field.SetString(promptRes)
 	}
 	addProvObj.Data[0].Provider = provConfig.Name
