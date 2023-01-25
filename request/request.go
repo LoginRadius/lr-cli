@@ -17,6 +17,7 @@ type APIErr struct {
 	Errorcode        *int    `json:"ErrorCode"`
 	Errormessage     *string `json:"ErrorMessage"`
 	Errordescription *string `json:"ErrorDescription"`
+	Description		 *string `json:"description"`
 	Message          *string `json:"Message"`
 }
 
@@ -117,11 +118,15 @@ func Rest(method string, url string, headers map[string]string, payload string) 
 	if err != nil {
 		return nil, err
 	}
-	return checkAPIError(respData)
+	var description bool
+	if strings.Contains(url, "verifysmtpsettings") {
+		description = true
+	}
+	return checkAPIError(respData, description)
 
 }
 
-func checkAPIError(respData []byte) ([]byte, error) {
+func checkAPIError(respData []byte, description bool) ([]byte, error) {
 	var errResp APIErr
 	_ = json.Unmarshal(respData, &errResp)
 	if errResp.Xsign != nil && *errResp.Xsign == "" {
@@ -130,6 +135,8 @@ func checkAPIError(respData []byte) ([]byte, error) {
 	} else if errResp.Errorcode != nil {
 		if errResp.Errormessage != nil {
 			return nil, errors.New(*errResp.Errormessage)
+		} else if errResp.Description != nil && description  {
+			return nil, errors.New(*errResp.Description)
 		} else if errResp.Message != nil {
 			return nil, errors.New(*errResp.Message)
 		} else {

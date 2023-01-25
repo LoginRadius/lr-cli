@@ -83,6 +83,31 @@ type CoreAppData struct {
 	} `json:"apps"`
 }
 
+type SmtpConfigSchema struct {
+	FromEmailId     string		`json:"FromEmailId"`
+	FromName    	string		`json:"FromName"`
+	IsSsl   		bool        `json:"IsSsl"`
+	Key      		string      `json:"Key"`
+	Password 		string      `json:"Password"`
+	Provider    	string		`json:"provider"`
+	Secret     		string      `json:"Secret"`
+	SmtpHost     	string      `json:"SmtpHost"`
+	SmtpPort     	int         `json:"SmtpPort"`
+	UserName     	string      `json:"UserName"`
+}
+
+type VerifySmtpConfigSchema struct {
+	SmtpConfigSchema
+	EmailId 		string		`json:"emailId"`
+	Message 		string		`json:"message"`
+	Subject 		string		`json:"subject"`
+}
+
+type VerifySmtpConfigError struct {
+	Description 		string		`json:"description"`
+	Message 		string		`json:"message"`
+}
+
 func GetSites() (*SitesReponse, error) {
 	var url string
 	url = conf.AdminConsoleAPIDomain + "/deployment/sites?ownerUid=&"
@@ -227,4 +252,62 @@ func CardPay() (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func GetSMTPConfiguration() (*SmtpConfigSchema, error) {
+	url := conf.AdminConsoleAPIDomain + "/deployment/smtp-settings/config?"
+	
+	var resultResp SmtpConfigSchema
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, nil
+}
+
+func AddSMTPConfiguration(data SmtpConfigSchema) (*SmtpConfigSchema, error) {
+	var url string
+	if strings.ToLower(data.Provider) == "mailazy"{
+		url = conf.AdminConsoleAPIDomain + "/deployment/smtp-settings/smtpprovider?"
+	} else {
+		url = conf.AdminConsoleAPIDomain + "/deployment/smtp-settings?"
+	}
+	body, _ := json.Marshal(data)
+	var resultResp SmtpConfigSchema
+	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, nil
+}
+
+func VerifySMTPConfiguration(data VerifySmtpConfigSchema) error {
+	url := conf.AdminConsoleAPIDomain + "/deployment/smtp-settings/verifysmtpsettings?"
+	body, _ := json.Marshal(data)
+
+   _, err := request.Rest(http.MethodPost, url, nil, string(body))
+
+   if err != nil {
+	   return  err
+   }
+   return  nil
+}
+
+func DeleteSMTPConfiguration() error {
+	 url := conf.AdminConsoleAPIDomain + "/deployment/smtp-settings/reset?"
+	
+	_, err := request.Rest(http.MethodPost, url, nil, "")
+	if err != nil {
+		return  err
+	}
+	return  nil
 }

@@ -22,6 +22,9 @@ var DomainValidation = regexp.MustCompile(`^((([\S]+:\/\/?)(?:[-;:&=\+\$,\w]+@)?
 
 var AccessRestrictionDomain = regexp.MustCompile(`^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\")){0,}@{0,1}((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$`)
 
+var ValidateEmail = regexp.MustCompile(`^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$`)
+
+
 type ThemeType struct {
 	PageType     string        `json:"PageType"`
 	CustomCss    []string      `json:"CustomCss"`
@@ -34,6 +37,28 @@ type ThemeType struct {
 	IsActive     bool          `json:"IsActive"`
 	MainScript   string        `json:"MainScript"`
 	Status       string        `json:"Status"`
+}
+
+type SmtpProviderSchema struct {
+	Name 		string 		
+	Display 	string 	
+	SmtpHost 	string 		
+	SmtpPort 	string 		
+	EnableSSL 	bool 		
+}
+
+  
+var SmtpOptionNames = map[string]string {
+	"FromName": 	"From Name",
+	"FromEmailId": 	"From Email Id",
+	"UserName": 	"SMTP User Name",
+	"Password": 	"SMTP Password",
+	"SmtpHost": 	"SMTP Host",
+	"SmtpPort": 	"SMTP Port",
+	"IsSsl": 		"Enable SSL",
+	"Provider": 	"SMTP Providers",
+	"Key": 			"Key",
+	"Secret": 		"Secret",
 }
 
 func updatePath(themechildkey string) string {
@@ -206,4 +231,77 @@ var Theme5Auth = ThemeType{
 	IsActive:     true,
 	MainScript:   "",
 	Status:       "4",
+}
+
+var SmtpProviders = map[int]SmtpProviderSchema {
+    0: {
+      Name: "Mailazy",
+      Display: "Mailazy",
+	  SmtpHost: "",
+      SmtpPort: "",
+      EnableSSL: false,
+    },
+    1: {
+      Name: "Amazon SES (US East)",
+      Display: "AmazonSES-USEast",
+	  SmtpHost: "email-smtp.us-east-1.amazonaws.com",
+      SmtpPort: "587",
+      EnableSSL: true,
+    },
+    2: {
+      Name: "Amazon SES (US West)",
+      Display: "AmazonSES-USWest",
+	  SmtpHost: "email-smtp.us-west-2.amazonaws.com",
+      SmtpPort: "587",
+      EnableSSL: true,
+    },
+    3: {
+      Name: "AmazonSES(EU)",
+      Display: "AmazonSES-EU",
+	  SmtpHost: "email-smtp.eu-west-1.amazonaws.com",
+      SmtpPort: "587",
+      EnableSSL: true,
+    },
+    4: {
+      Name: "Gmail",
+      Display: "Gmail",
+	  SmtpHost: "smtp.gmail.com",
+      SmtpPort: "587",
+      EnableSSL: true,
+    },
+    5: {
+      Name: "Mandrill",
+      Display: "Mandrill",
+	  SmtpHost: "smtp.mandrillapp.com",
+      SmtpPort: "587",
+      EnableSSL: true,
+    },
+    6: {
+      Name: "Rackspace-mailgun",
+      Display: "Rackspace-mailgun",
+	  SmtpHost: "smtp.mailgun.org",
+      SmtpPort: "587",
+      EnableSSL: true,
+    },
+    7: {
+      Name: "SendGrid",
+      Display: "SendGrid",
+	  SmtpHost: "smtp.sendgrid.net",
+      SmtpPort: "587",
+      EnableSSL: true,
+    },
+    8: {
+      Name: "Yahoo",
+      Display: "Yahoo",
+	  SmtpHost: "smtp.mail.yahoo.com",
+      SmtpPort: "587",
+      EnableSSL: true,
+    },
+    9: {
+      Name: "Other",
+      Display: "Other",
+	  SmtpHost: "",
+      SmtpPort: "",
+      EnableSSL: false,
+    },
 }
