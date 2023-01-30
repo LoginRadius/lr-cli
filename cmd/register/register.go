@@ -52,7 +52,7 @@ func register() error {
 		return err
 	}
 	fmt.Println("Successfully Authenticated, Fetching Your Site(s)...")
-	_, err = api.GetAppsInfo()
+	_,_, err = api.GetAppsInfo()
 	if err != nil {
 		return err
 	}

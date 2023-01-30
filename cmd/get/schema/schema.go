@@ -29,11 +29,11 @@ func NewschemaCmd() *cobra.Command {
 | country   | Country       | string   | false   |
 | firstname | First Name    | string   | false   |
 +-----------+---------------+----------+---------+
-+---------------+----------+---------+
-| CUSTOM FIELDS |   TYPE   | ENABLED |
-+---------------+----------+---------+
-| MyCF          | string   | false   |
-+---------------+----------+---------+
++-------------------+-----------------------+---------+--------+
+| CUSTOM FIELD NAME | CUSTOM FIELD DISPLAY  | TYPE   | ENABLED |
++-------------------+-----------------------+---------+--------+
+| cf_MyCF           | MyCF                  | string | false   |
++-------------------+-----------------------+---------+--------+
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return get()
@@ -67,7 +67,12 @@ func get() error {
 		if Type == "multi" {
 			Type = "checkbox"
 		}
-		data = append(data, []string{k, v.Display, Type, enabled})
+		var displayName string
+		displayName = activeRegField[k].Display 
+		if displayName == "" {
+			displayName =  v.Display
+		}
+		data = append(data, []string{k, displayName, Type, enabled})
 	}
 	sort.SliceStable(data, func(i, j int) bool {
 		return data[i][3] == "true"
@@ -86,18 +91,24 @@ func get() error {
 	if len(customFields.Data) > 0 {
 		for _, v := range customFields.Data {
 			enabled := "false"
-		_, ok := activeRegField["cf_" + v.Display]
+		_, ok := activeRegField["cf_" + v.Key]
 		if ok {
 			enabled = "true"
 		}
-		Type := activeRegField["cf_" + v.Display].Type
-			cfTable.Append([]string{v.Display, Type,enabled})
+		Type := activeRegField["cf_" + v.Key].Type
+
+		var displayName string
+		displayName = activeRegField["cf_" + v.Key].Display 
+		if displayName == "" {
+			displayName =  v.Display
+		}
+			cfTable.Append([]string{"cf_" + v.Key,displayName, Type,enabled})
 		}
 	} else {
 		cfTable.Append([]string{"No Custom Fields"})
 		cfTable.SetCaption(true, "Use command `lr add custom-field` to add the Custom Field")
 	}
-	cfTable.SetHeader([]string{"Custom Fields", "Type", "Enabled"})
+	cfTable.SetHeader([]string{"Custom Field Name","Custom Field Display", "Type", "Enabled"})
 	cfTable.Render()
 
 	return nil

@@ -101,7 +101,7 @@ func doLogin() error {
 
 func listSites(currSiteName string) error {
 	m := make(map[int]int64)
-	appInfo, err := api.GetAppsInfo()
+	appInfo, sharedAppInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
@@ -116,6 +116,15 @@ func listSites(currSiteName string) error {
 			options = append(options, App.Appname+" (Default site)")
 		} else {
 			options = append(options, App.Appname)
+		}
+		i += 1
+	}
+	for ID, App := range sharedAppInfo {
+		m[i] = ID
+		if appid == ID {
+			options = append(options, App.Appname+" (Default Shared site)")
+		} else {
+			options = append(options, App.Appname+" (Shared site)")
 		}
 		i += 1
 	}

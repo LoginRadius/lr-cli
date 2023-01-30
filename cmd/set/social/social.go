@@ -73,7 +73,7 @@ func update(provider string, on bool, off bool) error {
 		return err
 	}
 
-	provConfig, ok := activeProv[provider]
+	provConfig, ok := activeProv[strings.ToLower(provider)]
 	if !ok {
 		return errors.New("Configuration for the selected provider not found.")
 	}
@@ -119,12 +119,18 @@ func update(provider string, on bool, off bool) error {
 		Message: provObj.Options[0].Display + ":",
 		Default: provConfig.ProviderKey,
 	}, &updateProvObj.Data[0].ProviderKey, survey.WithValidator(survey.Required))
+	if strings.TrimSpace(updateProvObj.Data[0].ProviderKey) == "" {
+		return errors.New(provObj.Options[0].Display + " is required")
+	}
 
 	prompt.SurveyAskOne(&survey.Input{
 		Message: provObj.Options[1].Display + ":",
 		Default: provConfig.ProviderSecret,
 	}, &updateProvObj.Data[0].ProviderSecret, survey.WithValidator(survey.Required))
-
+	if strings.TrimSpace(updateProvObj.Data[0].ProviderSecret) == "" {
+		return errors.New(provObj.Options[1].Display + " is required")
+	}
+	
 	updateProvObj.Data[0].Provider = provConfig.Provider
 	updateProvObj.Data[0].Scope = provConfig.Scope
 	updateProvObj.Data[0].Status = provConfig.Status
