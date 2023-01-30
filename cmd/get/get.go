@@ -2,7 +2,7 @@ package get
 
 import (
 	"github.com/loginradius/lr-cli/cmd/get/account"
-	"github.com/loginradius/lr-cli/cmd/get/accountPassword"
+	// "github.com/loginradius/lr-cli/cmd/get/accountPassword"
 	"github.com/loginradius/lr-cli/cmd/get/config"
 	"github.com/loginradius/lr-cli/cmd/get/hooks"
 	"github.com/loginradius/lr-cli/cmd/get/loginMethod"
@@ -15,6 +15,8 @@ import (
 	"github.com/loginradius/lr-cli/cmd/get/serverInfo"
 	"github.com/loginradius/lr-cli/cmd/get/social"
 	"github.com/loginradius/lr-cli/cmd/get/theme"
+	"github.com/loginradius/lr-cli/cmd/get/accessRestriction"
+	"github.com/loginradius/lr-cli/cmd/get/smtpConfiguration"
 
 	"github.com/spf13/cobra"
 )
@@ -57,13 +59,19 @@ func NewGetCmd() *cobra.Command {
 	accountCmd := account.NewaccountCmd()
 	cmd.AddCommand(accountCmd)
 
-	accountPasswordCmd := accountPassword.NewaccountPasswordCmd()
-	cmd.AddCommand(accountPasswordCmd)
+	// accountPasswordCmd := accountPassword.NewaccountPasswordCmd()
+	// cmd.AddCommand(accountPasswordCmd)
 
 	profilesCmd := profiles.NewprofilesCmd()
 	cmd.AddCommand(profilesCmd)
 
 	schemaCmd := schema.NewschemaCmd()
 	cmd.AddCommand(schemaCmd)
+
+	accessRestrictionCmd := accessRestriction.NewaccessRestrictionCmd()
+	cmd.AddCommand(accessRestrictionCmd)
+
+	smtpConfigurationCmd := smtpConfiguration.NewsmtpConfigurationCmd()
+	cmd.AddCommand(smtpConfigurationCmd)
 	return cmd
 }

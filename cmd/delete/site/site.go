@@ -46,7 +46,7 @@ func NewSiteCmd() *cobra.Command {
 }
 
 func deleteSite() error {
-	siteInfo, err := api.GetAppsInfo()
+	siteInfo,_, err := api.GetAppsInfo()
 	if err != nil {
 		return err
 	}
@@ -112,7 +112,7 @@ func delete(appInfo api.SitesReponse) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		_, err = api.GetAppsInfo()
+		_,_, err = api.GetAppsInfo()
 		if err != nil {
 			return false, err
 		}

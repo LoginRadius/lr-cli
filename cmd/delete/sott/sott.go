@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"errors"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/prompt"
@@ -37,6 +39,9 @@ func NewSottCmd() *cobra.Command {
 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if token == "" && !*all  {
+				return &cmdutil.FlagError{Err: errors.New("`token` is required argument")}
+			}
 			return deleteSott()
 
 		},

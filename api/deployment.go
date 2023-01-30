@@ -49,6 +49,28 @@ type SitesReponse struct {
 	} `json:"ProductPlan"`
 }
 
+type SharedSitesReponse struct {
+	Appname               string      `json:"AppName"`
+	Domain                string      `json:"Domain"`
+	Appid                 int64       `json:"AppId"`
+	AppKey           	  string      `json:"ApiKey"`
+	AppSecret             string      `json:"ApiSecret"`
+	Role                  []string    `json:"Role"`
+	AdditionalPermissions []string 	  `json:"AdditionalPermissions"`
+	Recurlyaccountcode    *string     `json:"RecurlyAccountCode"`
+	Userlimit             int         `json:"UserLimit"`
+	Domainlimit           int         `json:"DomainLimit"`
+	Apiversion            string      `json:"ApiVersion"`
+	Israasenabled         bool        `json:"IsRaasEnabled"`
+	Ownerid               string      `json:"OwnerId"`
+	Productplan           *struct {
+		Name         string      `json:"Name"`
+		Expirytime   time.Time   `json:"ExpiryTime"`
+		Billingcycle interface{} `json:"BillingCycle"`
+		Fromdate     interface{} `json:"FromDate"`
+	} `json:"ProductPlan"`
+}
+
 type HostedPageResponse struct {
 	Pages []struct {
 		Pagetype     string        `json:"PageType"`
@@ -81,6 +103,34 @@ type CoreAppData struct {
 	Apps struct {
 		Data []SitesReponse `json:"Data"`
 	} `json:"apps"`
+	SharedApps struct {
+		Data []SharedSitesReponse `json:"Data"`
+	} `json:"sharedApps"`
+}
+
+type SmtpConfigSchema struct {
+	FromEmailId     string		`json:"FromEmailId"`
+	FromName    	string		`json:"FromName"`
+	IsSsl   		bool        `json:"IsSsl"`
+	Key      		string      `json:"Key"`
+	Password 		string      `json:"Password"`
+	Provider    	string		`json:"provider"`
+	Secret     		string      `json:"Secret"`
+	SmtpHost     	string      `json:"SmtpHost"`
+	SmtpPort     	int         `json:"SmtpPort"`
+	UserName     	string      `json:"UserName"`
+}
+
+type VerifySmtpConfigSchema struct {
+	SmtpConfigSchema
+	EmailId 		string		`json:"emailId"`
+	Message 		string		`json:"message"`
+	Subject 		string		`json:"subject"`
+}
+
+type VerifySmtpConfigError struct {
+	Description 		string		`json:"description"`
+	Message 		string		`json:"message"`
 }
 
 func GetSites() (*SitesReponse, error) {
@@ -227,4 +277,62 @@ func CardPay() (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func GetSMTPConfiguration() (*SmtpConfigSchema, error) {
+	url := conf.AdminConsoleAPIDomain + "/deployment/smtp-settings/config?"
+	
+	var resultResp SmtpConfigSchema
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, nil
+}
+
+func AddSMTPConfiguration(data SmtpConfigSchema) (*SmtpConfigSchema, error) {
+	var url string
+	if strings.ToLower(data.Provider) == "mailazy"{
+		url = conf.AdminConsoleAPIDomain + "/deployment/smtp-settings/smtpprovider?"
+	} else {
+		url = conf.AdminConsoleAPIDomain + "/deployment/smtp-settings?"
+	}
+	body, _ := json.Marshal(data)
+	var resultResp SmtpConfigSchema
+	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(resp, &resultResp)
+	if err != nil {
+		return nil, err
+	}
+	return &resultResp, nil
+}
+
+func VerifySMTPConfiguration(data VerifySmtpConfigSchema) error {
+	url := conf.AdminConsoleAPIDomain + "/deployment/smtp-settings/verifysmtpsettings?"
+	body, _ := json.Marshal(data)
+
+   _, err := request.Rest(http.MethodPost, url, nil, string(body))
+
+   if err != nil {
+	   return  err
+   }
+   return  nil
+}
+
+func DeleteSMTPConfiguration() error {
+	 url := conf.AdminConsoleAPIDomain + "/deployment/smtp-settings/reset?"
+	
+	_, err := request.Rest(http.MethodPost, url, nil, "")
+	if err != nil {
+		return  err
+	}
+	return  nil
 }
