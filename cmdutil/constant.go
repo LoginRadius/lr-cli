@@ -61,6 +61,48 @@ var SmtpOptionNames = map[string]string {
 	"Secret": 		"Secret",
 }
 
+var PermissionCommands = map[string]string {
+"lr_demo":		 				"API_ViewConfiguration",
+"lr_reset-secret":	 			"API_EditCredentials",
+"lr_verify": 					"UserManagement_Admin",
+"lr_get_config":				"API_ViewCredentials",
+"lr_get_domain":				"API_ViewConfiguration",
+"lr_get_server-info": 			"API_ViewConfiguration",
+"lr_get_theme": 				"API_ViewConfiguration",
+"lr_get_social": 				"API_ViewThirdPartyCredentials",
+"lr_get_sott":					"API_ViewConfiguration",
+"lr_get_hooks":					"ThirdPartyIntegration_View",
+"lr_get_schema":				"API_ViewConfiguration",
+"lr_get_login-method":			"API_ViewConfiguration",
+"lr_get_account":				"UserManagement_View",
+"lr_get_profile":				"UserManagement_View",
+"lr_get_smtp-configuration":	"API_ViewConfiguration",
+"lr_get_access-restriction":	"SecurityPolicy_View",
+"lr_add_domain":				"API_AdminConfiguration",
+"lr_add_social": 				"API_AdminThirdPartyCredentials",
+"lr_add_sott":					"API_AdminConfiguration",
+"lr_add_custom-field":			"API_AdminConfiguration",
+"lr_add_account":				"UserManagement_Admin",        
+"lr_add_hooks":					"ThirdPartyIntegration_Admin",
+"lr_add_smtp-configuration":	"API_AdminConfiguration",
+"lr_add_access-restriction":	"SecurityPolicy_Admin",
+"lr_set_domain":				"API_EditConfiguration",
+"lr_set_social": 				"API_EditThirdPartyCredentials",
+"lr_set_theme":					"API_EditConfiguration",
+"lr_set_schema":				"API_EditConfiguration",
+"lr_set_smtp-configuration":	"API_EditConfiguration",
+"lr_set_access-restriction":	"SecurityPolicy_Edit",
+"lr_delete_domain":				"API_AdminConfiguration",
+"lr_delete_social": 			"API_AdminThirdPartyCredentials",
+"lr_delete_sott":				"API_AdminConfiguration",
+"lr_delete_custom-field":		"API_AdminConfiguration",
+"lr_delete_account":			"UserManagement_Admin",        
+"lr_delete_hooks":				"ThirdPartyIntegration_Admin",
+"lr_delete_smtp-configuration":	"API_AdminConfiguration",
+"lr_delete_access-restriction":	"SecurityPolicy_Admin",
+"lr_verify_resend":				"UserManagement_Admin",
+}
+
 func updatePath(themechildkey string) string {
 	var hubDomain = conf.HubPageDomain
     var CdnIDXPath string;

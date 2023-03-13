@@ -105,7 +105,7 @@ func listSites(currSiteName string) error {
 	if err != nil {
 		return err
 	}
-	if len(appInfo) == 1 {
+	if len(appInfo) + len(sharedAppInfo) == 1 {
 		return nil
 	}
 	var i int
