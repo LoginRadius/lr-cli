@@ -44,10 +44,14 @@ func NewaccessRestrictionCmd() *cobra.Command {
 }
 
 func addAccessRestriction() error {
+	isPermission, err := api.GetPermission("lr_add_access-restriction")
+			if(!isPermission || err != nil) {
+				return nil
+			}
 	var restrictionType = []string {"None","WhiteList", "BlackList"}
 	var num int
 	var shouldAdd bool
-	err := prompt.SurveyAskOne(&survey.Select{
+	err = prompt.SurveyAskOne(&survey.Select{
 		Message: "Select the Restriction Type:",
 		Options:  restrictionType,
 	}, &num)

@@ -68,6 +68,11 @@ func addHooks() error {
 	// 	}
 	// }
 
+	isPermission, errr := api.GetPermission("lr_add_hooks")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
+
 	checkInput,err := input()
 	if !checkInput {
 		return err

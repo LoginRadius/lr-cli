@@ -30,6 +30,10 @@ func NewResetCmd() *cobra.Command {
 			API Secret reset successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_reset_secret")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			var shouldReset bool
 			if err := prompt.Confirm("If you change or reset the API secret, any API calls you have developed will stop working until you update them with your new key", 
 						&shouldReset); err != nil {

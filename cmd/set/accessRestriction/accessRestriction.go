@@ -32,6 +32,10 @@ func NewaccessRestrictionCmd() *cobra.Command {
 		Blacklist Domains/Emails have been updated successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_set_access-restriction")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			if opts.BlacklistDomain == "" && opts.WhitelistDomain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is a required argument ")}
 			}

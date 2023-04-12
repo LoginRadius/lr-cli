@@ -32,6 +32,10 @@ func NewDeleteCFCmd() *cobra.Command {
 }
 
 func delete() error {
+	isPermission, errr := api.GetPermission("lr_delete_custom-field")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 	regfields, err := api.GetAllCustomFields()
 	if err != nil {
 		return err

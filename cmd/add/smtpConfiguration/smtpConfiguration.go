@@ -52,6 +52,11 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 }
 
 func addAccessRestriction() error {
+
+	isPermission, errr := api.GetPermission("lr_add_smtp-configuration")
+		if(!isPermission || errr != nil) {
+			return nil
+		}
 	var smtpSchema api.SmtpConfigSchema 
 	var smtpLabels = [] string {"Provider","Key","Secret", "SmtpHost", "SmtpPort",
 	"FromName","FromEmailId","UserName","Password",  "IsSsl"}

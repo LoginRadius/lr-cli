@@ -22,6 +22,10 @@ func NewaccessRestrictionCmd() *cobra.Command {
 		...
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_get_access-restriction")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 
 			resp, err := api.GetEmailWhiteListBlackList()
 			if err != nil {

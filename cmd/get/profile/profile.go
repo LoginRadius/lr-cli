@@ -9,6 +9,7 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/request"
+	"github.com/loginradius/lr-cli/api"
 
 	"github.com/spf13/cobra"
 )
@@ -41,6 +42,10 @@ func NewprofilesCmd() *cobra.Command {
 		ID: <id>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_get_profile")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if inputUID != "" {
 				return getProfile(inputUID, "uid")
 			} else if inpEmail != "" {

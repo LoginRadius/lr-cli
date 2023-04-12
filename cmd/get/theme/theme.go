@@ -44,8 +44,8 @@ func NewThemeCmd() *cobra.Command {
 }
 
 func themes() error {
-	isPermission, err := api.getPermission("lr_demo")
-			if(!isPermission || err != nil) {
+	isPermission, errr := api.GetPermission("lr_get_theme")
+			if !isPermission || errr != nil {
 				return nil
 			}
 	if *all && !*active {

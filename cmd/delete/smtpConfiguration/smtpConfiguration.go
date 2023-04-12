@@ -21,7 +21,10 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 		Settings have been reset successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			
+			isPermission, errr := api.GetPermission("lr_delete_smtp-configuration")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			 err := api.DeleteSMTPConfiguration()
 			if err != nil {
 				return nil

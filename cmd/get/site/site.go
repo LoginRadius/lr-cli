@@ -1,6 +1,7 @@
 package site
 
 import (
+	"strings"
 	"errors"
 	"fmt"
 	"os"
@@ -45,6 +46,7 @@ func NewSiteCmd() *cobra.Command {
 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			
 			return getSite()
 		},
 	}
@@ -56,6 +58,7 @@ func NewSiteCmd() *cobra.Command {
 }
 
 func getSite() error {
+	
 	AppInfo,SharedAppInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return err
@@ -67,13 +70,15 @@ func getSite() error {
 			return err
 		}
 		fmt.Println("Active site: ")
-		if len(SharedAppInfo) != 0 {
-			val, _ := SharedAppInfo[currentID] 
-			Output(val.Appname, val.Appid,val.Domain)
-		} else {	
+		val, _ := SharedAppInfo[currentID] 
+			if val.Appid != 0 {
+				Output(val.Appname, val.Appid,val.Domain, strings.Join(val.Role, ", "))
+			} 	
 			vals, _ := AppInfo[currentID] 
-			Output(vals.Appname, vals.Appid,vals.Domain)
-		}
+			if vals.Appid != 0 {
+				Output(vals.Appname, vals.Appid,vals.Domain, vals.Role)
+			}
+		
 	} else if *all && (!*active && *appid == -1) {
 		var data [][]string
 		var sharedAppdata [][]string
@@ -106,9 +111,9 @@ func getSite() error {
 			return errors.New("There is no site with this App ID")
 		}
 		if ok {
-			Output(site.Appname, site.Appid,site.Domain)
+			Output(site.Appname, site.Appid,site.Domain, site.Role)
 		} else {
-			Output(sharedsite.Appname, sharedsite.Appid,sharedsite.Domain)
+			Output(sharedsite.Appname, sharedsite.Appid,sharedsite.Domain, strings.Join(sharedsite.Role, ", "))
 			
 		}
 
@@ -123,9 +128,10 @@ func getSite() error {
 	return nil
 }
 
-func Output(AppName string, Appid int64, Domain string) {
+func Output(AppName string, Appid int64, Domain string, Role string ) {
 	fmt.Println("------------------------------")
 	fmt.Println("App Name: ", AppName)
 	fmt.Println("App ID: ", Appid)
 	fmt.Println("Domain: ", Domain)
+	fmt.Println("Role: ", Role)
 }

@@ -36,6 +36,10 @@ func NewsocialCmd() *cobra.Command {
 }
 
 func add1() error {
+	isPermission, errr := api.GetPermission("lr_add_social")
+		if(!isPermission || errr != nil) {
+			return nil
+		}
 
 	allProv, err := api.GetAllProviders()
 	if err != nil {

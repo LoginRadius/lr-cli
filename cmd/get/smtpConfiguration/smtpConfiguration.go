@@ -28,6 +28,10 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 		From Email Id: <Email ID>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_get_smtp-configuration")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			var smtpLabels = [] string {"Provider","Key","Secret", "SmtpHost", "SmtpPort",
 			"FromName","FromEmailId","UserName","Password",  "IsSsl"}
 			resp, err := api.GetSMTPConfiguration()

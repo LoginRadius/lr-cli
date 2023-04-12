@@ -275,7 +275,7 @@ func UpdatePhoneLogin(feature string, status bool) (*FeatureSchema, error) {
 }
 
 
-func GetPermissions() ( error) {
+func GetPermissionsfromAPI() ( error) {
 	
 	coreAppData := conf.AdminConsoleAPIDomain + "/auth/permissions?"
 	data, err := request.Rest(http.MethodGet, coreAppData, nil, "")
@@ -311,7 +311,7 @@ func storePermissionData(data Permission) (error) {
 	return nil
 }
 
-func getPermission(str string) (bool, error) { 
+func GetPermission(str string) (bool, error) { 
 	data, err := cmdutil.ReadFile("permission.json")
 	if err != nil {
 	return false, err
@@ -322,10 +322,8 @@ func getPermission(str string) (bool, error) {
 		return false, err
 		}
 	if permission[str] == false {
-		fmt.Println("Access Denied")
-		fmt.Println("You do not have permission to Proceed further. Please ask the site owner for permission in order to proceed.")
-		fmt.Println("In case site owner has provided the relevant permission. Please logout and then login in order to proceed")
-		fmt.Println("Otherwise, Please contact LoginRadius:- " + conf.DashboardDomain + "/support/tickets")
+		fmt.Println("You don't have access to proceed, request access from the site owner. If you've already been granted access, log out and log back in. If the issue persists, contact LoginRadius support at ")
+		fmt.Println( conf.DashboardDomain + "/support/tickets")
 		return false , nil
 	}
 	return true , nil
