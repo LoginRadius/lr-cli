@@ -21,13 +21,21 @@ var once sync.Once
 
 // Read and parse the configuration file
 func read() *Config {
+	// config := Config{
+	// 	LoginRadiusAPIDomain:  "https://api.loginradius.com",
+	// 	HubPageDomain:         "https://accounts.loginradius.com",
+	// 	AdminConsoleAPIDomain: "https://adminconsole-api.loginradius.com",
+	// 	DashboardDomain:       "https://adminconsole.loginradius.com",
+	// 	ThemeDomain: 		   "https://cdn.loginradius.com/hub/prod/v1",
+	// }
 	config := Config{
-		LoginRadiusAPIDomain:  "https://api.loginradius.com",
-		HubPageDomain:         "https://accounts.loginradius.com",
-		AdminConsoleAPIDomain: "https://adminconsole-api.loginradius.com",
-		DashboardDomain:       "https://adminconsole.loginradius.com",
-		ThemeDomain: 		   "https://cdn.loginradius.com/hub/prod/v1",
-	}
+
+        LoginRadiusAPIDomain:  "https://devapi.lrinternal.com",
+        HubPageDomain:         "https://demotesting.devhub.lrinternal.com",
+        AdminConsoleAPIDomain: "https://devadmin-console-api.lrinternal.com",
+        DashboardDomain:       "https://devadmin-console.lrinternal.com",
+		ThemeDomain: 		   "https://cdn-dev.lrinternal.com",
+    }
 	return &config
 }
 

@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/MakeNowJust/heredoc"
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/loginradius/lr-cli/api"
 
 	"github.com/loginradius/lr-cli/cmdutil"
@@ -16,48 +15,90 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type domain struct {
-	Domain string `json:"domain"`
+
+type accessRestrictionObj struct {
+	BlacklistDomain    string `json:"blacklistdomain"`
+	WhitelistDomain    string `json:"whitelistdomain"`
+	DeniedIP    string `json:"deniedip"`
+	AllowedIP    string `json:"allowedip"`
+
 }
 
 func NewaccessRestrictionCmd() *cobra.Command {
+	opts := &accessRestrictionObj{}
 
 	cmd := &cobra.Command{
 		Use:   "access-restriction",
-		Short: "Whitelist/Blacklist a Domain/Email",
-		Long:  `Use this command to Whitelist/Blacklist Domain/Email or to disable access restriction.`,
+		Short: "Add access restriction for Domain/Email or IP/IP Range",
+		Long:  `Use this command to add access restriction for Domain/Email or IP/IP Range .`,
 		Example: heredoc.Doc(`
-		$ lr add access-restriction
-		? Select the Restriction Type: Whitelist
-		? Enter Domain/Email: <Domain>
-		? Adding Domain/Email to Whitelist will result in deletion of all Blacklist Domains/Emails. Are you sure you want to proceed?(Y/N):Yes 
+		$ 
+		(For Domain)
+		$ lr add access-restriction --whitelist-domain <domain>
+		? Adding Domain/Email to Whitelist will result in the deletion of all     Blacklist Domains/Emails. Are you sure you want to proceed?(Y/N):Yes
+		Whitelist Domain/Email have been updated successfully.
+	
+		(For IP/IP Range)
+		lr add access-restriction --allowed-ip <ip/ip range> 
+		? Adding IP or IP Range to Allowed IP or IP Range will result in the deletion of all Denied IP or IP Range. Are you sure you want to proceed?:Yes
+		IP authorization settings are saved successfully.
 		
 		
-		 Whitelist Domain/email have been updated successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return addAccessRestriction()
+			return addAccessRestriction(opts)
 		},
 	}
+
+	fl := cmd.Flags()
+	
+	fl.StringVarP(&opts.BlacklistDomain, "blacklist-domain", "b",  "", "Enter Blacklist Domain/Email Value you want to add")
+	fl.StringVarP(&opts.WhitelistDomain, "whitelist-domain", "w",  "", "Enter Whitelist Domain/Email Value you want to add")
+	fl.StringVarP(&opts.DeniedIP, "denied-ip", "d",  "", "Enter Denied IP or IP Range Value you want to add")
+	fl.StringVarP(&opts.AllowedIP, "allowed-ip", "a",  "", "Enter Allowed IP or IP Range Value you want to add")
 
 	return cmd
 }
 
-func addAccessRestriction() error {
-	var restrictionType = []string {"None","WhiteList", "BlackList"}
-	var num int
-	var shouldAdd bool
-	err := prompt.SurveyAskOne(&survey.Select{
-		Message: "Select the Restriction Type:",
-		Options:  restrictionType,
-	}, &num)
-	if err != nil {
-		return err
+func addAccessRestriction(opts *accessRestrictionObj) error {
+	if opts.BlacklistDomain != "" || opts.WhitelistDomain != "" {
+		addDomian( opts.WhitelistDomain, opts.BlacklistDomain)
+	} else if opts.AllowedIP != "" || opts.DeniedIP != "" {
+		addIpOrIpRange(opts.AllowedIP, opts.DeniedIP)
+	} else {
+		fmt.Println("Must use one of the following flags:")
+		fmt.Println("--blacklist-domain/whitelist-domain: To add either blacklist or whitelist Domain/Email")
+		fmt.Println("--allowed-ip/denied-ip: To add either the allowed or denied IP or IP Range	")
+
 	}
+
+	return nil
+
+}
+
+func addDomian(whitelistDomain string, blacklistDomain string) error {
+
+	
+	var shouldAdd bool
+
+	var email string 
 	var restrictType api.RegistrationRestrictionTypeSchema
-	restrictType.SelectedRestrictionType = strings.ToLower(restrictionType[num])
+
+	if whitelistDomain != "" {
+		restrictType.SelectedRestrictionType = "whitelist"
+		email = whitelistDomain
+	} else if blacklistDomain != "" {
+		restrictType.SelectedRestrictionType = "blacklist"
+		email = blacklistDomain
+	}
+
+	if !cmdutil.AccessRestrictionDomain.MatchString(email)  {
+		fmt.Println("Entered Domain/Email field is invalid")
+		return nil
+	}
+
 	var AddEmail api.EmailWhiteBLackListSchema 
-	if restrictionType[num] != "None" {
+	
 		resp, err := api.GetEmailWhiteListBlackList()
 			if err != nil {
 				if err.Error() != "No records found" {
@@ -68,21 +109,18 @@ func addAccessRestriction() error {
 					AddEmail.Domains = resp.Domains 
 				}
 			}
-		var email string
-		prompt.SurveyAskOne(&survey.Input{
-			Message: "Enter Domain/Email:",
-		}, &email, survey.WithValidator(survey.Required))
-		if !cmdutil.AccessRestrictionDomain.MatchString(email)  {
-			return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email field is invalid")}
-		}
+		
+		
 		for _, val := range AddEmail.Domains {
 			if val == email {
-				return &cmdutil.FlagError{Err: errors.New("Entered Domain/Email is already added")}
+				fmt.Println("Error: Entered Domain/Email is already added")
+				return nil
+
 			}
 		}
-		if  resp != nil && restrictionType[num] != resp.ListType {
+		if  resp != nil && restrictType.SelectedRestrictionType != strings.ToLower(resp.ListType) {
 			
-			if err := prompt.Confirm("Adding Domain/Email to " + restrictionType[num] + "  will result in the deletion of all " + resp.ListType + " Domains/Emails. Are you sure you want to proceed?", 
+			if err := prompt.Confirm("Adding Domain/Email to " + restrictType.SelectedRestrictionType + "  will result in the deletion of all " + resp.ListType + " Domains/Emails. Are you sure you want to proceed?", 
 						&shouldAdd); err != nil {
 							return err
 			}
@@ -92,12 +130,7 @@ func addAccessRestriction() error {
 		
 		AddEmail.Domains = append(AddEmail.Domains, email)
 		
-	} else {
-		if err := prompt.Confirm("Disabling access restriction will result in the deletion of all Whitelist/Blacklist Domains/Emails. Are you sure you want to proceed?", 
-						&shouldAdd); err != nil {
-							return err
-			}
-	}
+	
 	
 	if shouldAdd {
 		err = api.AddEmailWhitelistBlacklist(restrictType, AddEmail);
@@ -107,10 +140,100 @@ func addAccessRestriction() error {
 		if restrictType.SelectedRestrictionType == "none" {
 			fmt.Println("Access restrictions have been disabled" )
 		} else {
-			fmt.Println(restrictionType[num] + " Domains/Emails have been updated successfully" )
+			fmt.Println(strings.Title(restrictType.SelectedRestrictionType) + " Domains/Emails have been updated successfully" )
 		}
 	}
-	
 	return nil
+}
 
+func addIpOrIpRange(allowedip string, deniedip string) error {
+	var shouldAdd bool
+	var AddIPs api.IPResponse
+	var ip string
+	if allowedip != "" {
+		ip = allowedip
+	} else if deniedip != "" {
+		ip = deniedip
+	}
+	isValid, err := cmdutil.ValidateIPorIPRange(ip) 
+				if err != nil && !isValid {
+					fmt.Println("Error :" + err.Error())
+					return nil
+				}
+	
+	siteFeatures, err := api.GetSiteFeatures()
+	if err != nil {
+		return err
+	}
+	isIPenabled := api.IsIPAutthorizationEnabled(*siteFeatures)
+	resp, err := api.GetIPAccessRestrictionList()
+	if err != nil && isIPenabled {
+		return err
+		
+		} else if isIPenabled  {
+			AddIPs.AllowedIPs = resp.AllowedIPs
+			AddIPs.DeniedIPs = resp.DeniedIPs
+		}
+		var appfeature api.FeatureSchema
+			if !isIPenabled {
+				feature := api.Feature {
+					Feature : "ip_authorization_enabled",
+					Status: true,
+				}
+				appfeature.Data = append(appfeature.Data, feature)
+				err = api.UpdateSiteFeatures(appfeature)
+				if err != nil{
+					return err
+				}
+				
+			}
+				
+				
+				if allowedip != ""  {
+					for _, val := range AddIPs.AllowedIPs {
+						if val == ip {
+							return &cmdutil.FlagError{Err: errors.New("Entered IP or IP range is already added")}
+						}
+					}
+					if  len(AddIPs.DeniedIPs) > 0 {
+						if err := prompt.Confirm("Adding IP or IP Range to Allowed IP or IP Range will result in the deletion of all Denied IP or IP Range. Are you sure you want to proceed?", 
+									&shouldAdd); err != nil {
+										return err
+						}
+						if !shouldAdd {
+							return nil
+						} 
+					} 
+					AddIPs.DeniedIPs = make([]string, 0)
+					AddIPs.AllowedIPs = append(AddIPs.AllowedIPs, ip)
+		} else if deniedip != "" {
+			for _, val := range AddIPs.DeniedIPs {
+				if val == ip {
+					return &cmdutil.FlagError{Err: errors.New("Entered IP or IP range is already added")}
+				}
+			}
+				
+
+				if  len(AddIPs.AllowedIPs) > 0 {
+			
+					if err := prompt.Confirm("Adding IP or IP Range to Denied IP or IP Range will result in the deletion of all Allowed IP or IP Range. Are you sure you want to proceed?", 
+								&shouldAdd); err != nil {
+									return err
+					}
+					if !shouldAdd {
+						return nil
+					} 
+				} 
+			
+			AddIPs.AllowedIPs = make([]string, 0)
+			AddIPs.DeniedIPs = append(AddIPs.DeniedIPs, ip)
+		}
+		err = api.AddIPAccessRestrictionList(false, AddIPs)
+		if err != nil {
+			return err
+		}
+		fmt.Println("IP authorization settings saved successfully." )
+
+
+	return nil
 }

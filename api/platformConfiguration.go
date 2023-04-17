@@ -438,3 +438,19 @@ func UpdatePasswordlessLogin(body []byte) (*PasswordlessLogin, error) {
 	}
 	return &resultResp, err
 }
+
+func UpdateSiteFeatures (data FeatureSchema) error {
+	url := conf.AdminConsoleAPIDomain + "/platform-configuration/app-features?"
+	body, _ := json.Marshal(data)
+	resp, err := request.Rest(http.MethodPost, url, nil, string(body))
+	if err != nil {
+		return err
+	}
+	var resObj FeatureSchema
+	err = json.Unmarshal(resp, &resObj)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
