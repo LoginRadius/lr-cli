@@ -204,6 +204,15 @@ func IsPasswordLessEnabled(features FeatureSchema) bool {
 	return false
 }
 
+func IsIPAutthorizationEnabled(features FeatureSchema) bool {
+	for _, val := range features.Data {
+		if val.Feature == "ip_authorization_enabled" && val.Status {
+			return true
+		}
+	}
+	return false
+}
+
 func storeSiteInfo(data CoreAppData) (map[int64]SitesReponse, map[int64]SharedSitesReponse) {
 	siteInfo := make(map[int64]SitesReponse, len(data.Apps.Data))
 	sharedsiteInfo := make(map[int64]SharedSitesReponse, len(data.Apps.Data))
