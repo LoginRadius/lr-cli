@@ -167,21 +167,7 @@ func updatePath(themechildkey string) string {
 
 }
 
-
 var Theme1Profile = ThemeType{
-
-	PageType:     "Profile",
-	CustomCss:    []string{0: updatePath("/css/hosted-auth-default.css")},
-	FavIcon:      updatePath(("/images/favicon.ico")),
-	HtmlBody:     "<div class='grid lr-hostr-container lr-hostr-logged-in'>\n<div id='lr-raas-message' class='loginradius-raas-success-message'></div>\n<div class='grid lr-hostr-frame cf'>\n<div class='lr-profile-frame lr-social-login-frame lr-frames lr-sample-background-enabled cf'>\n<div class='lr-profile-image'><img alt=''></div>\n<h1 class='lr-profile-name'></h1>\n<div class='lr-profile-info'><p></p></div>\n<div class='lr-link-social-container'>\n<div class='lr-linked-social-frame' id='lr-linked-social'>\n<h5 class='lr-heading'>Linked social accounts</h5>\n</div>\n<script type=\"text/html\" id=\"linkedAccountsTemplate\"><# if(isLinked) { #> <div class=\"lr-social-account\"><span class=\"lr-social-icon lr-flat-<#= Name.toLowerCase() #> button-shade lr-sl-icon lr-sl-icon-<#= Name.toLowerCase() #>\"></span><span class=\"lr-social-info\"><#= Name #></span><span class=\"lr-social-unlink\"><a onclick='return window[\"loginradiusv1\"]? unLinkAccount(\"<#= Name.toLowerCase() #>\",\"<#= providerId #>\") : LRObject.util.unLinkAccount(\"<#= Name.toLowerCase() #>\",\"<#= providerId #>\")'>Unlink</a></span></div><# } #></script><div class='lr-not-linked-social-frame' id='lr-not-linked-social'>\n<h5 class='lr-heading'>Link more social accounts</h5>\n</div>\n<script type=\"text/html\" id=\"notLinkedAccountsTemplate\"><# if(!isLinked) { #> <span class=\"lr-social-icon lr-flat-<#= Name.toLowerCase() #> button-shade lr-sl-icon lr-sl-icon-<#= Name.toLowerCase() #>\" onclick='LRObject.util.openWindow(\"<#= Endpoint #>\");'></span><# } #></script></div>\n<div class='lr-menu lr-account-menu'>\n<div class='lr-menu-button'></div>\n<div class='lr-menu-list-frame'>\n<a class='lr-settings lr-menu-list lr-show-settings' data-query='lr-edit-profile'>Edit Profile</a>\n<a class='lr-settings lr-menu-list lr-show-settings' data-query='lr-change-password'>Change Password</a>\n<a class='lr-settings lr-menu-list lr-show-settings' data-query='lr-account-settings'>Account Settings</a>\n<a class='lr-logout lr-menu-list' href='auth.aspx?action=logout'>Logout</a>\n</div>\n</div>\n</div>\n<div class='lr-frames lr-more-info-container'>\n<div class='lr-more-info-frame'>\n<div class='lr-more-info-heading'>\n<h2>My Profile</h2>\n<div class='lr-edit-profile lr-button outline-grey lr-show-settings' data-query='lr-edit-profile'>Edit</div>\n</div>\n<div class='lr-content-section cf' id='profile-viewer'>\n</div>\n</div>\n<script type=\"text/html\" id=\"profileViewTemplate\"><# if(typeof value !=\"undefined\" ) { #> <div class=\"lr-content-group\"><h6 class=\"lr-label\"><#= display #></h6> <div class=\"lr-data\"><#= value #></div></div><# } #></script><div class='lr-more-menu-contents'>\n<div id='lr-edit-profile' class='lr-more-menu-frame lr-edit-profile lr-account-settings'>\n<div class='lr-more-info-heading'>\n<h2>Edit My Profile</h2>\n<a id='lr-close' class='lr-close'>&times;</a>\n</div>\n<div class='lr-editable-fields-frame' id='profile-editor-container'>\n</div>\n</div>\n<div id='lr-account-settings' class='lr-more-menu-frame lr-account-settings'>\n<div class='lr-more-info-heading'>\n<h2>Account Settings</h2>\n<a id='lr-close' class='lr-close'>&times;</a>\n</div>\n<div class='lr-account-settings-frame'>\n<h5 class='lr-setting-label'>Delete Account</h5>\n<div class='lr-action-box'>\n<a class='lr-button white button-shade' href='javascript:void(0)' onclick='deleteAccount();'>Delete my account</a>\n</div>\n</div>\n</div>\n<div id='lr-change-password' class='lr-more-menu-frame lr-field-editor lr-change-password lr-account-settings'>\n<div class='lr-more-info-heading'>\n<h2>Change Password</h2>\n<a id='lr-close' class='lr-close'>&times;</a>\n</div>\n<div class='lr-editable-fields-frame' id='change-password'>\n</div>\n<div class='lr-editable-fields-frame' id='set-password'>\n</div>\n</div>\n</div>\n</div>\n</div>\n</div>\n<div class='lr_fade lr-loading-screen-overlay' id='loading-spinner'>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n</div>",
-	EndScript:    "",
-	BeforeScript: updatePath("/js/default-profile-before-script.js"),
-	IsActive:     true,
-	MainScript:   "",
-	Status:       "0",
-}
-
-var Theme2Profile = ThemeType{
 
 	PageType:     "Profile",
 	CustomCss:    []string{0: updatePath("/Themes/Theme-Default/profile/css/profile-style.css")},
@@ -191,9 +177,21 @@ var Theme2Profile = ThemeType{
 	BeforeScript: updatePath("/Themes/Theme-Default/profile/js/profile-before-script.js"),
 	IsActive:     true,
 	MainScript:   "",
-	Status:       "1",
+	Status:       "0",
 }
 
+var Theme2Profile = ThemeType{
+
+	PageType:     "Profile",
+	CustomCss:    []string{0: updatePath("/css/hosted-auth-default.css")},
+	FavIcon:      updatePath(("/images/favicon.ico")),
+	HtmlBody:     "<div class='grid lr-hostr-container lr-hostr-logged-in'>\n<div id='lr-raas-message' class='loginradius-raas-success-message'></div>\n<div class='grid lr-hostr-frame cf'>\n<div class='lr-profile-frame lr-social-login-frame lr-frames lr-sample-background-enabled cf'>\n<div class='lr-profile-image'><img alt=''></div>\n<h1 class='lr-profile-name'></h1>\n<div class='lr-profile-info'><p></p></div>\n<div class='lr-link-social-container'>\n<div class='lr-linked-social-frame' id='lr-linked-social'>\n<h5 class='lr-heading'>Linked social accounts</h5>\n</div>\n<script type=\"text/html\" id=\"linkedAccountsTemplate\"><# if(isLinked) { #> <div class=\"lr-social-account\"><span class=\"lr-social-icon lr-flat-<#= Name.toLowerCase() #> button-shade lr-sl-icon lr-sl-icon-<#= Name.toLowerCase() #>\"></span><span class=\"lr-social-info\"><#= Name #></span><span class=\"lr-social-unlink\"><a onclick='return window[\"loginradiusv1\"]? unLinkAccount(\"<#= Name.toLowerCase() #>\",\"<#= providerId #>\") : LRObject.util.unLinkAccount(\"<#= Name.toLowerCase() #>\",\"<#= providerId #>\")'>Unlink</a></span></div><# } #></script><div class='lr-not-linked-social-frame' id='lr-not-linked-social'>\n<h5 class='lr-heading'>Link more social accounts</h5>\n</div>\n<script type=\"text/html\" id=\"notLinkedAccountsTemplate\"><# if(!isLinked) { #> <span class=\"lr-social-icon lr-flat-<#= Name.toLowerCase() #> button-shade lr-sl-icon lr-sl-icon-<#= Name.toLowerCase() #>\" onclick='LRObject.util.openWindow(\"<#= Endpoint #>\");'></span><# } #></script></div>\n<div class='lr-menu lr-account-menu'>\n<div class='lr-menu-button'></div>\n<div class='lr-menu-list-frame'>\n<a class='lr-settings lr-menu-list lr-show-settings' data-query='lr-edit-profile'>Edit Profile</a>\n<a class='lr-settings lr-menu-list lr-show-settings' data-query='lr-change-password'>Change Password</a>\n<a class='lr-settings lr-menu-list lr-show-settings' data-query='lr-account-settings'>Account Settings</a>\n<a class='lr-logout lr-menu-list' href='auth.aspx?action=logout'>Logout</a>\n</div>\n</div>\n</div>\n<div class='lr-frames lr-more-info-container'>\n<div class='lr-more-info-frame'>\n<div class='lr-more-info-heading'>\n<h2>My Profile</h2>\n<div class='lr-edit-profile lr-button outline-grey lr-show-settings' data-query='lr-edit-profile'>Edit</div>\n</div>\n<div class='lr-content-section cf' id='profile-viewer'>\n</div>\n</div>\n<script type=\"text/html\" id=\"profileViewTemplate\"><# if(typeof value !=\"undefined\" ) { #> <div class=\"lr-content-group\"><h6 class=\"lr-label\"><#= display #></h6> <div class=\"lr-data\"><#= value #></div></div><# } #></script><div class='lr-more-menu-contents'>\n<div id='lr-edit-profile' class='lr-more-menu-frame lr-edit-profile lr-account-settings'>\n<div class='lr-more-info-heading'>\n<h2>Edit My Profile</h2>\n<a id='lr-close' class='lr-close'>&times;</a>\n</div>\n<div class='lr-editable-fields-frame' id='profile-editor-container'>\n</div>\n</div>\n<div id='lr-account-settings' class='lr-more-menu-frame lr-account-settings'>\n<div class='lr-more-info-heading'>\n<h2>Account Settings</h2>\n<a id='lr-close' class='lr-close'>&times;</a>\n</div>\n<div class='lr-account-settings-frame'>\n<h5 class='lr-setting-label'>Delete Account</h5>\n<div class='lr-action-box'>\n<a class='lr-button white button-shade' href='javascript:void(0)' onclick='deleteAccount();'>Delete my account</a>\n</div>\n</div>\n</div>\n<div id='lr-change-password' class='lr-more-menu-frame lr-field-editor lr-change-password lr-account-settings'>\n<div class='lr-more-info-heading'>\n<h2>Change Password</h2>\n<a id='lr-close' class='lr-close'>&times;</a>\n</div>\n<div class='lr-editable-fields-frame' id='change-password'>\n</div>\n<div class='lr-editable-fields-frame' id='set-password'>\n</div>\n</div>\n</div>\n</div>\n</div>\n</div>\n<div class='lr_fade lr-loading-screen-overlay' id='loading-spinner'>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n</div>",
+	EndScript:    "",
+	BeforeScript: updatePath("/js/default-profile-before-script.js"),
+	IsActive:     true,
+	MainScript:   "",
+	Status:       "1",
+}
 var Theme3Profile = ThemeType{
 
 	PageType:     "Profile",
@@ -231,23 +229,7 @@ var Theme5Profile = ThemeType{
 	Status:       "4",
 }
 
-
-
 var Theme1Auth = ThemeType{
-	PageType: "Auth",
-	CustomCss: []string{
-		updatePath("/css/hosted-auth-default.css"),
-	},
-	FavIcon:      updatePath("/images/favicon.ico"),
-	HtmlBody:     "<div class='grid lr-hostr-container'>\n<div id='lr-raas-message' class='loginradius-raas-success-message'></div>\n<div class='grid lr-hostr-frame cf'>\n<div id='lr-social-login' class='lr-social-login-frame lr-frames lr-sample-background-enabled cf'>\n<h2 class='lr-social-login-message'>Login with your social account</h2>\n<div id='interfacecontainerdiv' class='lr-sl-shaded-brick-frame cf lr-widget-container'>\n</div>\n<script type=\"text/html\" id=\"loginradiuscustom_tmpl\"><span class=\"lr-provider-label lr-sl-shaded-brick-button lr-flat-<#=Name.toLowerCase()#>\" onclick=\" return LRObject.util.openWindow('<#= Endpoint #>'); \" title=\"Sign up with <#= Name #>\" alt=\"Sign in with <#= Name#>\"><span class=\"lr-sl-icon lr-sl-icon-<#= Name.toLowerCase()#>\"></span>Login with <#= Name#> </span> </script></div>\n<div class='lr-frames lr-forms-container'>\n<div id='lr-traditional-login' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>...or login with your email</h2>\n<div id='login-container' class='lr-widget-container'>\n</div>\n<div class='lr-link-box'>\n<a class='lr-raas-forgot-password'>Forgot password?</a>\n<a class='lr-register-link'>Create Account</a>\n</div>\n</div>\n<div id='lr-raas-registartion' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>...or create an account</h2>\n<div id='registration-container' class='lr-widget-container'>\n</div>\n<div class='lr-link-box'>\n<a class='lr-raas-forgot-password'>Forgot password?</a>\n<a class='lr-raas-login-link'>Login</a>\n</div>\n</div>\n<div id='lr-raas-forgotpassword' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>Forgot Password</h2>\n<p class='lr-form-login-subnote'>We'll email you an instruction on how to reset your password.</p>\n<div id='forgotpassword-container' class='lr-widget-container'>\n</div>\n<div class='lr-link-box'>\n<a class='lr-raas-login-link'>Login</a>\n<a class='lr-register-link'>Create Account</a>\n</div>\n</div>\n<div id='lr-raas-sociallogin' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>Complete your Profile</h2>\n<p class='lr-form-login-subnote'>Require to fill all mandatory fields.</p>\n<div id='sociallogin-container' class='lr-widget-container'>\n</div>\n</div>\n<div id='lr-raas-resetpassword' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>Reset your Password</h2>\n<p class='lr-form-login-subnote'>Reset your password to get back access of your account</p>\n<div id='resetpassword-container' class='lr-widget-container'>\n</div>\n</div>\n</div>\n</div>\n</div>\n<div class='lr_fade lr-loading-screen-overlay' id='loading-spinner'>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n</div>",
-	EndScript:    "",
-	BeforeScript: updatePath("/js/default-auth-before-script.js"),
-	IsActive:     true,
-	MainScript:   "",
-	Status:       "0",
-}
-
-var Theme2Auth = ThemeType{
 	PageType: "Auth",
 	CustomCss: []string{
 		updatePath("/Themes/Theme-Default/auth/css/idx-style.css"),
@@ -259,6 +241,20 @@ var Theme2Auth = ThemeType{
 	HtmlBody:     "<div id=\"idx-container\"></div>\n",
 	EndScript:    "",
 	BeforeScript: updatePath("/Themes/Theme-Default/auth/js/idx-options.js"),
+	IsActive:     true,
+	MainScript:   "",
+	Status:       "0",
+}
+
+var Theme2Auth = ThemeType{
+	PageType: "Auth",
+	CustomCss: []string{
+		updatePath("/css/hosted-auth-default.css"),
+	},
+	FavIcon:      updatePath("/images/favicon.ico"),
+	HtmlBody:     "<div class='grid lr-hostr-container'>\n<div id='lr-raas-message' class='loginradius-raas-success-message'></div>\n<div class='grid lr-hostr-frame cf'>\n<div id='lr-social-login' class='lr-social-login-frame lr-frames lr-sample-background-enabled cf'>\n<h2 class='lr-social-login-message'>Login with your social account</h2>\n<div id='interfacecontainerdiv' class='lr-sl-shaded-brick-frame cf lr-widget-container'>\n</div>\n<script type=\"text/html\" id=\"loginradiuscustom_tmpl\"><span class=\"lr-provider-label lr-sl-shaded-brick-button lr-flat-<#=Name.toLowerCase()#>\" onclick=\" return LRObject.util.openWindow('<#= Endpoint #>'); \" title=\"Sign up with <#= Name #>\" alt=\"Sign in with <#= Name#>\"><span class=\"lr-sl-icon lr-sl-icon-<#= Name.toLowerCase()#>\"></span>Login with <#= Name#> </span> </script></div>\n<div class='lr-frames lr-forms-container'>\n<div id='lr-traditional-login' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>...or login with your email</h2>\n<div id='login-container' class='lr-widget-container'>\n</div>\n<div class='lr-link-box'>\n<a class='lr-raas-forgot-password'>Forgot password?</a>\n<a class='lr-register-link'>Create Account</a>\n</div>\n</div>\n<div id='lr-raas-registartion' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>...or create an account</h2>\n<div id='registration-container' class='lr-widget-container'>\n</div>\n<div class='lr-link-box'>\n<a class='lr-raas-forgot-password'>Forgot password?</a>\n<a class='lr-raas-login-link'>Login</a>\n</div>\n</div>\n<div id='lr-raas-forgotpassword' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>Forgot Password</h2>\n<p class='lr-form-login-subnote'>We'll email you an instruction on how to reset your password.</p>\n<div id='forgotpassword-container' class='lr-widget-container'>\n</div>\n<div class='lr-link-box'>\n<a class='lr-raas-login-link'>Login</a>\n<a class='lr-register-link'>Create Account</a>\n</div>\n</div>\n<div id='lr-raas-sociallogin' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>Complete your Profile</h2>\n<p class='lr-form-login-subnote'>Require to fill all mandatory fields.</p>\n<div id='sociallogin-container' class='lr-widget-container'>\n</div>\n</div>\n<div id='lr-raas-resetpassword' class='lr-form-frame'>\n<h2 class='lr-form-login-message'>Reset your Password</h2>\n<p class='lr-form-login-subnote'>Reset your password to get back access of your account</p>\n<div id='resetpassword-container' class='lr-widget-container'>\n</div>\n</div>\n</div>\n</div>\n</div>\n<div class='lr_fade lr-loading-screen-overlay' id='loading-spinner'>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n<div class='load-dot'></div>\n</div>",
+	EndScript:    "",
+	BeforeScript: updatePath("/js/default-auth-before-script.js"),
 	IsActive:     true,
 	MainScript:   "",
 	Status:       "1",
