@@ -30,12 +30,12 @@ func NewSiteCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 			$ lr get site --all
 			All sites: 
-			+--------+-----------------+-------------------------+
-			|   ID   |      NAME       |         DOMAIN          |
-			+--------+-----------------+-------------------------+
-			| 111111 | new-test1       | https://mail7.io        |
-			| 122222 | my-app-final    | loginradius.com         | 
-			| 142670 | trail-pro       | https://loginradius.com | 
+			+--------+-----------------+-------------------------+-----------+
+			|   ID   |      NAME       |         DOMAIN          |	  ROLE   | 
+			+--------+-----------------+-------------------------+-----------+
+			| 111111 | new-test1       | https://mail7.io        |	Owner	 |
+			| 122222 | my-app-final    | loginradius.com         |  Admin    |
+			| 142670 | trail-pro       | https://loginradius.com |  Marketing|
 
 			$ lr get site --active
 			Current site: 
@@ -86,20 +86,20 @@ func getSite() error {
 		if len(AppInfo) != 0 {
 			fmt.Println("Your sites: ")
 			for _, site := range AppInfo {
-				data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain})
+				data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, site.Role})
 			}
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"ID", "Name", "Domain"})
+			table.SetHeader([]string{"ID", "Name", "Domain", "Role"})
 			table.AppendBulk(data)
 			table.Render()
 		} 
 		if len(SharedAppInfo) != 0 {
 			fmt.Println("Shared sites: ")
 			for _, site := range SharedAppInfo {
-				sharedAppdata = append(sharedAppdata, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain})
+				sharedAppdata = append(sharedAppdata, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, strings.Join(site.Role, ",")})
 			}
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"ID", "Name", "Domain"})
+			table.SetHeader([]string{"ID", "Name", "Domain", "Role"})
 			table.AppendBulk(sharedAppdata)
 			table.Render()
 		}

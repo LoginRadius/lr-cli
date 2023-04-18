@@ -1,9 +1,12 @@
 package cmdutil
 
 import (
+	"errors"
+	"encoding/binary"
 	"github.com/loginradius/lr-cli/config"
 	"regexp"
 	"strings"
+	"net"
 )
 
 var ThemeMap = map[string]string{
@@ -23,6 +26,75 @@ var DomainValidation = regexp.MustCompile(`^((([\S]+:\/\/?)(?:[-;:&=\+\$,\w]+@)?
 var AccessRestrictionDomain = regexp.MustCompile(`^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\")){0,}@{0,1}((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$`)
 
 var ValidateEmail = regexp.MustCompile(`^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$`)
+
+var ValidateIP = regexp.MustCompile(`^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})$`)
+
+
+func isNotLeadingZeroIp (ip string) bool {
+	octets := strings.Split(ip, ".")
+  for _,val := range octets {
+    if (len(val) > 1 && strings.HasPrefix(val, "0") ) {
+      return false
+    }
+  }
+  return true
+}
+
+func CompareTwoIPs (ip1 string, ip2 string) bool {
+	newip1 := net.ParseIP(ip1)
+	newip2 := net.ParseIP(ip2)
+	ip41 := newip1.To4()
+	ip42 := newip2.To4()
+  ip1Int := binary.BigEndian.Uint32(ip41)
+  ip2Int := binary.BigEndian.Uint32(ip42)
+  if ip1Int < ip2Int {
+    return true
+  } else {
+    return false
+  }
+}
+
+func ValidateIPorIPRange (ip string) (bool, error) {
+	if strings.Contains(ip, "-") {
+		ips := strings.Split(ip, "-")
+		ip1 := strings.TrimSpace(ips[0])
+		ip2 := strings.TrimSpace(ips[1])
+		isLowerValidIP := ValidateIP.MatchString(ip1)
+      	isHighetValidIP := ValidateIP.MatchString(ip2)
+      if isNotLeadingZeroIp(ip1) && isNotLeadingZeroIp(ip2) {
+        	if isLowerValidIP && isHighetValidIP && len(ips) == 2 {
+        	  if CompareTwoIPs(ip1, ip2) {
+        	    return true, nil
+        	  } else {
+				  return false,
+				  errors.New("Start IP should be lower than the end IP")
+        	  }
+        	} else {
+				return false,
+				errors.New("IP address or IP range must be in a valid format, example - 192.168.0.1 or 192.168.0.1-192.168.0.255")
+        	}
+		} else {
+			 
+			return false, errors.New("IP address or IP range must be in a valid format")
+		}
+		
+
+	} else {
+		if isNotLeadingZeroIp(ip) {
+			if ValidateIP.MatchString(ip){
+				return true, nil
+			} else {
+				return false,
+				errors.New("IP address or IP range must be in a valid format, example - 192.168.0.1 or 192.168.0.1-192.168.0.255")
+			}
+
+		} else {
+			return false,
+			errors.New("IP address or IP range must be in a valid format")
+		}
+	}
+}
+
 
 
 type ThemeType struct {
@@ -65,7 +137,7 @@ var PermissionCommands = map[string]string {
 "lr_demo":		 				"API_ViewConfiguration",
 "lr_reset_secret":	 			"API_EditCredentials",
 "lr_verify": 					"UserManagement_Admin",
-"lr_get_config":				"API_ViewCredentials",
+"lr_get_config":				"API_EditCredentials",
 "lr_get_domain":				"API_ViewConfiguration",
 "lr_get_server-info": 			"API_ViewConfiguration",
 "lr_get_theme": 				"API_ViewConfiguration",

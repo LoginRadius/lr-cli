@@ -227,6 +227,15 @@ func IsPasswordLessEnabled(features FeatureSchema) bool {
 	return false
 }
 
+func IsIPAutthorizationEnabled(features FeatureSchema) bool {
+	for _, val := range features.Data {
+		if val.Feature == "ip_authorization_enabled" && val.Status {
+			return true
+		}
+	}
+	return false
+}
+
 func storeSiteInfo(data CoreAppData) (map[int64]SitesReponse, map[int64]SharedSitesReponse) {
 	siteInfo := make(map[int64]SitesReponse, len(data.Apps.Data))
 	sharedsiteInfo := make(map[int64]SharedSitesReponse, len(data.Apps.Data))
@@ -242,9 +251,15 @@ func storeSiteInfo(data CoreAppData) (map[int64]SitesReponse, map[int64]SharedSi
 	currentId, err := CurrentID()
 	if err == nil {
 		site, ok := siteInfo[currentId]
+		sharedsite, sharedok := sharedsiteInfo[currentId]
 		if ok {
-			obj, _ := json.Marshal(site)
-			cmdutil.WriteFile("currentSite.json", obj)
+
+				obj, _ := json.Marshal(site)
+				cmdutil.WriteFile("currentSite.json", obj)
+			
+		} else if sharedok {
+			obj, _ := json.Marshal(sharedsite)
+				cmdutil.WriteFile("currentSite.json", obj)
 		}
 	}
 	return siteInfo,sharedsiteInfo

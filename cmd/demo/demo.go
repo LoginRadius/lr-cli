@@ -35,7 +35,7 @@ func NewDemoCmd() *cobra.Command {
 			if err != nil {
 				return errors.New("Error in getting your App Name")
 			}
-			cmdutil.Openbrowser("https://" + appCreds.AppName + ".devhub.lrinternal.com/auth.aspx")
+			cmdutil.Openbrowser("https://" + appCreds.AppName + ".hub.loginradius.com/auth.aspx")
 			return nil
 		},
 	}
