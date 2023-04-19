@@ -46,6 +46,10 @@ func NewaccessRestrictionCmd() *cobra.Command {
 		
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, err := api.GetPermission("lr_add_access-restriction")
+			if(!isPermission || err != nil) {
+				return nil
+			}
 			return addAccessRestriction(opts)
 		},
 	}

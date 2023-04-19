@@ -10,6 +10,7 @@ import (
 
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/request"
+	"github.com/loginradius/lr-cli/api"
 
 	"github.com/spf13/cobra"
 )
@@ -36,6 +37,10 @@ func NewaccountCmd() *cobra.Command {
 		User account sucessfully deleted
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_delete_account")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if inpEmail == "" && inpUID != "" {
 				return delete(inpUID, "uid")
 			} else if inpUID == "" && inpEmail != "" {

@@ -18,8 +18,14 @@ type SitesToken struct {
 	XToken        string `json:"xtoken"`
 }
 
-func SetSites(appid int64) (*SitesToken, error) {
-	switchapp := conf.AdminConsoleAPIDomain + "/account/switchapp?appid=" + strconv.FormatInt(appid, 10)
+func SetSites(appid int64, owned bool) (*SitesToken, error) {
+	var api string
+	if (owned){
+		api = "/account/switchapp?appid="
+	} else {
+		api = "/account/switchsharedsite?appid="
+	}
+	switchapp := conf.AdminConsoleAPIDomain + api + strconv.FormatInt(appid, 10)
 	switchResp, err := request.Rest(http.MethodGet, switchapp, nil, "")
 	var switchRespObj SitesToken
 	err = json.Unmarshal(switchResp, &switchRespObj)

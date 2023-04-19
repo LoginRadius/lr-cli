@@ -131,7 +131,6 @@ type VerifySmtpConfigSchema struct {
 type VerifySmtpConfigError struct {
 	Description 		string		`json:"description"`
 	Message 		string		`json:"message"`
-
 }
 
 func GetSites() (*SitesReponse, error) {

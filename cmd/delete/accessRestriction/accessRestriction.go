@@ -43,7 +43,10 @@ func NewaccessRestrictionCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 
-
+			isPermission, errr := api.GetPermission("lr_delete_access-restriction")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if opts.BlacklistDomain != "" || opts.WhitelistDomain != "" {
 
 				resp, err := api.GetEmailWhiteListBlackList()

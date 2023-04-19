@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"reflect"
 
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/config"
@@ -20,7 +21,7 @@ type LoginResponse struct {
 	AppName       string      `json:"app_name"`
 	Authenticated bool        `json:"authenticated"`
 	NoOfLogins    int32       `json:"no_of_logins"`
-	PlanDetails   interface{} `json"plan_detail"`
+	PlanDetails   interface{} `json:"plan_detail"`
 	XSign         string      `json:"xsign"`
 	XToken        string      `json:"xtoken"`
 }
@@ -42,6 +43,28 @@ type FeatureSchema struct {
 type Feature struct {
 	Feature string `json:"feature"`
 	Status  bool   `json:"status"`
+}
+
+type PermissionResponse struct {
+	Permissions Permission `json:"permissions"`
+}
+
+type Permission struct {
+	API_AdminConfiguration         		bool		`json:"API_AdminConfiguration"`
+	API_EditConfiguration       		bool		`json:"API_EditConfiguration"`
+	API_EditCredentials 				bool        `json:"API_EditCredentials"`
+	API_EditThirdPartyCredentials    	bool		`json:"API_EditThirdPartyCredentials"`
+	API_ViewCredentials   				bool		`json:"API_ViewCredentials"`
+	UserManagement_Admin		       	bool		`json:"UserManagement_Admin"`
+	API_ViewConfiguration        		bool		`json:"API_ViewConfiguration"`
+	API_ViewThirdPartyCredentials  		bool		`json:"API_ViewThirdPartyCredentials"`
+	ThirdPartyIntegration_View		    bool		`json:"ThirdPartyIntegration_View"`
+	UserManagement_View				    bool		`json:"UserManagement_View"`
+	SecurityPolicy_View				    bool		`json:"SecurityPolicy_View"`
+	API_AdminThirdPartyCredentials	    bool		`json:"API_AdminThirdPartyCredentials"`
+	ThirdPartyIntegration_Admin		    bool		`json:"ThirdPartyIntegration_Admin"`
+	SecurityPolicy_Admin			    bool		`json:"SecurityPolicy_Admin"`
+	SecurityPolicy_Edit				    bool		`json:"SecurityPolicy_Edit"`
 }
 
 func AuthLogin(params LoginOpts) (*LoginResponse, error) {
@@ -228,9 +251,15 @@ func storeSiteInfo(data CoreAppData) (map[int64]SitesReponse, map[int64]SharedSi
 	currentId, err := CurrentID()
 	if err == nil {
 		site, ok := siteInfo[currentId]
+		sharedsite, sharedok := sharedsiteInfo[currentId]
 		if ok {
-			obj, _ := json.Marshal(site)
-			cmdutil.WriteFile("currentSite.json", obj)
+
+				obj, _ := json.Marshal(site)
+				cmdutil.WriteFile("currentSite.json", obj)
+			
+		} else if sharedok {
+			obj, _ := json.Marshal(sharedsite)
+				cmdutil.WriteFile("currentSite.json", obj)
 		}
 	}
 	return siteInfo,sharedsiteInfo
@@ -258,4 +287,59 @@ func UpdatePhoneLogin(feature string, status bool) (*FeatureSchema, error) {
 		return nil, err
 	}
 	return &resultResp, err
+}
+
+
+func GetPermissionsfromAPI() ( error) {
+	
+	coreAppData := conf.AdminConsoleAPIDomain + "/auth/permissions?"
+	data, err := request.Rest(http.MethodGet, coreAppData, nil, "")
+	var  permissionsResp PermissionResponse
+	var permission Permission
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(data, &permissionsResp)
+	permission = permissionsResp.Permissions
+	err = storePermissionData(permission)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
+func storePermissionData(data Permission) (error) {
+	var permissionobj = cmdutil.PermissionCommands
+	permission := make(map[string]bool, len(permissionobj))
+	for key, val := range permissionobj {
+		v := reflect.ValueOf(&data).Elem().FieldByName(val)
+		if v.IsValid() {
+			permission[key] = v.Bool()
+		} 
+	}
+	obj, err := json.Marshal(permission)
+	if err != nil {
+		return nil
+	}
+	cmdutil.WriteFile("permission.json", obj)
+	return nil
+}
+
+func GetPermission(str string) (bool, error) { 
+	data, err := cmdutil.ReadFile("permission.json")
+	if err != nil {
+	return false, err
+	}
+	permission := make(map[string]bool)
+	err = json.Unmarshal(data, &permission)
+	if err != nil {
+		return false, err
+		}
+	if permission[str] == false {
+		fmt.Println("You don't have access to proceed, request access from the site owner. If you've already been granted access, log out and log back in. If the issue persists, contact LoginRadius support at ")
+		fmt.Println( conf.DashboardDomain + "/support/tickets")
+		return false , nil
+	}
+	return true , nil
 }

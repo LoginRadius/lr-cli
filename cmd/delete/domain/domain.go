@@ -33,6 +33,10 @@ func NewdomainCmd() *cobra.Command {
 		<domain> is now removed from whitelisted domain."
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_delete_domain")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if opts.Domain == "" {
 				return &cmdutil.FlagError{Err: errors.New("`domain` is required argument")}
 			}

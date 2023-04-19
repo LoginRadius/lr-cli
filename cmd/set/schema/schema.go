@@ -37,6 +37,10 @@ func NewSetSchemaCmd() *cobra.Command {
         "my-field" disabled successfully
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_set_schema")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			if fieldName == "" {
 				return &cmdutil.FlagError{Err: errors.New("`fieldName` is required argument")}
 			}

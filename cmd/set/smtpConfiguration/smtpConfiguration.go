@@ -42,6 +42,10 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 		SMTP settings are verified
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_set_smtp-configuration")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			if provider == "" {
 				return &cmdutil.FlagError{Err: errors.New("`provider` is required argument")}
 			}

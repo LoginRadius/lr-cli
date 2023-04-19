@@ -9,9 +9,6 @@ import (
 	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/spf13/cobra"
-
-
-
 )
 
 
@@ -46,7 +43,10 @@ IP authorization settings are saved successfully
 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			
+			isPermission, errr := api.GetPermission("lr_set_access-restriction")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			if opts.BlacklistDomain != "" || opts.WhitelistDomain != "" {
 
 				if opts.DomainMod == "" {

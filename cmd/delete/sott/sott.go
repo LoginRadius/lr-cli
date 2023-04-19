@@ -39,6 +39,10 @@ func NewSottCmd() *cobra.Command {
 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_delete_sott")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if token == "" && !*all  {
 				return &cmdutil.FlagError{Err: errors.New("`token` is required argument")}
 			}

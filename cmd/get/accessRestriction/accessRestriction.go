@@ -37,7 +37,10 @@ Allowed/Denied IP or IP Range
 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			
+			isPermission, errr := api.GetPermission("lr_get_access-restriction")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if *domain {
 				GetDomainEmailList()
 			} else if *ip  {
