@@ -200,7 +200,7 @@ func addIpOrIpRange(allowedip string, deniedip string) error {
 						}
 					}
 					if  len(AddIPs.DeniedIPs) > 0 {
-						if err := prompt.Confirm("Adding IP or IP Range to Allowed IP or IP Range will result in the deletion of all Denied IP or IP Range. Are you sure you want to proceed?", 
+						if err := prompt.Confirm("Denied IP or IP range configuration exists. Adding IP or IP range to the Allowed list will remove the existing denied IP or IP range. Are you sure you want to proceed?", 
 									&shouldAdd); err != nil {
 										return err
 						}
@@ -220,7 +220,7 @@ func addIpOrIpRange(allowedip string, deniedip string) error {
 
 				if  len(AddIPs.AllowedIPs) > 0 {
 			
-					if err := prompt.Confirm("Adding IP or IP Range to Denied IP or IP Range will result in the deletion of all Allowed IP or IP Range. Are you sure you want to proceed?", 
+					if err := prompt.Confirm("Allowed IP or IP range configuration exists. Adding IP or IP range to the Denied list will remove the existing allowed IP or IP range. Are you sure you want to proceed?", 
 								&shouldAdd); err != nil {
 									return err
 					}
