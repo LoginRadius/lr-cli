@@ -86,7 +86,7 @@ func reset() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("API Secret reset successfully")
+	fmt.Println("The API Secret has been successfully reset.")
 
 	return nil
 }

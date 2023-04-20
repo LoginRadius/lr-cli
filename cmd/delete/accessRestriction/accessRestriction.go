@@ -80,24 +80,12 @@ func NewaccessRestrictionCmd() *cobra.Command {
 				if len(newDomains) == 0 {
 					resp.ListType = "none"
 				}
-				deleteDomain(resp.ListType, newDomains)
+				return deleteDomain(resp.ListType, newDomains)
 
 
 			} else if opts.AllowedIP != "" || opts.DeniedIP != "" {
 
-				if opts.AllowedIP != "" {
-					isValid, err := cmdutil.ValidateIPorIPRange(opts.AllowedIP) 
-					if err != nil && !isValid {
-						fmt.Println("Error :" + err.Error())
-						return nil
-					}
-				} else if opts.DeniedIP != "" {
-					isValid, err := cmdutil.ValidateIPorIPRange(opts.DeniedIP) 
-					if err != nil && !isValid {
-						fmt.Println("Error :" + err.Error())
-						return nil
-					}
-				}
+				
 				
 				siteFeatures, err := api.GetSiteFeatures()
 				if err != nil {
@@ -150,7 +138,7 @@ func NewaccessRestrictionCmd() *cobra.Command {
 						break
 					}
 				}
-				deleteIP(ipRestrictionType,newIPList)
+				return deleteIP(ipRestrictionType,newIPList)
 
 			}else if *allDomain {
 				var AddEmail api.EmailWhiteBLackListSchema 

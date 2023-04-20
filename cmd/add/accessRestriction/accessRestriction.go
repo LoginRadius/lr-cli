@@ -66,9 +66,9 @@ func NewaccessRestrictionCmd() *cobra.Command {
 
 func addAccessRestriction(opts *accessRestrictionObj) error {
 	if opts.BlacklistDomain != "" || opts.WhitelistDomain != "" {
-		addDomian( opts.WhitelistDomain, opts.BlacklistDomain)
+		return addDomian( opts.WhitelistDomain, opts.BlacklistDomain)
 	} else if opts.AllowedIP != "" || opts.DeniedIP != "" {
-		addIpOrIpRange(opts.AllowedIP, opts.DeniedIP)
+		return addIpOrIpRange(opts.AllowedIP, opts.DeniedIP)
 	} else {
 		fmt.Println("Must use one of the following flags:")
 		fmt.Println("--blacklist-domain/whitelist-domain: To add either blacklist or whitelist Domain/Email")

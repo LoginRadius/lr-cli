@@ -98,7 +98,7 @@ func doLogin() error {
 	if err != nil {
 		return err
 	}
-	
+	fmt.Println("Fetching Permissions....")
 	err = api.GetPermissionsfromAPI()
 	if err != nil {
 		return err

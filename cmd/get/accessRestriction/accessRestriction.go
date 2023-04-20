@@ -42,9 +42,9 @@ Allowed/Denied IP or IP Range
 				return nil
 			}
 			if *domain {
-				GetDomainEmailList()
+				return GetDomainEmailList()
 			} else if *ip  {
-				GetIPList()
+				return GetIPList()
 			} else {
 				fmt.Println("Must use one of the following flags:") 
 					fmt.Println("--domain: To get the list of domains")
@@ -64,10 +64,7 @@ Allowed/Denied IP or IP Range
 
 func GetDomainEmailList() error {
 	resp, err := api.GetEmailWhiteListBlackList()
-			if err != nil && err.Error() == "No records found"{
-				fmt.Println(err.Error())
-				return nil
-			}
+		
 			if err != nil {
 				return err
 			}

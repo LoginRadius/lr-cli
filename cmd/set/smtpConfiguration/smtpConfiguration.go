@@ -29,7 +29,7 @@ func NewsmtpConfigurationCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 		# SMTP Provider's Names we can use in set commands
 		# Mailazy, AmazonSES-USEast, AmazonSES-USWest, AmazonSES-EU, Gmail, 
-		Mandrill, Rackspace-mailgun, SendGrid, Yahoo, Other
+		Mandrill, Rackspace-mailgun, SendGrid, Yahoo, CustomSMTPProviders
 		$ lr set smtp-configuration -p Mailazy
 		? Key: <Key>
 		? Secret: <Secret>
