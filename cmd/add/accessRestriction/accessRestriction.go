@@ -40,7 +40,7 @@ func NewaccessRestrictionCmd() *cobra.Command {
 	
 		(For IP/IP Range)
 		lr add access-restriction --allowed-ip <ip/ip range> 
-		? Adding IP or IP Range to Allowed IP or IP Range will result in the deletion of all Denied IP or IP Range. Are you sure you want to proceed?:Yes
+		Denied IP or IP range configuration exists. Adding IP or IP range to the Allowed list will remove the existing denied IP or IP range. Are you sure you want to proceed?:Yes
 		IP authorization settings are saved successfully.
 		
 		
