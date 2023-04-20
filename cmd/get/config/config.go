@@ -30,7 +30,12 @@ func NewConfigCmd() *cobra.Command {
 }
 
 func configure() error {
+	isPermission, errr := api.GetPermission("lr_get_config")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 	resp, err := api.GetSites()
+
 	if err != nil {
 		return err
 	}

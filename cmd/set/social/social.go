@@ -55,6 +55,10 @@ $ lr set social -p Google --enable
 Google Enabled Successfully
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_set_social")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			return update(provider, on, off)
 		},
 	}

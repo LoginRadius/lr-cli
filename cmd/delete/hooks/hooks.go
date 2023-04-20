@@ -38,6 +38,10 @@ func NewHooksCmd() *cobra.Command {
  
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_delete_hooks")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if hookid == "" {
 				return &cmdutil.FlagError{Err: errors.New("`--hookid` is required argument")}
 			}

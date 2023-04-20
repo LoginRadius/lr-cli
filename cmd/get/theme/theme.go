@@ -32,6 +32,7 @@ func NewThemeCmd() *cobra.Command {
 			Current Theme: Template_1
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			
 			return themes()
 		},
 	}
@@ -43,6 +44,10 @@ func NewThemeCmd() *cobra.Command {
 }
 
 func themes() error {
+	isPermission, errr := api.GetPermission("lr_get_theme")
+			if !isPermission || errr != nil {
+				return nil
+			}
 	if *all && !*active {
 		fmt.Println("Available Themes:")
 		fmt.Println("1. Template_1")

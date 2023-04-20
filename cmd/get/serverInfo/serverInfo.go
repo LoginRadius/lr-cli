@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
@@ -49,6 +50,10 @@ func NewServerInfoCmd() *cobra.Command {
 	return cmd
 }
 func serverInfo() error {
+	isPermission, errr := api.GetPermission("lr_get_server-info")
+	if(!isPermission || errr != nil) {
+		return nil
+	}
 	var resObj Server
 	resp, err := request.RestLRAPI(http.MethodGet, "/identity/v2/serverinfo?timedifference="+*timediff, nil, "")
 	if err != nil {

@@ -46,6 +46,10 @@ func NewThemeCmd() *cobra.Command {
 			
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_set_theme")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			if theme == "" {
 				return errors.New("`theme` is required argument")
 			}

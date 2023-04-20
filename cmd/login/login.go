@@ -86,12 +86,20 @@ func doLogin() error {
 	}
 	appid = int64(resObj.AppID)
 	creds, _ := json.Marshal(resObj)
+	if err != nil {
+		return err
+	}
 	err = cmdutil.WriteFile("token.json", creds)
 	if err != nil {
 		return err
 	}
 	fmt.Println("Successfully Authenticated, Fetching Your Site(s)...")
 	err = listSites(resObj.AppName)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Fetching Permissions....")
+	err = api.GetPermissionsfromAPI()
 	if err != nil {
 		return err
 	}
@@ -105,7 +113,7 @@ func listSites(currSiteName string) error {
 	if err != nil {
 		return err
 	}
-	if len(appInfo) == 1 {
+	if (len(appInfo) + len(sharedAppInfo)) == 1 {
 		return nil
 	}
 	var i int
@@ -141,12 +149,36 @@ func listSites(currSiteName string) error {
 		Options: options,
 	}, &siteChoice)
 	switchId := m[siteChoice]
-	switchRespObj, err := api.SetSites(switchId)
-
-	err = api.SitesBasic(switchRespObj)
+	owned := siteChoice < (len(appInfo) - 1)  
+	switchRespObj, err := api.SetSites(switchId, owned)
+	result := api.LoginResponse{
+		APIVersion:    switchRespObj.APIVersion,
+		AppName:       switchRespObj.AppName,
+		AppID:         switchRespObj.AppID,
+		Authenticated: true,
+		XSign:         switchRespObj.XSign, //switching tokens
+		XToken:        switchRespObj.XToken,
+	}
+	resObj, err := json.Marshal(result)
+	err = cmdutil.DeleteFiles()
 	if err != nil {
 		return err
 	}
+	// resObj, err := json.Marshal(re)
+
+	err = cmdutil.WriteFile("token.json", resObj)
+	if err != nil {
+		return err
+	}
+	_,_, err = api.GetAppsInfo()
+	if err != nil {
+		return err
+	}
+
+	// err = api.SitesBasic(switchRespObj)
+	// if err != nil {
+	// 	return err
+	// }
 	fmt.Println("Site has been updated.")
 
 	return nil

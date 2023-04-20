@@ -10,6 +10,7 @@ import (
 	"github.com/loginradius/lr-cli/config"
 	"github.com/loginradius/lr-cli/prompt"
 	"github.com/loginradius/lr-cli/request"
+	"github.com/loginradius/lr-cli/api"
 
 	"github.com/spf13/cobra"
 )
@@ -48,6 +49,11 @@ func NewSottCmd() *cobra.Command {
 		Technology: <tech>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_add_sott")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
+
 			if opts.FromDate == "" || opts.ToDate == "" {
 				if opts.FromDate == "" {
 					fmt.Println("FromDate (mm/dd/yyyy) is a required argument")

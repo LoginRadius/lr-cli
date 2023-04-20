@@ -34,6 +34,10 @@ func NewsocialCmd() *cobra.Command {
 		Google Successfully Deleted
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_delete_social")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if opts.ProviderName == "" {
 				return &cmdutil.FlagError{Err: errors.New("`provider` is require argument")}
 			}

@@ -34,6 +34,10 @@ func NewloginMethodCmd() *cobra.Command {
 }
 
 func deleteloginMethod() error {
+	isPermission, errr := api.GetPermission("lr_delete_login-method")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 	err := api.CheckLoginMethod()
 	if err != nil {
 		return err

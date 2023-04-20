@@ -10,6 +10,7 @@ import (
 	"github.com/loginradius/lr-cli/cmd/verify/resend"
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/request"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/spf13/cobra"
 )
 
@@ -35,6 +36,10 @@ func NewVerifyCmd() *cobra.Command {
 			$ lr verify -e <email> 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_verify")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			if opts.Email == "" {
 				return &cmdutil.FlagError{Err: errors.New("`--email` is require argument")}
 			}

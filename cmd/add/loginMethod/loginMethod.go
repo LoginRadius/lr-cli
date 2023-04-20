@@ -34,6 +34,11 @@ func NewloginMethodCmd() *cobra.Command {
 }
 
 func addloginMethod() error {
+	isPermission, errr := api.GetPermission("lr_add_login-method")
+		if(!isPermission || errr != nil) {
+			return nil
+		}
+
 	err := api.CheckLoginMethod()
 	if err != nil {
 		return err

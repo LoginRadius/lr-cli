@@ -51,7 +51,7 @@ func setSite() error {
 		fmt.Println("You are already using this site")
 		return nil
 	}
-	switchRespObj, err := api.SetSites(appid)
+	switchRespObj, err := api.SetSites(appid, true)
 	err = api.SitesBasic(switchRespObj)
 	if err != nil {
 		return err

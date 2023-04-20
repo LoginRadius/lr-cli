@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/loginradius/lr-cli/cmdutil"
+	"github.com/loginradius/lr-cli/api"
 	"github.com/loginradius/lr-cli/request"
 	"github.com/spf13/cobra"
 )
@@ -27,6 +28,10 @@ func NewResendCmd() *cobra.Command {
 		Short: "Resends verification mail to email ID",
 		Long:  `Use this command to resend the verification email to the email id entered.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_verify_resend")
+			if !isPermission || errr != nil {
+				return nil
+			}
 			if opts1.Email == "" {
 				return &cmdutil.FlagError{Err: errors.New("`--email` is require argument")}
 			}

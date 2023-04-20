@@ -44,7 +44,10 @@ func NewschemaCmd() *cobra.Command {
 }
 
 func get() error {
-
+	isPermission, errr := api.GetPermission("lr_get_schema")
+	if(!isPermission || errr != nil) {
+		return nil
+	}
 	features, err := api.GetSiteFeatures()
 	if err != nil {
 		return err
