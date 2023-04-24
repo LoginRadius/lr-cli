@@ -22,6 +22,10 @@ func NewDemoCmd() *cobra.Command {
 		$ lr demo
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_demo")
+		if !isPermission || errr != nil {
+			return nil
+		}
 			var appCreds *api.LoginResponse
 			creds, err := cmdutil.ReadFile("token.json")
 			if err != nil {

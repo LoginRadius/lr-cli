@@ -109,7 +109,7 @@ func add() error {
 	if err != nil {
 		return err
 	}
-	switchRespObj, err := api.SetSites(App.AppId)
+	switchRespObj, err := api.SetSites(App.AppId, true)
 	if err != nil {
 		return err
 	}

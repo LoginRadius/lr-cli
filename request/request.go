@@ -151,15 +151,34 @@ func getLRCreds() (string, error) {
 		Key    string `json:"Key"`
 		Secret string `json:"Secret"`
 	}
+	type SharedSiteLRCreds struct {
+		AppKey    string `json:"ApiKey"`
+		AppSecret string `json:"ApiSecret"`
+	}
 
 	var creds LRCreds
+	var key string
+	var secret string
 	data, err := cmdutil.ReadFile("currentSite.json")
 	if err != nil {
 		return "", err
 	}
 	err = json.Unmarshal(data, &creds)
+	key = creds.Key
+	secret = creds.Secret
+	var sharedSiteCreds SharedSiteLRCreds
+	if key == "" && secret == "" {
+		sharedSiteData, err := cmdutil.ReadFile("currentSite.json")
+		if err != nil {
+			return "", err
+	
+		}
+		err = json.Unmarshal(sharedSiteData, &sharedSiteCreds)
+		key = sharedSiteCreds.AppKey
+		secret = sharedSiteCreds.AppSecret
+	}
 	if err != nil {
 		return "", err
 	}
-	return "apikey=" + creds.Key + "&apisecret=" + creds.Secret, nil
+	return "apikey=" + key + "&apisecret=" + secret, nil
 }

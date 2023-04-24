@@ -10,6 +10,7 @@ import (
 
 	"github.com/loginradius/lr-cli/cmdutil"
 	"github.com/loginradius/lr-cli/request"
+	"github.com/loginradius/lr-cli/api"
 
 	"github.com/spf13/cobra"
 )
@@ -44,6 +45,10 @@ func NewaccountCmd() *cobra.Command {
 		ID: <id>
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			isPermission, errr := api.GetPermission("lr_get_account")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 			if inpEmail == "" {
 				return &cmdutil.FlagError{Err: errors.New("`email` is required argument")}
 			}

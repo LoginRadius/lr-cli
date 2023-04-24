@@ -33,6 +33,10 @@ func NewSottCmd() *cobra.Command {
 }
 
 func getSott() error {
+	isPermission, errr := api.GetPermission("lr_get_sott")
+			if !isPermission || errr != nil {
+				return nil
+			}
 	SottInfo, err := api.GetSott()
 	if err != nil {
 		return err

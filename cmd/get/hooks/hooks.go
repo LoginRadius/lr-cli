@@ -33,6 +33,10 @@ func NewHooksCmd() *cobra.Command {
 }
 
 func getHooks() error {
+	isPermission, errr := api.GetPermission("lr_get_hooks")
+			if(!isPermission || errr != nil) {
+				return nil
+			}
 	Hooks, err := api.Hooks(http.MethodGet, "")
 	if err != nil {
 		return err

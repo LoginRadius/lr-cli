@@ -20,6 +20,11 @@ type EmailResponse struct {
 	RegistrationType string `json:"RegistrationType"`
 }
 
+type IPResponse struct {
+	AllowedIPs []string `json:"AllowedIPs"`
+	DeniedIPs  []string `json:"DeniedIPs"`
+}
+
 type RegistrationRestrictionTypeSchema struct {
 	SelectedRestrictionType string `json:"selectedRestrictionType"`
 }
@@ -108,5 +113,41 @@ func AddEmailWhitelistBlacklist(restrictionType RegistrationRestrictionTypeSchem
 			return err
 		}
 	}
+	return nil
+}
+
+func GetIPAccessRestrictionList() (*IPResponse, error) {
+	url := conf.AdminConsoleAPIDomain + "/security-configuration/ip-config?"
+	resp, err := request.Rest(http.MethodGet, url, nil, "")
+	if err != nil {
+		return nil, err
+	}
+	var resObj IPResponse
+	err = json.Unmarshal(resp, &resObj)
+	if err != nil {
+		return nil, err
+	}
+	return &resObj, nil
+
+}
+
+
+func AddIPAccessRestrictionList(disabled bool, data IPResponse) error {
+
+	if disabled  {
+		domainUrl := conf.AdminConsoleAPIDomain + "/security-configuration/ip-config/reset?"
+		_, err := request.Rest(http.MethodPut, domainUrl, nil, "")
+		if err != nil {
+			return err
+		}
+	} else {
+	typeUrl := conf.AdminConsoleAPIDomain + "/security-configuration/ip-config?"
+	body, _ := json.Marshal(data)
+	_, err := request.Rest(http.MethodPut, typeUrl, nil, string(body))
+	if err != nil {
+		return err
+	}
+	} 
+	 
 	return nil
 }

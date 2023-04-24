@@ -1,6 +1,7 @@
 package site
 
 import (
+	"strings"
 	"errors"
 	"fmt"
 	"os"
@@ -29,12 +30,12 @@ func NewSiteCmd() *cobra.Command {
 		Example: heredoc.Doc(`
 			$ lr get site --all
 			All sites: 
-			+--------+-----------------+-------------------------+
-			|   ID   |      NAME       |         DOMAIN          |
-			+--------+-----------------+-------------------------+
-			| 111111 | new-test1       | https://mail7.io        |
-			| 122222 | my-app-final    | loginradius.com         | 
-			| 142670 | trail-pro       | https://loginradius.com | 
+			+--------+-----------------+-------------------------+-----------+
+			|   ID   |      NAME       |         DOMAIN          |	  ROLE   | 
+			+--------+-----------------+-------------------------+-----------+
+			| 111111 | new-test1       | https://mail7.io        |	Owner	 |
+			| 122222 | my-app-final    | loginradius.com         |  Admin    |
+			| 142670 | trail-pro       | https://loginradius.com |  Marketing|
 
 			$ lr get site --active
 			Current site: 
@@ -45,6 +46,7 @@ func NewSiteCmd() *cobra.Command {
 
 		`),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			
 			return getSite()
 		},
 	}
@@ -56,6 +58,7 @@ func NewSiteCmd() *cobra.Command {
 }
 
 func getSite() error {
+	
 	AppInfo,SharedAppInfo, err := api.GetAppsInfo()
 	if err != nil {
 		return err
@@ -67,13 +70,15 @@ func getSite() error {
 			return err
 		}
 		fmt.Println("Active site: ")
-		if len(SharedAppInfo) != 0 {
-			val, _ := SharedAppInfo[currentID] 
-			Output(val.Appname, val.Appid,val.Domain)
-		} else {	
+		val, _ := SharedAppInfo[currentID] 
+			if val.Appid != 0 {
+				Output(val.Appname, val.Appid,val.Domain, strings.Join(val.Role, ", "))
+			} 	
 			vals, _ := AppInfo[currentID] 
-			Output(vals.Appname, vals.Appid,vals.Domain)
-		}
+			if vals.Appid != 0 {
+				Output(vals.Appname, vals.Appid,vals.Domain, vals.Role)
+			}
+		
 	} else if *all && (!*active && *appid == -1) {
 		var data [][]string
 		var sharedAppdata [][]string
@@ -81,20 +86,20 @@ func getSite() error {
 		if len(AppInfo) != 0 {
 			fmt.Println("Your sites: ")
 			for _, site := range AppInfo {
-				data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain})
+				data = append(data, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, site.Role})
 			}
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"ID", "Name", "Domain"})
+			table.SetHeader([]string{"ID", "Name", "Domain", "Role"})
 			table.AppendBulk(data)
 			table.Render()
 		} 
 		if len(SharedAppInfo) != 0 {
 			fmt.Println("Shared sites: ")
 			for _, site := range SharedAppInfo {
-				sharedAppdata = append(sharedAppdata, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain})
+				sharedAppdata = append(sharedAppdata, []string{strconv.FormatInt(site.Appid, 10), site.Appname, site.Domain, strings.Join(site.Role, ",")})
 			}
 			table := tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"ID", "Name", "Domain"})
+			table.SetHeader([]string{"ID", "Name", "Domain", "Role"})
 			table.AppendBulk(sharedAppdata)
 			table.Render()
 		}
@@ -106,9 +111,9 @@ func getSite() error {
 			return errors.New("There is no site with this App ID")
 		}
 		if ok {
-			Output(site.Appname, site.Appid,site.Domain)
+			Output(site.Appname, site.Appid,site.Domain, site.Role)
 		} else {
-			Output(sharedsite.Appname, sharedsite.Appid,sharedsite.Domain)
+			Output(sharedsite.Appname, sharedsite.Appid,sharedsite.Domain, strings.Join(sharedsite.Role, ", "))
 			
 		}
 
@@ -123,9 +128,10 @@ func getSite() error {
 	return nil
 }
 
-func Output(AppName string, Appid int64, Domain string) {
+func Output(AppName string, Appid int64, Domain string, Role string ) {
 	fmt.Println("------------------------------")
 	fmt.Println("App Name: ", AppName)
 	fmt.Println("App ID: ", Appid)
 	fmt.Println("Domain: ", Domain)
+	fmt.Println("Role: ", Role)
 }

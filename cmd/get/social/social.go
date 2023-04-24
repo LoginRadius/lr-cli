@@ -37,7 +37,10 @@ $ lr get social
 }
 
 func get() error {
-
+	isPermission, errr := api.GetPermission("lr_get_social")
+	if !isPermission || errr != nil {
+		return nil
+	}
 	activeProv, err := api.GetProvidersDetail()
 	if err != nil {
 		return err
